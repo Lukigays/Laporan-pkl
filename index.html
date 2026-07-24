@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Laporan PKL</title>
+    <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         table, th, td {
@@ -18,11 +18,44 @@
         }
         th { font-weight: bold; }
         
+        /* Pengaturan Watermark */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 4rem;
+            color: rgba(0, 0, 0, 0.08); /* Warna transparan */
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+        }
+        
+        /* Konten agar selalu di atas watermark */
+        .konten-tabel {
+            position: relative;
+            z-index: 10;
+        }
+
         /* Menyembunyikan elemen tertentu saat dicetak ke PDF */
         @media print {
             .no-print { display: none !important; }
             body { background-color: white; padding: 0; }
             .cetak-area { box-shadow: none; padding: 0; }
+            /* Memastikan warna watermark ikut tercetak di PDF */
+            .watermark {
+                color: rgba(0, 0, 0, 0.1) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .watermark {
+                font-size: 6rem;
+            }
         }
     </style>
 </head>
@@ -30,8 +63,7 @@
 
     <div class="max-w-4xl mx-auto">
         
-        <!-- Panel Input (Akan hilang saat di-print) -->
-        <div class="mb-8 p-6 bg-white rounded-lg shadow-md no-print">
+        <div class="mb-8 p-6 bg-white rounded-lg shadow-md no-print relative z-20">
             <h2 class="text-xl font-bold mb-4">Input Kegiatan PKL Baru</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -49,7 +81,7 @@
             </div>
             
             <div class="mt-4 flex flex-wrap gap-2">
-                <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">
+                <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700" id="btnTambah">
                     + Tambah ke Laporan
                 </button>
                 <button onclick="window.print()" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
@@ -61,42 +93,46 @@
             </div>
         </div>
 
-        <!-- Area Dokumen (Tampil seperti screenshot) -->
-        <div class="cetak-area bg-white p-8 shadow-lg min-h-screen">
-            <div class="mb-6 font-serif text-lg">
-                <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
-                <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="font-bold">...</span></p>
-            </div>
+        <div class="cetak-area bg-white p-8 shadow-lg min-h-screen relative">
+            
+            <!-- Elemen Watermark LUKYY -->
+            <div class="watermark">LAPORAN PKL BY LUKYY</div>
 
-            <table class="w-full text-sm md:text-base">
-                <thead>
-                    <tr>
-                        <th class="w-10 text-center">No</th>
-                        <th class="w-24">Hari</th>
-                        <th class="w-32">Tanggal</th>
-                        <th>Uraian kegiatan pkl</th>
-                        <th class="w-48 text-center">Foto kegiatan</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelBody">
-                    <!-- Data akan masuk ke sini secara realtime -->
-                </tbody>
-            </table>
+            <!-- Wrapper Konten Tabel -->
+            <div class="konten-tabel">
+                <div class="mb-6 font-serif text-lg">
+                    <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
+                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="font-bold">...</span></p>
+                </div>
+
+                <table class="w-full text-sm md:text-base bg-white/50">
+                    <thead>
+                        <tr>
+                            <th class="w-10 text-center">No</th>
+                            <th class="w-24">Hari</th>
+                            <th class="w-32">Tanggal</th>
+                            <th>Uraian kegiatan pkl</th>
+                            <th class="w-48 text-center">Foto kegiatan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelBody">
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
 
     <script>
         let noUrut = 1;
-        // Mengambil data lama dari localStorage (jika ada)
         let dataLaporan = JSON.parse(localStorage.getItem('laporanPKL')) || [];
 
-        // Fungsi ini berjalan otomatis saat website pertama kali dibuka
         window.onload = function() {
             renderSemuaData();
         };
 
         function tambahBaris() {
+            const btn = document.getElementById('btnTambah');
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
             const fotoInput = document.getElementById('inputFoto');
@@ -105,6 +141,9 @@
                 alert('Harap isi Tanggal dan Uraian Kegiatan terlebih dahulu!');
                 return;
             }
+
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
 
             const dateObj = new Date(tanggalInput);
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -119,17 +158,40 @@
             if(fotoInput.files && fotoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const fotoBase64 = e.target.result;
-                    simpanKeArray(hari, tanggalFormat, uraian, fotoBase64, labelBulan);
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height = Math.round((height * MAX_WIDTH) / width);
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const fotoKompres = canvas.toDataURL('image/jpeg', 0.6);
+                        simpanKeArray(hari, tanggalFormat, uraian, fotoKompres, labelBulan);
+                        
+                        btn.innerText = "+ Tambah ke Laporan";
+                        btn.disabled = false;
+                    }
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
                 simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan);
+                btn.innerText = "+ Tambah ke Laporan";
+                btn.disabled = false;
             }
         }
 
         function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan) {
-            // Memasukkan data baru ke dalam array
             dataLaporan.push({
                 hari: hari,
                 tanggal: tanggal,
@@ -138,41 +200,39 @@
                 bulanLabel: labelBulan
             });
             
-            // Menyimpan array ke localStorage
-            localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
-            
-            // Render ulang tabel
-            renderSemuaData();
-            
-            // Kosongkan form input setelah data ditambahkan
-            document.getElementById('inputUraian').value = '';
-            document.getElementById('inputFoto').value = '';
+            try {
+                localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
+                renderSemuaData();
+                document.getElementById('inputUraian').value = '';
+                document.getElementById('inputFoto').value = '';
+            } catch (e) {
+                alert("Gagal menyimpan! Memori browser penuh. Hapus data sebelumnya atau gunakan foto yang lebih kecil.");
+                dataLaporan.pop();
+            }
         }
 
         function renderSemuaData() {
             const tbody = document.getElementById('tabelBody');
-            tbody.innerHTML = ''; // Kosongkan tabel sebelum render ulang
+            tbody.innerHTML = ''; 
             noUrut = 1;
 
             if(dataLaporan.length > 0) {
-                // Update label bulan di kop dokumen mengikuti entri terakhir
                 document.getElementById('labelBulan').innerText = dataLaporan[dataLaporan.length - 1].bulanLabel;
             } else {
                 document.getElementById('labelBulan').innerText = '...';
             }
 
-            // Loop untuk mencetak semua data dari localStorage
             dataLaporan.forEach(item => {
                 const tr = document.createElement('tr');
                 const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
                 const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">` : '';
 
                 tr.innerHTML = `
-                    <td class="text-center">${noUrut}</td>
-                    <td>${item.hari}</td>
-                    <td>${item.tanggal}</td>
-                    <td>${uraianFormatted}</td>
-                    <td class="text-center align-middle">${fotoHtml}</td>
+                    <td class="text-center bg-white/60">${noUrut}</td>
+                    <td class="bg-white/60">${item.hari}</td>
+                    <td class="bg-white/60">${item.tanggal}</td>
+                    <td class="bg-white/60">${uraianFormatted}</td>
+                    <td class="text-center align-middle bg-white/60">${fotoHtml}</td>
                 `;
                 tbody.appendChild(tr);
                 noUrut++;
