@@ -34,13 +34,13 @@
             user-select: none;
         }
         
-        .konten-tabel {
-            position: relative;
-            z-index: 10;
-        }
+        .konten-tabel { position: relative; z-index: 10; }
         
         @media (min-width: 768px) {
             .watermark { font-size: 6rem; }
+        }
+        @media print {
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -48,8 +48,8 @@
 
     <div class="max-w-4xl mx-auto">
         
-        <div class="mb-8 p-6 bg-white rounded-lg shadow-md relative z-20">
-            <h2 class="text-xl font-bold mb-4">Input Kegiatan PKL Baru</h2>
+        <div class="mb-6 p-6 bg-white rounded-lg shadow-md relative z-20 no-print">
+            <h2 class="text-xl font-bold mb-4" id="judulForm">Input Kegiatan PKL Baru</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-1">Tanggal</label>
@@ -60,8 +60,9 @@
                     <textarea id="inputUraian" class="w-full border border-gray-300 rounded p-2" rows="3" placeholder="Contoh: Membersihkan transmisi..."></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Foto Kegiatan</label>
-                    <input type="file" id="inputFoto" accept="image/*" class="w-full border border-gray-300 rounded p-2">
+                    <label class="block text-sm font-medium mb-1" id="labelFoto">Foto Kegiatan</label>
+                    <input type="file" id="inputFoto" accept="image/*" class="w-full border border-gray-300 rounded p-2 text-sm">
+                    <p class="text-xs text-gray-500 mt-1" id="infoFotoEdit" style="display:none;">*Kosongkan jika tidak ingin mengubah foto</p>
                 </div>
             </div>
             
@@ -69,19 +70,41 @@
                 <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700" id="btnTambah">
                     + Tambah ke Laporan
                 </button>
-                
+                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
+                    ❌ Batal Edit
+                </button>
                 <button onclick="downloadPDF()" id="btnDownload" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
                     ⬇️ Download PDF
                 </button>
+            </div>
+
+            <hr class="my-5 border-gray-200">
+
+            <!-- FITUR BARU: Filter & Data Management -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="font-bold text-sm whitespace-nowrap">Filter Bulan:</label>
+                    <select id="filterBulan" onchange="renderSemuaData()" class="border border-gray-300 rounded p-1.5 text-sm bg-gray-50 w-full md:w-auto">
+                        <option value="SEMUA">Semua Bulan</option>
+                    </select>
+                </div>
                 
-                <button onclick="hapusSemuaData()" class="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 ml-auto">
-                    🗑️ Hapus Semua Data
-                </button>
+                <div class="flex flex-wrap gap-2 w-full md:w-auto md:justify-end">
+                    <button onclick="backupData()" class="bg-indigo-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-indigo-700">
+                        💾 Backup Data
+                    </button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-yellow-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-yellow-700">
+                        📂 Restore Data
+                    </button>
+                    <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
+                    <button onclick="hapusSemuaData()" class="bg-red-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-red-700">
+                        🗑️ Hapus Semua
+                    </button>
+                </div>
             </div>
         </div>
 
         <div class="bg-white shadow-lg min-h-screen relative" id="areaCetak">
-            
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
             <div class="konten-tabel p-8 bg-white/50">
@@ -98,6 +121,8 @@
                             <th class="w-32">Tanggal</th>
                             <th>Uraian kegiatan pkl</th>
                             <th class="w-48 text-center">Foto kegiatan</th>
+                            <!-- FITUR BARU: Kolom Aksi (Otomatis hilang saat PDF/Print) -->
+                            <th class="w-20 text-center no-print">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tabelBody">
@@ -110,6 +135,7 @@
 
     <script>
         let dataLaporan = JSON.parse(localStorage.getItem('laporanPKL')) || [];
+        let indexEditMode = -1; // Penanda jika sedang mengedit baris tertentu
 
         window.onload = function() {
             renderSemuaData();
@@ -161,99 +187,216 @@
                         ctx.drawImage(img, 0, 0, width, height);
 
                         const fotoKompres = canvas.toDataURL('image/jpeg', 0.6);
-                        
-                        // Kirim data beserta format YYYY-MM-DD (tanggalInput) agar mudah disortir
-                        simpanKeArray(hari, tanggalFormat, uraian, fotoKompres, labelBulan, tanggalInput);
-                        
-                        btn.innerText = "+ Tambah ke Laporan";
+                        simpanKeArray(hari, tanggalFormat, uraian, fotoKompres, labelBulan);
                         btn.disabled = false;
                     }
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan, tanggalInput);
-                btn.innerText = "+ Tambah ke Laporan";
+                // Jika sedang edit tapi foto tidak diganti, pakai foto lama
+                let fotoFinal = '';
+                if (indexEditMode > -1) {
+                    fotoFinal = dataLaporan[indexEditMode].foto;
+                }
+                simpanKeArray(hari, tanggalFormat, uraian, fotoFinal, labelBulan);
                 btn.disabled = false;
             }
         }
 
-        function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan, rawDate) {
-            // Masukkan data baru
+        function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan) {
             const dataBaru = {
                 hari: hari,
                 tanggal: tanggal,
                 uraian: uraian,
                 foto: fotoBase64,
-                bulanLabel: labelBulan,
-                rawDate: rawDate // YYYY-MM-DD
+                bulanLabel: labelBulan
             };
             
-            dataLaporan.push(dataBaru);
-            
-            // FUNGSI BARU: Urutkan data berdasarkan tanggal dari terkecil ke terbesar (Masa lalu ke masa depan)
-            dataLaporan.sort((a, b) => {
-                // Konversi tanggal ke angka (waktu) untuk dibandingkan
-                let dateA = new Date(a.rawDate).getTime();
-                let dateB = new Date(b.rawDate).getTime();
-                return dateA - dateB;
-            });
+            if (indexEditMode > -1) {
+                // Proses Edit (Timpa data lama)
+                dataLaporan[indexEditMode] = dataBaru;
+                batalEdit(); // Reset form setelah edit
+            } else {
+                // Proses Tambah Baru
+                dataLaporan.push(dataBaru);
+            }
             
             try {
+                // Lakukan Auto-Sort
+                dataLaporan.sort((a, b) => {
+                    let partA = a.tanggal.split('/'); 
+                    let partB = b.tanggal.split('/'); 
+                    let numA = parseInt(partA[2] + partA[1] + partA[0]); 
+                    let numB = parseInt(partB[2] + partB[1] + partB[0]); 
+                    return numA - numB; 
+                });
+                
                 localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
                 renderSemuaData();
                 document.getElementById('inputUraian').value = '';
                 document.getElementById('inputFoto').value = '';
+                document.getElementById('btnTambah').innerText = "+ Tambah ke Laporan";
             } catch (e) {
-                alert("Gagal menyimpan! Memori browser penuh. Hapus data sebelumnya atau gunakan foto yang lebih kecil.");
-                // Jika memori penuh, hapus data yang baru saja dimasukkan agar tidak error
-                const index = dataLaporan.indexOf(dataBaru);
-                if (index > -1) dataLaporan.splice(index, 1); 
+                alert("Gagal menyimpan! Memori browser penuh.");
+                if(indexEditMode === -1) dataLaporan.pop(); 
             }
         }
 
         function renderSemuaData() {
+            // Update daftar bulan di Dropdown Filter
+            const selectFilter = document.getElementById('filterBulan');
+            const currentFilter = selectFilter.value;
+            selectFilter.innerHTML = '<option value="SEMUA">Semua Bulan</option>';
+            
+            const daftarBulanUnik = [...new Set(dataLaporan.map(item => item.bulanLabel))];
+            daftarBulanUnik.forEach(bulan => {
+                const opt = document.createElement('option');
+                opt.value = bulan;
+                opt.innerText = bulan;
+                selectFilter.appendChild(opt);
+            });
+
+            if (daftarBulanUnik.includes(currentFilter)) {
+                selectFilter.value = currentFilter;
+            } else {
+                selectFilter.value = 'SEMUA';
+            }
+
+            const filterAktif = selectFilter.value;
             const tbody = document.getElementById('tabelBody');
             tbody.innerHTML = ''; 
             
-            // Nomor urut akan direstart dari 1 setiap kali render ulang
             let noUrut = 1;
 
-            if(dataLaporan.length > 0) {
-                // Gunakan label bulan dari data yang posisinya paling terakhir (tanggal terbaru)
-                document.getElementById('labelBulan').innerText = dataLaporan[dataLaporan.length - 1].bulanLabel;
-            } else {
-                document.getElementById('labelBulan').innerText = '...';
-            }
+            dataLaporan.forEach((item, index) => {
+                // Tampilkan hanya jika filter sesuai
+                if (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif) {
+                    const tr = document.createElement('tr');
+                    const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">` : '';
 
-            dataLaporan.forEach(item => {
-                const tr = document.createElement('tr');
-                const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">` : '';
-
-                tr.innerHTML = `
-                    <td class="text-center">${noUrut}</td>
-                    <td>${item.hari}</td>
-                    <td>${item.tanggal}</td>
-                    <td>${uraianFormatted}</td>
-                    <td class="text-center align-middle">${fotoHtml}</td>
-                `;
-                tbody.appendChild(tr);
-                noUrut++; // Nomor urut bertambah otomatis
+                    tr.innerHTML = `
+                        <td class="text-center">${noUrut}</td>
+                        <td>${item.hari}</td>
+                        <td>${item.tanggal}</td>
+                        <td>${uraianFormatted}</td>
+                        <td class="text-center align-middle">${fotoHtml}</td>
+                        <td class="text-center align-middle no-print">
+                            <button onclick="editBaris(${index})" class="bg-blue-500 text-white px-2 py-1 rounded text-xs mb-1 w-full hover:bg-blue-600">✏️ Edit</button>
+                            <button onclick="hapusBaris(${index})" class="bg-red-500 text-white px-2 py-1 rounded text-xs w-full hover:bg-red-600">🗑️ Hapus</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    noUrut++; 
+                }
             });
+
+            // Update Teks Label Bulan di Dokumen
+            if (filterAktif === 'SEMUA') {
+                document.getElementById('labelBulan').innerText = dataLaporan.length > 0 ? "Semua Bulan (Campuran)" : "...";
+            } else {
+                document.getElementById('labelBulan').innerText = filterAktif;
+            }
+        }
+
+        // FITUR BARU: Edit Baris
+        function editBaris(index) {
+            indexEditMode = index;
+            const item = dataLaporan[index];
+            
+            // Convert DD/MM/YYYY kembali ke format YYYY-MM-DD untuk input HTML
+            const parts = item.tanggal.split('/'); 
+            document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            document.getElementById('inputUraian').value = item.uraian;
+            
+            document.getElementById('judulForm').innerText = "Edit Kegiatan PKL";
+            document.getElementById('btnTambah').innerText = "💾 Simpan Perubahan";
+            document.getElementById('btnTambah').classList.replace('bg-blue-600', 'bg-indigo-600');
+            document.getElementById('btnBatalEdit').classList.remove('hidden');
+            document.getElementById('infoFotoEdit').style.display = "block";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll ke atas
+        }
+
+        function batalEdit() {
+            indexEditMode = -1;
+            document.getElementById('judulForm').innerText = "Input Kegiatan PKL Baru";
+            document.getElementById('btnTambah').innerText = "+ Tambah ke Laporan";
+            document.getElementById('btnTambah').classList.replace('bg-indigo-600', 'bg-blue-600');
+            document.getElementById('btnBatalEdit').classList.add('hidden');
+            document.getElementById('infoFotoEdit').style.display = "none";
+            
+            document.getElementById('inputTanggal').value = '';
+            document.getElementById('inputUraian').value = '';
+            document.getElementById('inputFoto').value = '';
+        }
+
+        // FITUR BARU: Hapus Baris Tertentu
+        function hapusBaris(index) {
+            if(confirm("Yakin ingin menghapus kegiatan ini?")) {
+                dataLaporan.splice(index, 1); // Buang data dari array
+                localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
+                renderSemuaData();
+                if(indexEditMode === index) batalEdit();
+            }
+        }
+
+        // FITUR BARU: Backup Data
+        function backupData() {
+            if(dataLaporan.length === 0) {
+                alert("Tabel masih kosong, tidak ada data yang bisa dibackup.");
+                return;
+            }
+            const dataStr = JSON.stringify(dataLaporan, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Backup_Data_PKL.json";
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // FITUR BARU: Restore Data
+        function restoreData(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if(Array.isArray(parsedData)) {
+                        dataLaporan = parsedData;
+                        localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
+                        renderSemuaData();
+                        alert("✅ Data berhasil dipulihkan dari Backup!");
+                    } else {
+                        alert("❌ Format file tidak valid.");
+                    }
+                } catch (err) {
+                    alert("❌ Gagal membaca file backup.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input agar bisa import file yang sama jika diperlukan
+        }
+
+        function hapusSemuaData() {
+            const konfirmasi = confirm("⚠️ BAHAYA: Yakin ingin menghapus semua data? Pastikan kamu sudah melakukan BACKUP terlebih dahulu.");
+            if(konfirmasi) {
+                localStorage.removeItem('laporanPKL');
+                dataLaporan = [];
+                batalEdit();
+                renderSemuaData();
+            }
         }
 
         function updateLabelBulan(indexBulan, tahun) {
             const namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return `${namaBulan[indexBulan]} ${tahun}`;
-        }
-
-        function hapusSemuaData() {
-            const konfirmasi = confirm("Yakin ingin menghapus semua data laporan? Data yang dihapus tidak bisa dikembalikan.");
-            if(konfirmasi) {
-                localStorage.removeItem('laporanPKL');
-                dataLaporan = [];
-                renderSemuaData();
-            }
         }
 
         function downloadPDF() {
@@ -263,12 +406,14 @@
             
             btn.innerText = "⏳ Sedang Mengunduh...";
             btn.disabled = true;
-
             watermark.style.display = 'none';
+
+            const filterAktif = document.getElementById('filterBulan').value;
+            const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_Semua_Bulan.pdf' : `Laporan_PKL_${filterAktif.replace(' ', '_')}.pdf`;
 
             const opsiPDF = {
                 margin:       10,
-                filename:     'Laporan_Kegiatan_PKL.pdf',
+                filename:     namaFile,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
