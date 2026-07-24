@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tambahan library untuk langsung download PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -21,14 +20,13 @@
         }
         th { font-weight: bold; }
         
-        /* Pengaturan Watermark untuk Tampilan Layar Saja */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 4rem;
-            color: rgba(0, 0, 0, 0.08); /* Transparan */
+            color: rgba(0, 0, 0, 0.08);
             font-weight: bold;
             white-space: nowrap;
             pointer-events: none;
@@ -50,7 +48,6 @@
 
     <div class="max-w-4xl mx-auto">
         
-        <!-- Panel Input -->
         <div class="mb-8 p-6 bg-white rounded-lg shadow-md relative z-20">
             <h2 class="text-xl font-bold mb-4">Input Kegiatan PKL Baru</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -73,7 +70,6 @@
                     + Tambah ke Laporan
                 </button>
                 
-                <!-- Tombol Print diubah menjadi Download PDF -->
                 <button onclick="downloadPDF()" id="btnDownload" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
                     ⬇️ Download PDF
                 </button>
@@ -84,13 +80,10 @@
             </div>
         </div>
 
-        <!-- Area Dokumen yang akan dijadikan PDF -->
         <div class="bg-white shadow-lg min-h-screen relative" id="areaCetak">
             
-            <!-- Elemen Watermark LUKYY -->
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
-            <!-- Wrapper Konten Tabel -->
             <div class="konten-tabel p-8 bg-white/50">
                 <div class="mb-6 font-serif text-lg">
                     <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
@@ -116,7 +109,6 @@
     </div>
 
     <script>
-        let noUrut = 1;
         let dataLaporan = JSON.parse(localStorage.getItem('laporanPKL')) || [];
 
         window.onload = function() {
@@ -169,7 +161,9 @@
                         ctx.drawImage(img, 0, 0, width, height);
 
                         const fotoKompres = canvas.toDataURL('image/jpeg', 0.6);
-                        simpanKeArray(hari, tanggalFormat, uraian, fotoKompres, labelBulan);
+                        
+                        // Kirim data beserta format YYYY-MM-DD (tanggalInput) agar mudah disortir
+                        simpanKeArray(hari, tanggalFormat, uraian, fotoKompres, labelBulan, tanggalInput);
                         
                         btn.innerText = "+ Tambah ke Laporan";
                         btn.disabled = false;
@@ -177,19 +171,31 @@
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan);
+                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan, tanggalInput);
                 btn.innerText = "+ Tambah ke Laporan";
                 btn.disabled = false;
             }
         }
 
-        function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan) {
-            dataLaporan.push({
+        function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan, rawDate) {
+            // Masukkan data baru
+            const dataBaru = {
                 hari: hari,
                 tanggal: tanggal,
                 uraian: uraian,
                 foto: fotoBase64,
-                bulanLabel: labelBulan
+                bulanLabel: labelBulan,
+                rawDate: rawDate // YYYY-MM-DD
+            };
+            
+            dataLaporan.push(dataBaru);
+            
+            // FUNGSI BARU: Urutkan data berdasarkan tanggal dari terkecil ke terbesar (Masa lalu ke masa depan)
+            dataLaporan.sort((a, b) => {
+                // Konversi tanggal ke angka (waktu) untuk dibandingkan
+                let dateA = new Date(a.rawDate).getTime();
+                let dateB = new Date(b.rawDate).getTime();
+                return dateA - dateB;
             });
             
             try {
@@ -199,16 +205,21 @@
                 document.getElementById('inputFoto').value = '';
             } catch (e) {
                 alert("Gagal menyimpan! Memori browser penuh. Hapus data sebelumnya atau gunakan foto yang lebih kecil.");
-                dataLaporan.pop();
+                // Jika memori penuh, hapus data yang baru saja dimasukkan agar tidak error
+                const index = dataLaporan.indexOf(dataBaru);
+                if (index > -1) dataLaporan.splice(index, 1); 
             }
         }
 
         function renderSemuaData() {
             const tbody = document.getElementById('tabelBody');
             tbody.innerHTML = ''; 
-            noUrut = 1;
+            
+            // Nomor urut akan direstart dari 1 setiap kali render ulang
+            let noUrut = 1;
 
             if(dataLaporan.length > 0) {
+                // Gunakan label bulan dari data yang posisinya paling terakhir (tanggal terbaru)
                 document.getElementById('labelBulan').innerText = dataLaporan[dataLaporan.length - 1].bulanLabel;
             } else {
                 document.getElementById('labelBulan').innerText = '...';
@@ -227,7 +238,7 @@
                     <td class="text-center align-middle">${fotoHtml}</td>
                 `;
                 tbody.appendChild(tr);
-                noUrut++;
+                noUrut++; // Nomor urut bertambah otomatis
             });
         }
 
@@ -245,31 +256,25 @@
             }
         }
 
-        // Fungsi Baru: Langsung Download PDF tanpa Print Dialog
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const elemenCetak = document.getElementById('areaCetak');
             const watermark = document.getElementById('teksWatermark');
             
-            // 1. Ubah teks tombol jadi loading
             btn.innerText = "⏳ Sedang Mengunduh...";
             btn.disabled = true;
 
-            // 2. Sembunyikan Watermark sementara
             watermark.style.display = 'none';
 
-            // 3. Konfigurasi file PDF
             const opsiPDF = {
-                margin:       10, // margin tepi (dalam mm)
+                margin:       10,
                 filename:     'Laporan_Kegiatan_PKL.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Agar hasil gambar tidak pecah
+                html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 4. Proses pembuatan file PDF
             html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
-                // 5. Kembalikan seperti semula setelah selesai download
                 watermark.style.display = 'block';
                 btn.innerText = "⬇️ Download PDF";
                 btn.disabled = false;
