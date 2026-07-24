@@ -7,7 +7,55 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
+    <!-- Menggunakan font modern (Inter) untuk UI ala Apple -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* Pengaturan Font General untuk UI */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f2f2f7; /* Warna background abu-abu khas iOS */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Glassmorphism Effect / Liquid UI */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Input Styling */
+        input[type="date"], input[type="file"], textarea, select {
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Button Click Animation */
+        button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Area Dokumen Kertas Tetap Formal */
+        .area-kertas {
+            font-family: "Times New Roman", Times, serif;
+            background-color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
         table, th, td {
             border: 1px solid black;
             border-collapse: collapse;
@@ -16,9 +64,7 @@
             padding: 8px;
             text-align: left;
             vertical-align: top;
-            font-family: "Times New Roman", Times, serif;
         }
-        th { font-weight: bold; }
         
         .watermark {
             position: absolute;
@@ -32,6 +78,7 @@
             pointer-events: none;
             z-index: 1;
             user-select: none;
+            font-family: 'Inter', sans-serif;
         }
         
         .konten-tabel { position: relative; z-index: 10; }
@@ -39,78 +86,94 @@
         @media (min-width: 768px) {
             .watermark { font-size: 6rem; }
         }
+
+        /* Mode Print - Membersihkan semua UI */
         @media print {
             .no-print { display: none !important; }
+            body { background: white !important; }
+            .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8 bg-gray-100">
+<body class="p-4 md:p-8 text-gray-800 antialiased">
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto space-y-6">
         
-        <div class="mb-6 p-6 bg-white rounded-lg shadow-md relative z-20 no-print">
-            <h2 class="text-xl font-bold mb-4" id="judulForm">Input Kegiatan PKL Baru</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Header Aplikasi -->
+        <div class="text-center mb-2 no-print mt-4">
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 drop-shadow-sm">Laporan PKL Generator</h1>
+            <p class="text-gray-500 mt-1 text-sm font-medium">Create, manage, and export your reports easily.</p>
+        </div>
+
+        <!-- Panel Input (Glassmorphism UI) -->
+        <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print">
+            <h2 class="text-lg font-bold mb-5 flex items-center gap-2 text-blue-600" id="judulForm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                Input Kegiatan Baru
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                    <label class="block text-sm font-medium mb-1">Tanggal</label>
-                    <input type="date" id="inputTanggal" class="w-full border border-gray-300 rounded p-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
+                    <input type="date" id="inputTanggal" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Uraian Kegiatan</label>
-                    <textarea id="inputUraian" class="w-full border border-gray-300 rounded p-2" rows="3" placeholder="Contoh: Membersihkan transmisi..."></textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
+                    <textarea id="inputUraian" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm" rows="3" placeholder="Contoh: Membersihkan transmisi..."></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1" id="labelFoto">Foto Kegiatan</label>
-                    <input type="file" id="inputFoto" accept="image/*" class="w-full border border-gray-300 rounded p-2 text-sm">
-                    <p class="text-xs text-gray-500 mt-1" id="infoFotoEdit" style="display:none;">*Kosongkan jika tidak ingin mengubah foto</p>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" id="labelFoto">Foto Kegiatan</label>
+                    <input type="file" id="inputFoto" accept="image/*" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="text-xs text-blue-500 mt-2 font-medium" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tetap sama</p>
                 </div>
             </div>
             
-            <div class="mt-4 flex flex-wrap gap-2">
-                <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700" id="btnTambah">
-                    + Tambah ke Laporan
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button onclick="tambahBaris()" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50" id="btnTambah">
+                    ✨ Tambah Laporan
                 </button>
-                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600">
-                    ❌ Batal Edit
+                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-2xl hover:bg-gray-300">
+                    Batal Edit
                 </button>
-                <button onclick="downloadPDF()" id="btnDownload" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
-                    ⬇️ Download PDF
-                </button>
-            </div>
-
-            <hr class="my-5 border-gray-200">
-
-            <!-- FITUR BARU: Filter & Data Management -->
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <label class="font-bold text-sm whitespace-nowrap">Filter Bulan:</label>
-                    <select id="filterBulan" onchange="renderSemuaData()" class="border border-gray-300 rounded p-1.5 text-sm bg-gray-50 w-full md:w-auto">
-                        <option value="SEMUA">Semua Bulan</option>
-                    </select>
-                </div>
                 
-                <div class="flex flex-wrap gap-2 w-full md:w-auto md:justify-end">
-                    <button onclick="backupData()" class="bg-indigo-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-indigo-700">
-                        💾 Backup Data
-                    </button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-yellow-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-yellow-700">
-                        📂 Restore Data
-                    </button>
-                    <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
-                    <button onclick="hapusSemuaData()" class="bg-red-600 text-white font-bold py-1.5 px-3 text-sm rounded hover:bg-red-700">
-                        🗑️ Hapus Semua
-                    </button>
-                </div>
+                <button onclick="downloadPDF()" id="btnDownload" class="ml-auto bg-white border border-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-2xl shadow-sm hover:bg-gray-50 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    Simpan PDF
+                </button>
             </div>
         </div>
 
-        <div class="bg-white shadow-lg min-h-screen relative" id="areaCetak">
+        <!-- Panel Filter & Backup (Minimalist) -->
+        <div class="glass-panel rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 no-print relative z-10">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <span class="p-2 bg-blue-100 text-blue-600 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
+                <select id="filterBulan" onchange="renderSemuaData()" class="border-0 bg-white/70 rounded-xl p-2.5 text-sm font-semibold text-gray-700 w-full md:w-48 shadow-sm">
+                    <option value="SEMUA">Semua Bulan</option>
+                </select>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 w-full md:w-auto md:justify-end">
+                <button onclick="backupData()" class="bg-white border border-gray-200 text-gray-600 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-gray-50 shadow-sm">
+                    💾 Backup (.json)
+                </button>
+                <button onclick="document.getElementById('importFile').click()" class="bg-white border border-gray-200 text-gray-600 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-gray-50 shadow-sm">
+                    📂 Restore
+                </button>
+                <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
+                <button onclick="hapusSemuaData()" class="bg-red-50 text-red-600 border border-red-100 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-red-100">
+                    Kosongkan Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Area Kertas Dokumen (Formal) -->
+        <div class="area-kertas rounded-xl min-h-screen relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
-            <div class="konten-tabel p-8 bg-white/50">
-                <div class="mb-6 font-serif text-lg">
-                    <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
-                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="font-bold">...</span></p>
+            <div class="konten-tabel p-6 md:p-12 bg-white/50">
+                <div class="mb-8 text-lg font-bold">
+                    <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
+                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
                 <table class="w-full text-sm md:text-base">
@@ -121,7 +184,6 @@
                             <th class="w-32">Tanggal</th>
                             <th>Uraian kegiatan pkl</th>
                             <th class="w-48 text-center">Foto kegiatan</th>
-                            <!-- FITUR BARU: Kolom Aksi (Otomatis hilang saat PDF/Print) -->
                             <th class="w-20 text-center no-print">Aksi</th>
                         </tr>
                     </thead>
@@ -133,9 +195,10 @@
 
     </div>
 
+    <!-- JavaScript (Sama persis dengan sebelumnya, hanya penyesuaian UI class) -->
     <script>
         let dataLaporan = JSON.parse(localStorage.getItem('laporanPKL')) || [];
-        let indexEditMode = -1; // Penanda jika sedang mengedit baris tertentu
+        let indexEditMode = -1; 
 
         window.onload = function() {
             renderSemuaData();
@@ -152,7 +215,7 @@
                 return;
             }
 
-            btn.innerText = "Memproses...";
+            btn.innerHTML = "⏳ Memproses...";
             btn.disabled = true;
 
             const dateObj = new Date(tanggalInput);
@@ -193,7 +256,6 @@
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                // Jika sedang edit tapi foto tidak diganti, pakai foto lama
                 let fotoFinal = '';
                 if (indexEditMode > -1) {
                     fotoFinal = dataLaporan[indexEditMode].foto;
@@ -213,16 +275,13 @@
             };
             
             if (indexEditMode > -1) {
-                // Proses Edit (Timpa data lama)
                 dataLaporan[indexEditMode] = dataBaru;
-                batalEdit(); // Reset form setelah edit
+                batalEdit(); 
             } else {
-                // Proses Tambah Baru
                 dataLaporan.push(dataBaru);
             }
             
             try {
-                // Lakukan Auto-Sort
                 dataLaporan.sort((a, b) => {
                     let partA = a.tanggal.split('/'); 
                     let partB = b.tanggal.split('/'); 
@@ -235,7 +294,7 @@
                 renderSemuaData();
                 document.getElementById('inputUraian').value = '';
                 document.getElementById('inputFoto').value = '';
-                document.getElementById('btnTambah').innerText = "+ Tambah ke Laporan";
+                document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
             } catch (e) {
                 alert("Gagal menyimpan! Memori browser penuh.");
                 if(indexEditMode === -1) dataLaporan.pop(); 
@@ -243,7 +302,6 @@
         }
 
         function renderSemuaData() {
-            // Update daftar bulan di Dropdown Filter
             const selectFilter = document.getElementById('filterBulan');
             const currentFilter = selectFilter.value;
             selectFilter.innerHTML = '<option value="SEMUA">Semua Bulan</option>';
@@ -269,21 +327,20 @@
             let noUrut = 1;
 
             dataLaporan.forEach((item, index) => {
-                // Tampilkan hanya jika filter sesuai
                 if (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif) {
                     const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">` : '';
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto; border-radius: 4px;">` : '';
 
                     tr.innerHTML = `
-                        <td class="text-center">${noUrut}</td>
+                        <td class="text-center font-bold">${noUrut}</td>
                         <td>${item.hari}</td>
                         <td>${item.tanggal}</td>
                         <td>${uraianFormatted}</td>
                         <td class="text-center align-middle">${fotoHtml}</td>
                         <td class="text-center align-middle no-print">
-                            <button onclick="editBaris(${index})" class="bg-blue-500 text-white px-2 py-1 rounded text-xs mb-1 w-full hover:bg-blue-600">✏️ Edit</button>
-                            <button onclick="hapusBaris(${index})" class="bg-red-500 text-white px-2 py-1 rounded text-xs w-full hover:bg-red-600">🗑️ Hapus</button>
+                            <button onclick="editBaris(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs mb-2 w-full hover:bg-blue-200 font-semibold font-sans">Edit</button>
+                            <button onclick="hapusBaris(${index})" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs w-full hover:bg-red-200 font-semibold font-sans">Hapus</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -291,38 +348,33 @@
                 }
             });
 
-            // Update Teks Label Bulan di Dokumen
             if (filterAktif === 'SEMUA') {
-                document.getElementById('labelBulan').innerText = dataLaporan.length > 0 ? "Semua Bulan (Campuran)" : "...";
+                document.getElementById('labelBulan').innerText = dataLaporan.length > 0 ? "Campuran" : "...";
             } else {
                 document.getElementById('labelBulan').innerText = filterAktif;
             }
         }
 
-        // FITUR BARU: Edit Baris
         function editBaris(index) {
             indexEditMode = index;
             const item = dataLaporan[index];
             
-            // Convert DD/MM/YYYY kembali ke format YYYY-MM-DD untuk input HTML
             const parts = item.tanggal.split('/'); 
             document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
             document.getElementById('inputUraian').value = item.uraian;
             
-            document.getElementById('judulForm').innerText = "Edit Kegiatan PKL";
-            document.getElementById('btnTambah').innerText = "💾 Simpan Perubahan";
-            document.getElementById('btnTambah').classList.replace('bg-blue-600', 'bg-indigo-600');
+            document.getElementById('judulForm').innerHTML = "✏️ Edit Kegiatan PKL";
+            document.getElementById('btnTambah').innerHTML = "💾 Simpan Perubahan";
             document.getElementById('btnBatalEdit').classList.remove('hidden');
             document.getElementById('infoFotoEdit').style.display = "block";
             
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         function batalEdit() {
             indexEditMode = -1;
-            document.getElementById('judulForm').innerText = "Input Kegiatan PKL Baru";
-            document.getElementById('btnTambah').innerText = "+ Tambah ke Laporan";
-            document.getElementById('btnTambah').classList.replace('bg-indigo-600', 'bg-blue-600');
+            document.getElementById('judulForm').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Input Kegiatan Baru';
+            document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('infoFotoEdit').style.display = "none";
             
@@ -331,20 +383,18 @@
             document.getElementById('inputFoto').value = '';
         }
 
-        // FITUR BARU: Hapus Baris Tertentu
         function hapusBaris(index) {
-            if(confirm("Yakin ingin menghapus kegiatan ini?")) {
-                dataLaporan.splice(index, 1); // Buang data dari array
+            if(confirm("Hapus kegiatan ini?")) {
+                dataLaporan.splice(index, 1); 
                 localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
                 renderSemuaData();
                 if(indexEditMode === index) batalEdit();
             }
         }
 
-        // FITUR BARU: Backup Data
         function backupData() {
             if(dataLaporan.length === 0) {
-                alert("Tabel masih kosong, tidak ada data yang bisa dibackup.");
+                alert("Tabel masih kosong.");
                 return;
             }
             const dataStr = JSON.stringify(dataLaporan, null, 2);
@@ -355,11 +405,9 @@
             a.href = url;
             a.download = "Backup_Data_PKL.json";
             a.click();
-            
             URL.revokeObjectURL(url);
         }
 
-        // FITUR BARU: Restore Data
         function restoreData(event) {
             const file = event.target.files[0];
             if(!file) return;
@@ -372,21 +420,20 @@
                         dataLaporan = parsedData;
                         localStorage.setItem('laporanPKL', JSON.stringify(dataLaporan));
                         renderSemuaData();
-                        alert("✅ Data berhasil dipulihkan dari Backup!");
+                        alert("✅ Restore berhasil!");
                     } else {
-                        alert("❌ Format file tidak valid.");
+                        alert("❌ File tidak valid.");
                     }
                 } catch (err) {
-                    alert("❌ Gagal membaca file backup.");
+                    alert("❌ Gagal membaca file.");
                 }
             };
             reader.readAsText(file);
-            event.target.value = ''; // Reset input agar bisa import file yang sama jika diperlukan
+            event.target.value = ''; 
         }
 
         function hapusSemuaData() {
-            const konfirmasi = confirm("⚠️ BAHAYA: Yakin ingin menghapus semua data? Pastikan kamu sudah melakukan BACKUP terlebih dahulu.");
-            if(konfirmasi) {
+            if(confirm("⚠️ Yakin hapus semua? Pastikan sudah di-backup!")) {
                 localStorage.removeItem('laporanPKL');
                 dataLaporan = [];
                 batalEdit();
@@ -403,30 +450,31 @@
             const btn = document.getElementById('btnDownload');
             const elemenCetak = document.getElementById('areaCetak');
             const watermark = document.getElementById('teksWatermark');
+            const textAsli = btn.innerHTML;
             
-            btn.innerText = "⏳ Sedang Mengunduh...";
+            btn.innerHTML = "⏳ Mengunduh...";
             btn.disabled = true;
             watermark.style.display = 'none';
 
             const filterAktif = document.getElementById('filterBulan').value;
-            const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_Semua_Bulan.pdf' : `Laporan_PKL_${filterAktif.replace(' ', '_')}.pdf`;
+            const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
             const opsiPDF = {
-                margin:       10,
+                margin:       [10, 10, 15, 10], 
                 filename:     namaFile,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
                 watermark.style.display = 'block';
-                btn.innerText = "⬇️ Download PDF";
+                btn.innerHTML = textAsli;
                 btn.disabled = false;
             }).catch(err => {
-                alert("Terjadi kesalahan saat membuat PDF.");
+                alert("Gagal membuat PDF.");
                 watermark.style.display = 'block';
-                btn.innerText = "⬇️ Download PDF";
+                btn.innerHTML = textAsli;
                 btn.disabled = false;
             });
         }
