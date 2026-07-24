@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Laporan PKL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styling khusus untuk tabel agar mirip dengan dokumen asli */
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            font-family: "Times New Roman", Times, serif;
+        }
+        th {
+            font-weight: bold;
+        }
+        /* Menyembunyikan form input saat dicetak/disimpan ke PDF */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; padding: 0; }
+            .cetak-area { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 bg-gray-100">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Panel Input (Akan hilang saat di-print) -->
+        <div class="mb-8 p-6 bg-white rounded-lg shadow-md no-print">
+            <h2 class="text-xl font-bold mb-4">Input Kegiatan PKL Baru</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Tanggal</label>
+                    <input type="date" id="inputTanggal" class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Uraian Kegiatan</label>
+                    <textarea id="inputUraian" class="w-full border border-gray-300 rounded p-2" rows="3" placeholder="Contoh: Membersihkan transmisi..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Foto Kegiatan</label>
+                    <input type="file" id="inputFoto" accept="image/*" class="w-full border border-gray-300 rounded p-2">
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">
+                    + Tambah ke Laporan
+                </button>
+                <button onclick="window.print()" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
+                    🖨️ Simpan PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Area Dokumen (Tampil seperti screenshot) -->
+        <div class="cetak-area bg-white p-8 shadow-lg min-h-screen">
+            <div class="mb-6 font-serif text-lg">
+                <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
+                <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="font-bold">...</span></p>
+            </div>
+
+            <table class="w-full text-sm md:text-base">
+                <thead>
+                    <tr>
+                        <th class="w-10 text-center">No</th>
+                        <th class="w-24">Hari</th>
+                        <th class="w-32">Tanggal</th>
+                        <th>Uraian kegiatan pkl</th>
+                        <th class="w-48 text-center">Foto kegiatan</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelBody">
+                    <!-- Data akan masuk ke sini secara realtime -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let noUrut = 1;
+
+        function tambahBaris() {
+            const tanggalInput = document.getElementById('inputTanggal').value;
+            const uraian = document.getElementById('inputUraian').value;
+            const fotoInput = document.getElementById('inputFoto');
+
+            if(!tanggalInput || !uraian) {
+                alert('Harap isi Tanggal dan Uraian Kegiatan terlebih dahulu!');
+                return;
+            }
+
+            // Memproses format tanggal (Mendapatkan Hari dan DD/MM/YYYY)
+            const dateObj = new Date(tanggalInput);
+            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const hari = namaHari[dateObj.getDay()];
+            
+            const tgl = String(dateObj.getDate()).padStart(2, '0');
+            const bln = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const thn = dateObj.getFullYear();
+            const tanggalFormat = `${tgl}/${bln}/${thn}`;
+
+            // Update Label Bulan di Header (contoh: Juli 2025)
+            const namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            document.getElementById('labelBulan').innerText = `${namaBulan[dateObj.getMonth()]} ${thn}`;
+
+            // Memproses Foto menjadi Base64 agar tampil langsung tanpa server
+            let fotoHtml = '';
+            if(fotoInput.files && fotoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Render row setelah foto selesai di-load
+                    renderRow(hari, tanggalFormat, uraian, `<img src="${e.target.result}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">`);
+                }
+                reader.readAsDataURL(fotoInput.files[0]);
+            } else {
+                renderRow(hari, tanggalFormat, uraian, '');
+            }
+        }
+
+        function renderRow(hari, tanggal, uraian, fotoHtml) {
+            const tbody = document.getElementById('tabelBody');
+            const tr = document.createElement('tr');
+            
+            // Konversi enter menjadi <br> agar text turun ke bawah
+            const uraianFormatted = uraian.replace(/\n/g, '<br>');
+
+            tr.innerHTML = `
+                <td class="text-center">${noUrut}</td>
+                <td>${hari}</td>
+                <td>${tanggal}</td>
+                <td>${uraianFormatted}</td>
+                <td class="text-center align-middle">${fotoHtml}</td>
+            `;
+            tbody.appendChild(tr);
+            noUrut++;
+            
+            // Kosongkan form input setelah data ditambahkan (kecuali tanggal)
+            document.getElementById('inputUraian').value = '';
+            document.getElementById('inputFoto').value = '';
+        }
+    </script>
+</body>
+</html>
