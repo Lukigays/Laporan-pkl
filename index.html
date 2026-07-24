@@ -21,7 +21,6 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Styling Dark Mode untuk Web */
         body.dark-mode {
             background-color: #0f172a;
             color: #f1f5f9;
@@ -79,22 +78,30 @@
             transform: scale(0.95);
         }
 
-        /* Area Kertas Dokumen Tetap Putih Bersih Formal */
+        /* Area Kertas Dokumen */
         .area-kertas {
             font-family: "Times New Roman", Times, serif;
             background-color: white !important;
             color: black !important;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            /* Dihapus min-h-screen agar tidak membuat blank page di PDF */
         }
+        
         .area-kertas table, .area-kertas th, .area-kertas td {
             border: 1px solid black !important;
             border-collapse: collapse;
             color: black !important;
         }
+        
         .area-kertas th, .area-kertas td {
             padding: 8px;
             text-align: left;
             vertical-align: top;
+        }
+
+        /* Mencegah baris tabel terpotong di tengah saat beda halaman PDF */
+        tr {
+            page-break-inside: avoid !important;
         }
         
         .watermark {
@@ -126,6 +133,12 @@
     </style>
 </head>
 <body class="p-4 md:p-8 text-gray-800 antialiased">
+
+    <!-- Modal Lightbox (Untuk Pop-up Foto) -->
+    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
+        <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 text-4xl font-bold transition-colors">&times;</button>
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
 
     <div class="max-w-4xl mx-auto space-y-6">
         
@@ -215,7 +228,7 @@
         </div>
 
         <!-- Area Kertas Dokumen -->
-        <div class="area-kertas rounded-xl min-h-screen relative overflow-hidden" id="areaCetak">
+        <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
             <div class="konten-tabel p-6 md:p-12 bg-white/50" style="background: white !important; color: black !important;">
@@ -232,7 +245,8 @@
                             <th class="w-32">Tanggal</th>
                             <th>Uraian kegiatan pkl</th>
                             <th class="w-48 text-center">Foto kegiatan</th>
-                            <th class="w-20 text-center no-print">Aksi</th>
+                            <!-- Kolom Aksi kita berikan class 'kolom-aksi' khusus untuk mempermudah hide saat PDF -->
+                            <th class="w-20 text-center no-print kolom-aksi">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tabelBody">
@@ -248,7 +262,6 @@
         let indexEditMode = -1; 
 
         window.onload = function() {
-            // Cek preferensi Dark Mode sebelumnya
             if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('btnDarkMode').innerHTML = '☀️ <span class="hidden md:inline">Mode Terang</span>';
@@ -257,7 +270,22 @@
             cekKapasitasMemori();
         };
 
-        // FUNGSI TOGGLE DARK MODE
+        // FUNGSI LIGHTBOX (FOTO BESAR)
+        function bukaLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImg');
+            img.src = src;
+            lightbox.classList.remove('hidden');
+            setTimeout(() => { img.classList.replace('scale-95', 'scale-100'); }, 10);
+        }
+
+        function tutupLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImg');
+            img.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => { lightbox.classList.add('hidden'); }, 150);
+        }
+
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -278,7 +306,6 @@
                     totalBytes += ((localStorage[key].length + key.length) * 2); 
                 }
             }
-            
             const maxBytes = 5 * 1024 * 1024;
             let persentase = (totalBytes / maxBytes) * 100;
             if (persentase > 100) persentase = 100;
@@ -430,7 +457,8 @@
                 if (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif) {
                     const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto; border-radius: 4px;" alt="foto">` : '';
+                    // FITUR BARU: Klik foto untuk membesarkan (Cursor ditambahkan)
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto; border-radius: 4px;" alt="foto">` : '';
 
                     tr.innerHTML = `
                         <td class="text-center font-bold" style="color: black !important;">${noUrut}</td>
@@ -438,7 +466,7 @@
                         <td style="color: black !important;">${item.tanggal}</td>
                         <td style="color: black !important;">${uraianFormatted}</td>
                         <td class="text-center align-middle">${fotoHtml}</td>
-                        <td class="text-center align-middle no-print">
+                        <td class="text-center align-middle no-print kolom-aksi">
                             <button onclick="editBaris(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs mb-2 w-full hover:bg-blue-200 font-semibold font-sans">Edit</button>
                             <button onclick="hapusBaris(${index})" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs w-full hover:bg-red-200 font-semibold font-sans">Hapus</button>
                         </td>
@@ -563,6 +591,10 @@
             btn.disabled = true;
             watermark.style.display = 'none';
 
+            // MENCEGAH BUG KOLOM "AKSI" IKUT TERCETAK DI PDF
+            const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
+            elemenNoPrint.forEach(el => el.style.display = 'none');
+
             const filterAktif = document.getElementById('filterBulan').value;
             const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
@@ -571,16 +603,21 @@
                 filename:     namaFile,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                // MENCEGAH BUG HALAMAN KOSONG / TERPOTONG
+                pagebreak:    { mode: ['css', 'legacy'] } 
             };
 
             html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
                 watermark.style.display = 'block';
+                // KEMBALIKAN KOLOM AKSI
+                elemenNoPrint.forEach(el => el.style.display = '');
                 btn.innerHTML = textAsli;
                 btn.disabled = false;
             }).catch(err => {
                 alert("Gagal membuat PDF.");
                 watermark.style.display = 'block';
+                elemenNoPrint.forEach(el => el.style.display = '');
                 btn.innerHTML = textAsli;
                 btn.disabled = false;
             });
