@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tambahan library untuk langsung download PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         table, th, td {
             border: 1px solid black;
@@ -18,14 +21,14 @@
         }
         th { font-weight: bold; }
         
-        /* Pengaturan Watermark */
+        /* Pengaturan Watermark untuk Tampilan Layar Saja */
         .watermark {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 4rem;
-            color: rgba(0, 0, 0, 0.08); /* Warna transparan */
+            color: rgba(0, 0, 0, 0.08); /* Transparan */
             font-weight: bold;
             white-space: nowrap;
             pointer-events: none;
@@ -33,29 +36,13 @@
             user-select: none;
         }
         
-        /* Konten agar selalu di atas watermark */
         .konten-tabel {
             position: relative;
             z-index: 10;
         }
-
-        /* Menyembunyikan elemen tertentu saat dicetak ke PDF */
-        @media print {
-            .no-print { display: none !important; }
-            body { background-color: white; padding: 0; }
-            .cetak-area { box-shadow: none; padding: 0; }
-            /* Memastikan warna watermark ikut tercetak di PDF */
-            .watermark {
-                color: rgba(0, 0, 0, 0.1) !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
         
         @media (min-width: 768px) {
-            .watermark {
-                font-size: 6rem;
-            }
+            .watermark { font-size: 6rem; }
         }
     </style>
 </head>
@@ -63,7 +50,8 @@
 
     <div class="max-w-4xl mx-auto">
         
-        <div class="mb-8 p-6 bg-white rounded-lg shadow-md no-print relative z-20">
+        <!-- Panel Input -->
+        <div class="mb-8 p-6 bg-white rounded-lg shadow-md relative z-20">
             <h2 class="text-xl font-bold mb-4">Input Kegiatan PKL Baru</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -84,28 +72,32 @@
                 <button onclick="tambahBaris()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700" id="btnTambah">
                     + Tambah ke Laporan
                 </button>
-                <button onclick="window.print()" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
-                    🖨️ Simpan PDF
+                
+                <!-- Tombol Print diubah menjadi Download PDF -->
+                <button onclick="downloadPDF()" id="btnDownload" class="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
+                    ⬇️ Download PDF
                 </button>
+                
                 <button onclick="hapusSemuaData()" class="bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 ml-auto">
                     🗑️ Hapus Semua Data
                 </button>
             </div>
         </div>
 
-        <div class="cetak-area bg-white p-8 shadow-lg min-h-screen relative">
+        <!-- Area Dokumen yang akan dijadikan PDF -->
+        <div class="bg-white shadow-lg min-h-screen relative" id="areaCetak">
             
             <!-- Elemen Watermark LUKYY -->
-            <div class="watermark">LAPORAN PKL BY LUKYY</div>
+            <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
             <!-- Wrapper Konten Tabel -->
-            <div class="konten-tabel">
+            <div class="konten-tabel p-8 bg-white/50">
                 <div class="mb-6 font-serif text-lg">
                     <p>1. &nbsp;&nbsp;<strong>Laporan Kegiatan Harian</strong></p>
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="font-bold">...</span></p>
                 </div>
 
-                <table class="w-full text-sm md:text-base bg-white/50">
+                <table class="w-full text-sm md:text-base">
                     <thead>
                         <tr>
                             <th class="w-10 text-center">No</th>
@@ -228,11 +220,11 @@
                 const fotoHtml = item.foto ? `<img src="${item.foto}" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto;">` : '';
 
                 tr.innerHTML = `
-                    <td class="text-center bg-white/60">${noUrut}</td>
-                    <td class="bg-white/60">${item.hari}</td>
-                    <td class="bg-white/60">${item.tanggal}</td>
-                    <td class="bg-white/60">${uraianFormatted}</td>
-                    <td class="text-center align-middle bg-white/60">${fotoHtml}</td>
+                    <td class="text-center">${noUrut}</td>
+                    <td>${item.hari}</td>
+                    <td>${item.tanggal}</td>
+                    <td>${uraianFormatted}</td>
+                    <td class="text-center align-middle">${fotoHtml}</td>
                 `;
                 tbody.appendChild(tr);
                 noUrut++;
@@ -251,6 +243,42 @@
                 dataLaporan = [];
                 renderSemuaData();
             }
+        }
+
+        // Fungsi Baru: Langsung Download PDF tanpa Print Dialog
+        function downloadPDF() {
+            const btn = document.getElementById('btnDownload');
+            const elemenCetak = document.getElementById('areaCetak');
+            const watermark = document.getElementById('teksWatermark');
+            
+            // 1. Ubah teks tombol jadi loading
+            btn.innerText = "⏳ Sedang Mengunduh...";
+            btn.disabled = true;
+
+            // 2. Sembunyikan Watermark sementara
+            watermark.style.display = 'none';
+
+            // 3. Konfigurasi file PDF
+            const opsiPDF = {
+                margin:       10, // margin tepi (dalam mm)
+                filename:     'Laporan_Kegiatan_PKL.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 }, // Agar hasil gambar tidak pecah
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 4. Proses pembuatan file PDF
+            html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
+                // 5. Kembalikan seperti semula setelah selesai download
+                watermark.style.display = 'block';
+                btn.innerText = "⬇️ Download PDF";
+                btn.disabled = false;
+            }).catch(err => {
+                alert("Terjadi kesalahan saat membuat PDF.");
+                watermark.style.display = 'block';
+                btn.innerText = "⬇️ Download PDF";
+                btn.disabled = false;
+            });
         }
     </script>
 </body>
