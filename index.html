@@ -251,7 +251,7 @@
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
-                <!-- TAMBAHAN ID BUNGKUS TABEL -->
+                <!-- BUNGKUS TABEL -->
                 <div id="bungkusTabel" class="overflow-x-auto pb-4">
                     <table class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
                         <thead>
@@ -274,6 +274,7 @@
     </div>
 
     <script>
+        // === LOGIKA PWA & INSTALL APP ===
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
 
@@ -302,6 +303,7 @@
                     .catch(err => console.log('Service Worker gagal didaftarkan', err));
             });
         }
+        // ================================
 
         let dataLaporan = [];
         let indexEditMode = -1; 
@@ -675,7 +677,7 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- UPDATE TERBARU: SOLUSI PDF TERPOTONG / BLANK ---
+        // --- UPDATE FINAL: FIX BUG KEPOTONG/MARGIN ATAS TERLALU JAUH ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const elemenCetak = document.getElementById('areaCetak');
@@ -683,6 +685,9 @@
             const bungkusTabel = document.getElementById('bungkusTabel');
             const tabel = document.querySelector('table');
             const textAsli = btn.innerHTML;
+            
+            // 1. PAKSA LAYAR KEMBALI KE PALING ATAS AGAR TIDAK ADA JARAK KOSONG
+            window.scrollTo(0, 0); 
             
             btn.innerHTML = "⏳ Memproses PDF...";
             btn.disabled = true;
@@ -692,12 +697,11 @@
             const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
             elemenNoPrint.forEach(el => el.style.display = 'none');
 
-            // 1. MATIKAN SEMUA PEMBATAS KONTEN YANG MEMBUAT PDF BLANK
+            // Matikan semua pembatas konten
             if (bungkusTabel) bungkusTabel.classList.remove('overflow-x-auto');
             if (tabel) tabel.classList.remove('min-w-[700px]');
             elemenCetak.classList.remove('overflow-hidden');
 
-            // 2. GUNAKAN SET TIMEOUT AGAR DOM SEMPAT TER-REFRESH
             setTimeout(() => {
                 const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
                 if(teksPencarianSaatIni !== '') {
@@ -712,14 +716,13 @@
                     margin:       [10, 10, 15, 10], 
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    // Setel windowWidth agar hasil screenshot html2canvas membaca tabel penuh
-                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 }, 
+                    // 2. TAMBAHKAN scrollY: 0 AGAR TITIK AWAL FOTO BENAR-BENAR DI ATAS
+                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, scrollY: 0 }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
                 html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
-                    // KEMBALIKAN SEMUA CLASS SEPERTI SEMULA SETELAH SELESAI
                     watermark.style.display = 'block';
                     elemenNoPrint.forEach(el => el.style.display = '');
                     if (bungkusTabel) bungkusTabel.classList.add('overflow-x-auto');
@@ -743,7 +746,7 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 });
-            }, 500); // Tunggu 0.5 detik
+            }, 500); 
         }
     </script>
 </body>
