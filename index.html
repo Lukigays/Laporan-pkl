@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TAMBAHAN: Tag Meta untuk PWA -->
+    <!-- Tag Meta untuk PWA -->
     <meta name="theme-color" content="#3b82f6">
     <link rel="manifest" href="manifest.json">
     
@@ -151,7 +151,6 @@
             </div>
             
             <div class="flex gap-2">
-                <!-- TAMBAHAN: Tombol Install PWA -->
                 <button id="btnInstall" class="hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-semibold">
                     📱 <span class="hidden md:inline">Install App</span>
                 </button>
@@ -279,19 +278,14 @@
         const btnInstall = document.getElementById('btnInstall');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Mencegah browser menampilkan prompt otomatis
             e.preventDefault();
-            // Simpan event untuk dipicu nanti
             deferredPrompt = e;
-            // Tampilkan tombol install kita
             btnInstall.classList.remove('hidden');
         });
 
         btnInstall.addEventListener('click', async () => {
             if (deferredPrompt) {
-                // Tampilkan prompt install
                 deferredPrompt.prompt();
-                // Tunggu respon pengguna
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     console.log('Pengguna menginstal aplikasi');
@@ -301,7 +295,6 @@
             }
         });
 
-        // Daftarkan Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
@@ -683,6 +676,7 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
+        // --- FIX BUG PDF (Menghapus class scroll sementara sebelum download) ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const elemenCetak = document.getElementById('areaCetak');
@@ -695,6 +689,12 @@
 
             const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
             elemenNoPrint.forEach(el => el.style.display = 'none');
+
+            // Kita matikan sementara fitur scroll horizontal agar PDF membaca full tabel
+            const pembungkusTabel = document.querySelector('.overflow-x-auto');
+            if (pembungkusTabel) {
+                pembungkusTabel.classList.remove('overflow-x-auto');
+            }
 
             const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
             if(teksPencarianSaatIni !== '') {
@@ -718,6 +718,11 @@
                 watermark.style.display = 'block';
                 elemenNoPrint.forEach(el => el.style.display = '');
                 
+                // Kembalikan fitur scroll setelah selesai
+                if (pembungkusTabel) {
+                    pembungkusTabel.classList.add('overflow-x-auto');
+                }
+                
                 if(teksPencarianSaatIni !== '') {
                     document.getElementById('inputPencarian').value = teksPencarianSaatIni;
                     renderSemuaData();
@@ -729,6 +734,11 @@
                 alert("Gagal membuat PDF.");
                 watermark.style.display = 'block';
                 elemenNoPrint.forEach(el => el.style.display = '');
+                
+                if (pembungkusTabel) {
+                    pembungkusTabel.classList.add('overflow-x-auto');
+                }
+                
                 btn.innerHTML = textAsli;
                 btn.disabled = false;
             });
