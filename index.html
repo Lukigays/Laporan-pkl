@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tag Meta untuk PWA -->
     <meta name="theme-color" content="#3b82f6">
     <link rel="manifest" href="manifest.json">
     
@@ -251,7 +250,6 @@
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
-                <!-- BUNGKUS TABEL -->
                 <div id="bungkusTabel" class="overflow-x-auto pb-4">
                     <table class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
                         <thead>
@@ -677,7 +675,7 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- TRIK CLONE BAYANGAN: SOLUSI PASTI BUG MARGIN & POTONG ---
+        // --- UPDATE MENTOK: HAPUS PAKSA PENGUNCI LEBAR AGAR TIDAK KEPOTONG ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
@@ -685,7 +683,6 @@
             btn.innerHTML = "⏳ Memproses PDF...";
             btn.disabled = true;
 
-            // Reset teks pencarian agar semua data pada filter bulan ikut ter-print
             const inputPencarian = document.getElementById('inputPencarian');
             const teksPencarianSaatIni = inputPencarian ? inputPencarian.value : '';
             if (teksPencarianSaatIni !== '') {
@@ -693,44 +690,51 @@
                 renderSemuaData();
             }
 
-            // Tunggu sebentar agar reset tabel selesai dirender browser
             setTimeout(() => {
-                // 1. Ambil area asli yang ingin kita cetak
                 const elemenCetakAsli = document.getElementById('areaCetak');
-                
-                // 2. Buat "Kloning" (Copy-an persis) dari tabel tersebut
                 const cloneDOM = elemenCetakAsli.cloneNode(true);
                 
-                // 3. Bersihkan elemen yang tidak boleh ikut terprint pada clone
-                cloneDOM.querySelectorAll('.no-print').forEach(el => el.remove()); // Hapus div no-print
-                cloneDOM.querySelectorAll('.kolom-aksi').forEach(el => el.remove()); // Hapus kolom Edit/Hapus
+                cloneDOM.querySelectorAll('.no-print').forEach(el => el.remove()); 
+                cloneDOM.querySelectorAll('.kolom-aksi').forEach(el => el.remove()); 
                 
-                // Matikan Watermark saat di print
                 const watermark = cloneDOM.querySelector('.watermark');
                 if (watermark) watermark.remove();
                 
-                // Hapus efek scroll di HP pada clone agar tabel memanjang penuh (tidak potong)
                 const bungkusTabel = cloneDOM.querySelector('#bungkusTabel');
-                if (bungkusTabel) bungkusTabel.classList.remove('overflow-x-auto');
+                if (bungkusTabel) {
+                    bungkusTabel.classList.remove('overflow-x-auto', 'pb-4');
+                }
 
-                // 4. BUAT WADAH RAHASIA DI KOORDINAT 0,0
-                // Ini memaksa sistem memotret dari ujung paling atas tanpa terpengaruh posisi scroll layarmu saat ini.
+                // 1. KUNCI FIX KEPOTONG KANAN: Hapus min-w-[700px] dari tabel kloning
+                const tabelClone = cloneDOM.querySelector('table');
+                if (tabelClone) {
+                    tabelClone.classList.remove('min-w-[700px]');
+                    tabelClone.style.width = '100%'; // Pastikan tabel melebar 100% dari wadah, bukan lebih
+                }
+
+                // 2. Kurangi padding berlebih di versi PDF agar ruang tabel lebih lega
+                const kontenTabel = cloneDOM.querySelector('.konten-tabel');
+                if (kontenTabel) {
+                    kontenTabel.classList.remove('p-6', 'md:p-12');
+                    kontenTabel.style.padding = '10px 20px';
+                }
+
+                // 3. Buat Wadah Rahasia dan paskan persis lebarnya 800px (Desktop / A4 standar)
                 const wadahRahasia = document.createElement('div');
                 wadahRahasia.style.position = 'absolute';
                 wadahRahasia.style.top = '0';
                 wadahRahasia.style.left = '0';
-                wadahRahasia.style.width = '850px'; // Paksa lebar 850px agar tabel super lega dan tidak potong kanan
+                wadahRahasia.style.width = '800px'; 
                 wadahRahasia.style.backgroundColor = 'white';
-                wadahRahasia.style.zIndex = '-9999'; // Sembunyikan jauh di balik layar
+                wadahRahasia.style.zIndex = '-9999'; 
                 
-                // Masukkan tabel clone ke dalam wadah rahasia
                 wadahRahasia.appendChild(cloneDOM);
                 document.body.appendChild(wadahRahasia);
 
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
-                // 5. SETTING PDF
+                // 4. Seting PDF, arahkan html2pdf untuk memotret "wadahRahasia" yang lebarnya sudah pasti 800px
                 const opsiPDF = {
                     margin:       [10, 10, 15, 10], 
                     filename:     namaFile,
@@ -738,34 +742,26 @@
                     html2canvas:  { 
                         scale: 2, 
                         useCORS: true,
-                        scrollY: 0, // Kunci paksa titik awal foto ke Y:0
-                        scrollX: 0, // Kunci paksa titik awal foto ke X:0
-                        windowWidth: 850 // Samakan dengan lebar wadahRahasia
+                        scrollY: 0, 
+                        scrollX: 0, 
+                        windowWidth: 800 
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
-                // 6. GENERATE PDF DARI CLONE BAYANGAN
-                html2pdf().set(opsiPDF).from(cloneDOM).save().then(() => {
-                    // HANCURKAN WADAH RAHASIA SETELAH SELESAI AGAR WEB KEMBALI NORMAL
+                // PENTING: .from(wadahRahasia) bukan (cloneDOM)
+                html2pdf().set(opsiPDF).from(wadahRahasia).save().then(() => {
                     document.body.removeChild(wadahRahasia);
-                    
-                    // Kembalikan filter pencarian jika sebelumnya kamu sedang mencari sesuatu
                     if (teksPencarianSaatIni !== '') {
                         inputPencarian.value = teksPencarianSaatIni;
                         renderSemuaData();
                     }
-
-                    // Kembalikan status tombol
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 }).catch(err => {
-                    console.error("PDF Error: ", err);
-                    alert("Gagal membuat PDF.");
-                    
-                    // Jaga-jaga jika error, wadah rahasia tetap harus dibersihkan
                     document.body.removeChild(wadahRahasia);
+                    alert("Gagal membuat PDF.");
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 });
