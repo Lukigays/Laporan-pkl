@@ -1,0 +1,17 @@
+{
+  "name": "Laporan PKL LUKYY",
+  "short_name": "PKL LUKYY",
+  "description": "Aplikasi Manajemen Laporan PKL Harian",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2991/2991112.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
