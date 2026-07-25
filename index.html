@@ -89,7 +89,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         
-        /* PERBAIKAN BORDER DAN UKURAN FONT UNTUK PDF */
         .area-kertas table {
             border: 1px solid black !important;
             border-collapse: collapse !important;
@@ -110,7 +109,6 @@
             font-weight: 600;
             text-align: center;
         }
-        /* GARIS PENUTUP BAWAH - PASTIKAN SELALU ADA */
         .area-kertas table tbody tr:last-child td {
             border-bottom: 2px solid black !important;
         }
@@ -149,7 +147,7 @@
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
         }
 
-        /* PANEL AKSI RINGKAS */
+        /* Panel aksi ringkas (hanya hapus) */
         #panelAksiContainer {
             max-height: 110px;
             overflow-y: auto;
@@ -177,21 +175,12 @@
             font-weight: 500;
             color: #1f2937;
         }
-        .aksi-item button {
+        .aksi-item button.hapus {
             background: transparent;
             border: none;
             cursor: pointer;
             font-size: 13px;
             padding: 0 2px;
-            line-height: 1.4;
-        }
-        .aksi-item button.edit {
-            color: #2563eb;
-        }
-        .aksi-item button.edit:hover {
-            color: #1d4ed8;
-        }
-        .aksi-item button.hapus {
             color: #dc2626;
         }
         .aksi-item button.hapus:hover {
@@ -205,25 +194,19 @@
             color: #e2e8f0;
         }
 
-        /* Tombol isi otomatis */
-        .btn-isi-otomatis {
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #86efac;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.2s;
+        /* Dropdown edit */
+        #pilihEdit {
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 8px 12px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
         }
-        .btn-isi-otomatis:hover {
-            background: #dcfce7;
-        }
-        body.dark-mode .btn-isi-otomatis {
-            background: #1a2e1f;
-            color: #86efac;
-            border-color: #166534;
+        body.dark-mode #pilihEdit {
+            background: #1e293b;
+            color: #f1f5f9;
+            border-color: #334155;
         }
     </style>
 </head>
@@ -260,6 +243,12 @@
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
+                    <select id="pilihEdit" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                        <option value="baru">+ Tambah Baru</option>
+                    </select>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
                     <input type="date" id="inputTanggal" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm">
@@ -334,7 +323,7 @@
             </div>
         </div>
 
-        <!-- PANEL MANAJEMEN AKSI RINGKAS -->
+        <!-- PANEL MANAJEMEN AKSI (hanya hapus) -->
         <div class="glass-panel rounded-2xl p-3 no-print space-y-2">
             <div class="flex items-center justify-between flex-wrap gap-2">
                 <div class="flex items-center gap-2">
@@ -344,16 +333,13 @@
                     </h3>
                     <span class="text-[10px] text-gray-400" id="jumlahDataAksi">0 data</span>
                 </div>
-                <button onclick="isiOtomatis28_31()" class="btn-isi-otomatis">
-                    ➕ Isi Otomatis 28-31
-                </button>
             </div>
             <div id="panelAksiContainer" class="scrollbar-thin scrollbar-thumb-gray-300">
-                <!-- Aksi item akan di-render di sini -->
+                <!-- Aksi item (hanya hapus) akan di-render di sini -->
             </div>
         </div>
 
-        <!-- AREA KERTAS BERSIH TANPA KOLOM AKSI -->
+        <!-- AREA KERTAS -->
         <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
@@ -524,6 +510,42 @@
             }
         }
 
+        // ========== FUNGSI PILIH TANGGAL EDIT ==========
+        function pilihTanggalEdit() {
+            const select = document.getElementById('pilihEdit');
+            const val = select.value;
+            if (val === 'baru') {
+                // Mode tambah baru
+                batalEdit();
+                document.getElementById('inputTanggal').value = '';
+                document.getElementById('inputUraian').value = '';
+                document.getElementById('inputFoto').value = '';
+                document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
+                document.getElementById('judulForm').innerHTML = '<svg ...> Input Kegiatan Baru';
+                document.getElementById('btnBatalEdit').classList.add('hidden');
+                document.getElementById('infoFotoEdit').style.display = 'none';
+                return;
+            }
+
+            // Cari indeks data dengan tanggal yang dipilih
+            const index = dataLaporan.findIndex(item => item.tanggal === val);
+            if (index === -1) return;
+
+            // Masuk mode edit
+            indexEditMode = index;
+            const item = dataLaporan[index];
+            const parts = item.tanggal.split('/');
+            document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            document.getElementById('inputUraian').value = item.uraian;
+            document.getElementById('judulForm').innerHTML = "✏️ Edit Kegiatan PKL";
+            document.getElementById('btnTambah').innerHTML = "💾 Update Laporan";
+            document.getElementById('btnBatalEdit').classList.remove('hidden');
+            document.getElementById('infoFotoEdit').style.display = 'block';
+            // Foto tidak diisi otomatis (biarkan kosong, akan tetap pakai yang lama jika tidak diubah)
+            document.getElementById('inputFoto').value = '';
+        }
+
+        // ========== TAMBAH / UPDATE ==========
         function tambahBaris() {
             const btn = document.getElementById('btnTambah');
             const tanggalInput = document.getElementById('inputTanggal').value;
@@ -548,6 +570,16 @@
             const tanggalFormat = `${tgl}/${bln}/${thn}`;
             const labelBulan = updateLabelBulan(dateObj.getMonth(), thn);
 
+            // Jika mode edit, gunakan foto lama jika tidak ada file baru
+            if (indexEditMode > -1 && (!fotoInput.files || fotoInput.files.length === 0)) {
+                // Pertahankan foto lama
+                const fotoLama = dataLaporan[indexEditMode].foto;
+                simpanKeArray(hari, tanggalFormat, uraian, fotoLama, labelBulan);
+                btn.disabled = false;
+                return;
+            }
+
+            // Jika ada file foto
             if(fotoInput.files && fotoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -576,11 +608,8 @@
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                let fotoFinal = '';
-                if (indexEditMode > -1) {
-                    fotoFinal = dataLaporan[indexEditMode].foto;
-                }
-                simpanKeArray(hari, tanggalFormat, uraian, fotoFinal, labelBulan);
+                // Tanpa foto (tambah baru tanpa foto)
+                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan);
                 btn.disabled = false;
             }
         }
@@ -617,15 +646,19 @@
                 renderSemuaData();
                 cekKapasitasMemori();
                 
+                // Reset form
                 document.getElementById('inputUraian').value = '';
                 document.getElementById('inputFoto').value = '';
                 document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
+                document.getElementById('pilihEdit').value = 'baru'; // reset dropdown
+                batalEdit(); // reset mode edit
             } catch (e) {
                 alert("⚠️ Gagal menyimpan! Storage browser penuh atau terjadi error sistem.");
                 dataLaporan = JSON.parse(backupDataSebelumError); 
             }
         }
 
+        // ========== RENDER DATA ==========
         function renderSemuaData() {
             const selectFilter = document.getElementById('filterBulan');
             const currentFilter = selectFilter.value;
@@ -646,6 +679,23 @@
                 selectFilter.value = currentFilter;
             } else {
                 selectFilter.value = 'SEMUA';
+            }
+
+            // Update dropdown edit
+            const selectEdit = document.getElementById('pilihEdit');
+            const currentEditVal = selectEdit.value;
+            selectEdit.innerHTML = '<option value="baru">+ Tambah Baru</option>';
+            dataLaporan.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.tanggal;
+                opt.innerText = item.tanggal + ' - ' + item.uraian.substring(0,15);
+                selectEdit.appendChild(opt);
+            });
+            // Kembalikan pilihan jika masih valid
+            if (dataLaporan.some(item => item.tanggal === currentEditVal)) {
+                selectEdit.value = currentEditVal;
+            } else {
+                selectEdit.value = 'baru';
             }
 
             const filterAktif = selectFilter.value;
@@ -671,7 +721,7 @@
                     dataDitemukan = true;
                     jumlahDataTampil++;
                     
-                    // Render Tabel Bersih
+                    // Render tabel
                     const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
                     const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity mx-auto rounded" style="max-width: 70px; max-height: 70px; display: block;" alt="foto">` : '-';
@@ -686,12 +736,11 @@
                     tbody.appendChild(tr);
                     barisTerakhir = tr;
 
-                    // Render Panel Aksi Ringkas (hanya ikon)
+                    // Panel aksi (hanya hapus)
                     const aksiDiv = document.createElement('div');
                     aksiDiv.className = 'aksi-item';
                     aksiDiv.innerHTML = `
                         <span class="label" title="${item.tanggal} - ${item.uraian.substring(0,20)}">#${noUrut} ${item.tanggal}</span>
-                        <button class="edit" onclick="editBaris(${index})" title="Edit">✏️</button>
                         <button class="hapus" onclick="hapusBaris(${index})" title="Hapus">🗑️</button>
                     `;
                     panelAksi.appendChild(aksiDiv);
@@ -702,7 +751,6 @@
 
             document.getElementById('jumlahDataAksi').textContent = `${jumlahDataTampil} data`;
 
-            // PASTIKAN GARIS BAWAH TERAKHIR ADA (jika ada data)
             if (barisTerakhir) {
                 const semuaTd = barisTerakhir.querySelectorAll('td');
                 semuaTd.forEach(td => {
@@ -714,7 +762,6 @@
                  const tr = document.createElement('tr');
                  tr.innerHTML = `<td colspan="5" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
                  tbody.appendChild(tr);
-                 
                  panelAksi.innerHTML = `<span class="text-xs text-gray-400 italic">Tidak ada aksi tersedia.</span>`;
             } else if (dataLaporan.length === 0) {
                 panelAksi.innerHTML = `<span class="text-xs text-gray-400 italic">Belum ada data kegiatan.</span>`;
@@ -731,34 +778,20 @@
             }
         }
 
-        function editBaris(index) {
-            indexEditMode = index;
-            const item = dataLaporan[index];
-            
-            const parts = item.tanggal.split('/'); 
-            document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            document.getElementById('inputUraian').value = item.uraian;
-            
-            document.getElementById('judulForm').innerHTML = "✏️ Edit Kegiatan PKL";
-            document.getElementById('btnTambah').innerHTML = "💾 Simpan Perubahan";
-            document.getElementById('btnBatalEdit').classList.remove('hidden');
-            document.getElementById('infoFotoEdit').style.display = "block";
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
+        // ========== BATAL EDIT ==========
         function batalEdit() {
             indexEditMode = -1;
             document.getElementById('judulForm').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Input Kegiatan Baru';
             document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('infoFotoEdit').style.display = "none";
-            
             document.getElementById('inputTanggal').value = '';
             document.getElementById('inputUraian').value = '';
             document.getElementById('inputFoto').value = '';
+            document.getElementById('pilihEdit').value = 'baru';
         }
 
+        // ========== HAPUS BARIS ==========
         async function hapusBaris(index) {
             if(confirm("Hapus kegiatan ini?")) {
                 dataLaporan.splice(index, 1); 
@@ -769,6 +802,7 @@
             }
         }
 
+        // ========== BACKUP / RESTORE ==========
         function backupData() {
             if(dataLaporan.length === 0) {
                 alert("Tabel masih kosong.");
@@ -829,78 +863,7 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // === FUNGSI ISI OTOMATIS 28-31 ===
-        async function isiOtomatis28_31() {
-            // Cek apakah data Juli 2026 sudah ada
-            const bulanTarget = 'Juli 2026';
-            const dataJuli = dataLaporan.filter(item => item.bulanLabel === bulanTarget);
-            if (dataJuli.length === 0) {
-                alert('Belum ada data Juli 2026. Silakan tambahkan minimal 1 data terlebih dahulu.');
-                return;
-            }
-
-            // Cek tanggal terakhir yang sudah ada
-            const tanggalTerakhir = dataJuli.reduce((max, item) => {
-                const parts = item.tanggal.split('/');
-                const tglNum = parseInt(parts[0]);
-                return tglNum > max ? tglNum : max;
-            }, 0);
-
-            if (tanggalTerakhir >= 31) {
-                alert('Data sudah lengkap sampai 31 Juli 2026.');
-                return;
-            }
-
-            // Mulai dari tanggalTerakhir + 1 sampai 31
-            let start = tanggalTerakhir + 1;
-            if (start < 28) start = 28; // pastikan minimal 28
-
-            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            let tambahan = 0;
-
-            for (let tgl = start; tgl <= 31; tgl++) {
-                // Buat objek Date untuk tahun 2026, bulan 6 (Juli = 6 karena 0-based)
-                const dateObj = new Date(2026, 6, tgl);
-                const hari = namaHari[dateObj.getDay()];
-                const tglStr = String(tgl).padStart(2, '0');
-                const tanggalFormat = `${tglStr}/07/2026`;
-                const labelBulan = 'Juli 2026';
-
-                // Cek apakah tanggal ini sudah ada
-                const sudahAda = dataLaporan.some(item => item.tanggal === tanggalFormat && item.bulanLabel === labelBulan);
-                if (!sudahAda) {
-                    dataLaporan.push({
-                        hari: hari,
-                        tanggal: tanggalFormat,
-                        uraian: '-',  // kosong, bisa diisi nanti
-                        foto: '',
-                        bulanLabel: labelBulan
-                    });
-                    tambahan++;
-                }
-            }
-
-            if (tambahan === 0) {
-                alert('Tidak ada tanggal baru yang ditambahkan (mungkin sudah lengkap).');
-                return;
-            }
-
-            // Urutkan dan simpan
-            dataLaporan.sort((a, b) => {
-                let partA = a.tanggal.split('/'); 
-                let partB = b.tanggal.split('/'); 
-                let numA = parseInt(partA[2] + partA[1] + partA[0]); 
-                let numB = parseInt(partB[2] + partB[1] + partB[0]); 
-                return numA - numB; 
-            });
-
-            await localforage.setItem('laporanPKL', dataLaporan);
-            renderSemuaData();
-            cekKapasitasMemori();
-            alert(`✅ Berhasil menambahkan ${tambahan} data untuk tanggal ${start}-31 Juli 2026.`);
-        }
-
-        // --- DOWNLOAD PDF ---
+        // ========== DOWNLOAD PDF ==========
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
