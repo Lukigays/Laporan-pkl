@@ -6,6 +6,7 @@
     <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Library LocalForage untuk IndexedDB -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -127,6 +128,8 @@
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            /* Tambahan untuk memastikan print tabel tetap rapi tanpa scrollbar horizontal */
+            .overflow-x-auto { overflow-x: visible !important; }
         }
     </style>
 </head>
@@ -187,7 +190,6 @@
         </div>
 
         <div class="glass-panel rounded-2xl p-4 space-y-4 no-print relative z-10">
-            <!-- TAMBAHAN: FITUR PENCARIAN DI SINI -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 flex-wrap">
                 
                 <div class="flex items-center gap-3 w-full md:w-auto">
@@ -197,6 +199,7 @@
                     </select>
                 </div>
 
+                <!-- KOLOM PENCARIAN -->
                 <div class="relative w-full md:flex-1 max-w-sm">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -240,20 +243,23 @@
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
-                <table class="w-full text-sm md:text-base" style="color: black !important;">
-                    <thead>
-                        <tr>
-                            <th class="w-10 text-center">No</th>
-                            <th class="w-24">Hari</th>
-                            <th class="w-32">Tanggal</th>
-                            <th>Uraian kegiatan pkl</th>
-                            <th class="w-48 text-center">Foto kegiatan</th>
-                            <th class="w-20 text-center no-print kolom-aksi">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelBody">
-                    </tbody>
-                </table>
+                <!-- BUNGKUSAN TABEL AGAR BISA SCROLL DI HP -->
+                <div class="overflow-x-auto pb-4">
+                    <table class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
+                        <thead>
+                            <tr>
+                                <th class="w-10 text-center">No</th>
+                                <th class="w-24">Hari</th>
+                                <th class="w-32">Tanggal</th>
+                                <th>Uraian kegiatan pkl</th>
+                                <th class="w-48 text-center">Foto kegiatan</th>
+                                <th class="w-20 text-center no-print kolom-aksi">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -464,7 +470,6 @@
             const currentFilter = selectFilter.value;
             selectFilter.innerHTML = '<option value="SEMUA">Semua Bulan</option>';
             
-            // LOGIKA PENCARIAN
             const inputPencarian = document.getElementById('inputPencarian');
             const kataKunci = inputPencarian ? inputPencarian.value.toLowerCase() : '';
             
@@ -492,7 +497,6 @@
             dataLaporan.forEach((item, index) => {
                 const cocokBulan = (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif);
                 
-                // Cek apakah uraian, hari, atau tanggal mengandung kata kunci yang diketik
                 const cocokPencarian = item.uraian.toLowerCase().includes(kataKunci) || 
                                        item.tanggal.includes(kataKunci) || 
                                        item.hari.toLowerCase().includes(kataKunci);
@@ -501,7 +505,6 @@
                     dataDitemukan = true;
                     const tr = document.createElement('tr');
                     
-                    // Highlight kata kunci yang dicari (opsional untuk memperjelas tampilan teks)
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
                     const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto; border-radius: 4px;" alt="foto">` : '';
 
@@ -521,7 +524,6 @@
                 }
             });
 
-            // Tampilkan pesan jika tidak ada data yang cocok dengan pencarian
             if (!dataDitemukan && dataLaporan.length > 0) {
                  const tr = document.createElement('tr');
                  tr.innerHTML = `<td colspan="6" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
@@ -605,7 +607,7 @@
                         dataLaporan = parsedData;
                         await localforage.setItem('laporanPKL', dataLaporan);
                         
-                        document.getElementById('inputPencarian').value = ''; // Reset form pencarian saat restore
+                        document.getElementById('inputPencarian').value = ''; 
 
                         renderSemuaData();
                         cekKapasitasMemori();
@@ -650,7 +652,6 @@
             const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
             elemenNoPrint.forEach(el => el.style.display = 'none');
 
-            // Reset Pencarian Sementara agar PDF mencetak semua data dalam bulan terkait
             const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
             if(teksPencarianSaatIni !== '') {
                 document.getElementById('inputPencarian').value = '';
@@ -673,7 +674,6 @@
                 watermark.style.display = 'block';
                 elemenNoPrint.forEach(el => el.style.display = '');
                 
-                // Kembalikan teks pencarian jika ada
                 if(teksPencarianSaatIni !== '') {
                     document.getElementById('inputPencarian').value = teksPencarianSaatIni;
                     renderSemuaData();
