@@ -89,22 +89,38 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         
-        .area-kertas table, .area-kertas th, .area-kertas td {
+        /* PERBAIKAN BORDER DAN UKURAN FONT UNTUK PDF */
+        .area-kertas table {
             border: 1px solid black !important;
-            border-collapse: collapse;
-            color: black !important;
+            border-collapse: collapse !important;
+            font-size: 10px !important;
+            width: 100%;
+            table-layout: fixed;
         }
-        
-        .area-kertas th, .area-kertas td {
-            padding: 8px;
-            text-align: left;
+        .area-kertas th,
+        .area-kertas td {
+            border: 1px solid black !important;
+            padding: 4px 6px !important;
             vertical-align: top;
+            color: black !important;
+            word-break: break-word;
+        }
+        .area-kertas th {
+            background-color: #f0f0f0 !important;
+            font-weight: 600;
+            text-align: center;
+        }
+        .area-kertas table tbody tr:last-child td {
+            border-bottom: 1px solid black !important;
         }
 
-        tr {
+        .area-kertas table tr {
             page-break-inside: avoid !important;
         }
-        
+        .area-kertas table {
+            page-break-inside: avoid !important;
+        }
+
         .watermark {
             position: absolute;
             top: 50%;
@@ -130,6 +146,62 @@
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        }
+
+        /* PANEL AKSI RINGKAS */
+        #panelAksiContainer {
+            max-height: 110px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 6px;
+            padding: 4px 0;
+            align-items: center;
+        }
+        #panelAksiContainer .aksi-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2px 8px 2px 6px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .aksi-item .label {
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        .aksi-item button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 0 2px;
+            line-height: 1.4;
+        }
+        .aksi-item button.edit {
+            color: #2563eb;
+        }
+        .aksi-item button.edit:hover {
+            color: #1d4ed8;
+        }
+        .aksi-item button.hapus {
+            color: #dc2626;
+        }
+        .aksi-item button.hapus:hover {
+            color: #b91c1c;
+        }
+        body.dark-mode .aksi-item {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: #334155;
+        }
+        body.dark-mode .aksi-item .label {
+            color: #e2e8f0;
         }
     </style>
 </head>
@@ -240,13 +312,17 @@
             </div>
         </div>
 
-        <!-- PANEL MANAJEMEN AKSI DILUAR TABEL (KHUSUS HP/WEB) -->
-        <div class="glass-panel rounded-2xl p-4 no-print space-y-3">
-            <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
-                ⚙️ Daftar Pengelolaan Data (Edit / Hapus per Baris)
-            </h3>
-            <div id="panelAksiContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1">
-                <!-- Tombol aksi per baris akan muncul di sini secara otomatis -->
+        <!-- PANEL MANAJEMEN AKSI RINGKAS -->
+        <div class="glass-panel rounded-2xl p-3 no-print space-y-2">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold text-gray-700 flex items-center gap-1 cursor-pointer" onclick="togglePanelAksi()">
+                    ⚙️ Daftar Pengelolaan Data 
+                    <span id="toggleAksiIcon" class="text-gray-500 text-sm">▼</span>
+                </h3>
+                <span class="text-[10px] text-gray-400" id="jumlahDataAksi">0 data</span>
+            </div>
+            <div id="panelAksiContainer" class="scrollbar-thin scrollbar-thumb-gray-300">
+                <!-- Aksi item akan di-render di sini -->
             </div>
         </div>
 
@@ -254,14 +330,14 @@
         <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
-            <div class="konten-tabel p-6 md:p-12 bg-white/50" id="kontenTabelId" style="background: white !important; color: black !important;">
-                <div class="mb-8 text-lg font-bold" style="color: black !important;">
-                    <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
+            <div class="konten-tabel p-4 md:p-8 bg-white/50" id="kontenTabelId" style="background: white !important; color: black !important;">
+                <div class="mb-4 text-base font-bold" style="color: black !important;">
+                    <p class="mb-0.5">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
                 <div>
-                    <table id="tabelPkl" class="w-full text-sm md:text-base" style="color: black !important; table-layout: fixed;">
+                    <table id="tabelPkl" class="w-full" style="color: black !important; table-layout: fixed;">
                         <thead>
                             <tr>
                                 <th class="w-[8%] text-center">No</th>
@@ -312,6 +388,7 @@
 
         let dataLaporan = [];
         let indexEditMode = -1; 
+        let panelAksiVisible = true;
 
         window.onload = async function() {
             if (localStorage.getItem('darkMode') === 'true') {
@@ -364,6 +441,20 @@
                 btn.innerHTML = '☀️ <span class="hidden md:inline">Mode Terang</span>';
             } else {
                 btn.innerHTML = '🌙 <span class="hidden md:inline">Mode Gelap</span>';
+            }
+        }
+
+        function togglePanelAksi() {
+            const container = document.getElementById('panelAksiContainer');
+            const icon = document.getElementById('toggleAksiIcon');
+            if (panelAksiVisible) {
+                container.style.display = 'none';
+                icon.textContent = '▶';
+                panelAksiVisible = false;
+            } else {
+                container.style.display = 'flex';
+                icon.textContent = '▼';
+                panelAksiVisible = true;
             }
         }
 
@@ -539,6 +630,7 @@
             
             let noUrut = 1;
             let dataDitemukan = false;
+            let jumlahDataTampil = 0;
 
             dataLaporan.forEach((item, index) => {
                 const cocokBulan = (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif);
@@ -549,11 +641,12 @@
 
                 if (cocokBulan && cocokPencarian) {
                     dataDitemukan = true;
+                    jumlahDataTampil++;
                     
-                    // 1. Render Tabel Bersih (Tanpa kolom Aksi)
+                    // Render Tabel Bersih
                     const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity mx-auto rounded" style="max-width: 90px; max-height: 90px; display: block;" alt="foto">` : '-';
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity mx-auto rounded" style="max-width: 70px; max-height: 70px; display: block;" alt="foto">` : '-';
 
                     tr.innerHTML = `
                         <td class="text-center font-bold" style="color: black !important; word-break: break-word;">${noUrut}</td>
@@ -564,30 +657,30 @@
                     `;
                     tbody.appendChild(tr);
 
-                    // 2. Render Panel Tombol Aksi di Luar Tabel
-                    const cardAksi = document.createElement('div');
-                    cardAksi.className = "flex justify-between items-center bg-white/70 border border-gray-200 p-2.5 rounded-xl shadow-sm text-xs";
-                    cardAksi.innerHTML = `
-                        <span class="font-semibold text-gray-700 truncate max-w-[140px]">#${noUrut} - ${item.tanggal}</span>
-                        <div class="flex gap-1.5">
-                            <button onclick="editBaris(${index})" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg font-semibold hover:bg-blue-200">Edit</button>
-                            <button onclick="hapusBaris(${index})" class="bg-red-100 text-red-700 px-2.5 py-1 rounded-lg font-semibold hover:bg-red-200">Hapus</button>
-                        </div>
+                    // Render Panel Aksi Ringkas (hanya ikon)
+                    const aksiDiv = document.createElement('div');
+                    aksiDiv.className = 'aksi-item';
+                    aksiDiv.innerHTML = `
+                        <span class="label" title="${item.tanggal} - ${item.uraian.substring(0,20)}">#${noUrut} ${item.tanggal}</span>
+                        <button class="edit" onclick="editBaris(${index})" title="Edit">✏️</button>
+                        <button class="hapus" onclick="hapusBaris(${index})" title="Hapus">🗑️</button>
                     `;
-                    panelAksi.appendChild(cardAksi);
+                    panelAksi.appendChild(aksiDiv);
 
                     noUrut++; 
                 }
             });
+
+            document.getElementById('jumlahDataAksi').textContent = `${jumlahDataTampil} data`;
 
             if (!dataDitemukan && dataLaporan.length > 0) {
                  const tr = document.createElement('tr');
                  tr.innerHTML = `<td colspan="5" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
                  tbody.appendChild(tr);
                  
-                 panelAksi.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-2">Tidak ada aksi tersedia.</p>`;
+                 panelAksi.innerHTML = `<span class="text-xs text-gray-400 italic">Tidak ada aksi tersedia.</span>`;
             } else if (dataLaporan.length === 0) {
-                panelAksi.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-2">Belum ada data kegiatan.</p>`;
+                panelAksi.innerHTML = `<span class="text-xs text-gray-400 italic">Belum ada data kegiatan.</span>`;
             }
 
             if (filterAktif === 'SEMUA') {
@@ -699,7 +792,7 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- DOWNLOAD PDF AMAN TANPA TABEL MELUBER ---
+        // --- DOWNLOAD PDF ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
@@ -724,17 +817,18 @@
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
                 const opsiPDF = {
-                    margin:       [10, 10, 15, 10], 
+                    margin:       [5, 5, 5, 5],
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
                         scale: 2, 
                         useCORS: true,
                         scrollY: 0,
-                        windowWidth: 794 // Ukuran pas standar A4 dalam pixel web
+                        windowWidth: 794,
+                        letterRendering: true
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak:    { mode: ['css', 'legacy'] } 
+                    pagebreak:    { mode: 'avoid-all' }
                 };
 
                 html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
