@@ -110,8 +110,9 @@
             font-weight: 600;
             text-align: center;
         }
+        /* GARIS PENUTUP BAWAH - PASTIKAN SELALU ADA */
         .area-kertas table tbody tr:last-child td {
-            border-bottom: 1px solid black !important;
+            border-bottom: 2px solid black !important;
         }
 
         .area-kertas table tr {
@@ -202,6 +203,27 @@
         }
         body.dark-mode .aksi-item .label {
             color: #e2e8f0;
+        }
+
+        /* Tombol isi otomatis */
+        .btn-isi-otomatis {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #86efac;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-isi-otomatis:hover {
+            background: #dcfce7;
+        }
+        body.dark-mode .btn-isi-otomatis {
+            background: #1a2e1f;
+            color: #86efac;
+            border-color: #166534;
         }
     </style>
 </head>
@@ -314,12 +336,17 @@
 
         <!-- PANEL MANAJEMEN AKSI RINGKAS -->
         <div class="glass-panel rounded-2xl p-3 no-print space-y-2">
-            <div class="flex items-center justify-between">
-                <h3 class="text-xs font-bold text-gray-700 flex items-center gap-1 cursor-pointer" onclick="togglePanelAksi()">
-                    ⚙️ Daftar Pengelolaan Data 
-                    <span id="toggleAksiIcon" class="text-gray-500 text-sm">▼</span>
-                </h3>
-                <span class="text-[10px] text-gray-400" id="jumlahDataAksi">0 data</span>
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-xs font-bold text-gray-700 flex items-center gap-1 cursor-pointer" onclick="togglePanelAksi()">
+                        ⚙️ Daftar Pengelolaan Data 
+                        <span id="toggleAksiIcon" class="text-gray-500 text-sm">▼</span>
+                    </h3>
+                    <span class="text-[10px] text-gray-400" id="jumlahDataAksi">0 data</span>
+                </div>
+                <button onclick="isiOtomatis28_31()" class="btn-isi-otomatis">
+                    ➕ Isi Otomatis 28-31
+                </button>
             </div>
             <div id="panelAksiContainer" class="scrollbar-thin scrollbar-thumb-gray-300">
                 <!-- Aksi item akan di-render di sini -->
@@ -631,6 +658,7 @@
             let noUrut = 1;
             let dataDitemukan = false;
             let jumlahDataTampil = 0;
+            let barisTerakhir = null;
 
             dataLaporan.forEach((item, index) => {
                 const cocokBulan = (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif);
@@ -656,6 +684,7 @@
                         <td class="text-center align-middle">${fotoHtml}</td>
                     `;
                     tbody.appendChild(tr);
+                    barisTerakhir = tr;
 
                     // Render Panel Aksi Ringkas (hanya ikon)
                     const aksiDiv = document.createElement('div');
@@ -672,6 +701,14 @@
             });
 
             document.getElementById('jumlahDataAksi').textContent = `${jumlahDataTampil} data`;
+
+            // PASTIKAN GARIS BAWAH TERAKHIR ADA (jika ada data)
+            if (barisTerakhir) {
+                const semuaTd = barisTerakhir.querySelectorAll('td');
+                semuaTd.forEach(td => {
+                    td.style.borderBottom = '2px solid black !important';
+                });
+            }
 
             if (!dataDitemukan && dataLaporan.length > 0) {
                  const tr = document.createElement('tr');
@@ -790,6 +827,77 @@
         function updateLabelBulan(indexBulan, tahun) {
             const namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return `${namaBulan[indexBulan]} ${tahun}`;
+        }
+
+        // === FUNGSI ISI OTOMATIS 28-31 ===
+        async function isiOtomatis28_31() {
+            // Cek apakah data Juli 2026 sudah ada
+            const bulanTarget = 'Juli 2026';
+            const dataJuli = dataLaporan.filter(item => item.bulanLabel === bulanTarget);
+            if (dataJuli.length === 0) {
+                alert('Belum ada data Juli 2026. Silakan tambahkan minimal 1 data terlebih dahulu.');
+                return;
+            }
+
+            // Cek tanggal terakhir yang sudah ada
+            const tanggalTerakhir = dataJuli.reduce((max, item) => {
+                const parts = item.tanggal.split('/');
+                const tglNum = parseInt(parts[0]);
+                return tglNum > max ? tglNum : max;
+            }, 0);
+
+            if (tanggalTerakhir >= 31) {
+                alert('Data sudah lengkap sampai 31 Juli 2026.');
+                return;
+            }
+
+            // Mulai dari tanggalTerakhir + 1 sampai 31
+            let start = tanggalTerakhir + 1;
+            if (start < 28) start = 28; // pastikan minimal 28
+
+            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            let tambahan = 0;
+
+            for (let tgl = start; tgl <= 31; tgl++) {
+                // Buat objek Date untuk tahun 2026, bulan 6 (Juli = 6 karena 0-based)
+                const dateObj = new Date(2026, 6, tgl);
+                const hari = namaHari[dateObj.getDay()];
+                const tglStr = String(tgl).padStart(2, '0');
+                const tanggalFormat = `${tglStr}/07/2026`;
+                const labelBulan = 'Juli 2026';
+
+                // Cek apakah tanggal ini sudah ada
+                const sudahAda = dataLaporan.some(item => item.tanggal === tanggalFormat && item.bulanLabel === labelBulan);
+                if (!sudahAda) {
+                    dataLaporan.push({
+                        hari: hari,
+                        tanggal: tanggalFormat,
+                        uraian: '-',  // kosong, bisa diisi nanti
+                        foto: '',
+                        bulanLabel: labelBulan
+                    });
+                    tambahan++;
+                }
+            }
+
+            if (tambahan === 0) {
+                alert('Tidak ada tanggal baru yang ditambahkan (mungkin sudah lengkap).');
+                return;
+            }
+
+            // Urutkan dan simpan
+            dataLaporan.sort((a, b) => {
+                let partA = a.tanggal.split('/'); 
+                let partB = b.tanggal.split('/'); 
+                let numA = parseInt(partA[2] + partA[1] + partA[0]); 
+                let numB = parseInt(partB[2] + partB[1] + partB[0]); 
+                return numA - numB; 
+            });
+
+            await localforage.setItem('laporanPKL', dataLaporan);
+            renderSemuaData();
+            cekKapasitasMemori();
+            alert(`✅ Berhasil menambahkan ${tambahan} data untuk tanggal ${start}-31 Juli 2026.`);
         }
 
         // --- DOWNLOAD PDF ---
