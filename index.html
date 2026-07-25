@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tag Meta untuk PWA -->
     <meta name="theme-color" content="#3b82f6">
     <link rel="manifest" href="manifest.json">
     
@@ -244,14 +245,14 @@
         <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
-            <div class="konten-tabel p-6 md:p-12 bg-white/50" style="background: white !important; color: black !important;">
+            <div class="konten-tabel p-6 md:p-12 bg-white/50" id="kontenTabelId" style="background: white !important; color: black !important;">
                 <div class="mb-8 text-lg font-bold" style="color: black !important;">
                     <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
                 <div id="bungkusTabel" class="overflow-x-auto pb-4">
-                    <table class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
+                    <table id="tabelPkl" class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
                         <thead>
                             <tr>
                                 <th class="w-10 text-center">No</th>
@@ -675,11 +676,15 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- UPDATE MENTOK: HAPUS PAKSA PENGUNCI LEBAR AGAR TIDAK KEPOTONG ---
+        // --- SOLUSI STRETCH: AMAN DARI BLANK DAN POTONG KANAN ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
-            
+            const elemenCetak = document.getElementById('areaCetak');
+            const bungkusTabel = document.getElementById('bungkusTabel');
+            const tabelPkl = document.getElementById('tabelPkl');
+            const watermark = document.getElementById('teksWatermark');
+
             btn.innerHTML = "⏳ Memproses PDF...";
             btn.disabled = true;
 
@@ -691,50 +696,33 @@
             }
 
             setTimeout(() => {
-                const elemenCetakAsli = document.getElementById('areaCetak');
-                const cloneDOM = elemenCetakAsli.cloneNode(true);
-                
-                cloneDOM.querySelectorAll('.no-print').forEach(el => el.remove()); 
-                cloneDOM.querySelectorAll('.kolom-aksi').forEach(el => el.remove()); 
-                
-                const watermark = cloneDOM.querySelector('.watermark');
-                if (watermark) watermark.remove();
-                
-                const bungkusTabel = cloneDOM.querySelector('#bungkusTabel');
-                if (bungkusTabel) {
-                    bungkusTabel.classList.remove('overflow-x-auto', 'pb-4');
-                }
+                // Sembunyikan elemen yang tidak perlu
+                watermark.style.display = 'none';
+                const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
+                elemenNoPrint.forEach(el => el.style.display = 'none');
 
-                // 1. KUNCI FIX KEPOTONG KANAN: Hapus min-w-[700px] dari tabel kloning
-                const tabelClone = cloneDOM.querySelector('table');
-                if (tabelClone) {
-                    tabelClone.classList.remove('min-w-[700px]');
-                    tabelClone.style.width = '100%'; // Pastikan tabel melebar 100% dari wadah, bukan lebih
-                }
+                // 1. Simpan gaya asli agar bisa dikembalikan nanti
+                const originalCetakStyle = elemenCetak.getAttribute('style') || '';
+                const originalBungkusStyle = bungkusTabel ? bungkusTabel.className : '';
+                const originalTabelStyle = tabelPkl ? tabelPkl.className : '';
+                const originalKontenTabelStyle = document.getElementById('kontenTabelId').getAttribute('style') || '';
 
-                // 2. Kurangi padding berlebih di versi PDF agar ruang tabel lebih lega
-                const kontenTabel = cloneDOM.querySelector('.konten-tabel');
-                if (kontenTabel) {
-                    kontenTabel.classList.remove('p-6', 'md:p-12');
-                    kontenTabel.style.padding = '10px 20px';
-                }
-
-                // 3. Buat Wadah Rahasia dan paskan persis lebarnya 800px (Desktop / A4 standar)
-                const wadahRahasia = document.createElement('div');
-                wadahRahasia.style.position = 'absolute';
-                wadahRahasia.style.top = '0';
-                wadahRahasia.style.left = '0';
-                wadahRahasia.style.width = '800px'; 
-                wadahRahasia.style.backgroundColor = 'white';
-                wadahRahasia.style.zIndex = '-9999'; 
+                // 2. PAKSA elemen melebar jadi 800px persis seukuran desktop/A4
+                // Scroll dipaksa ke paling atas untuk hilangkan margin atas
+                window.scrollTo(0, 0); 
                 
-                wadahRahasia.appendChild(cloneDOM);
-                document.body.appendChild(wadahRahasia);
+                elemenCetak.style.width = '800px';
+                elemenCetak.style.maxWidth = 'none';
+                elemenCetak.style.margin = '0';
+                
+                document.getElementById('kontenTabelId').style.padding = '20px'; // Buat padding rapi
+
+                if (bungkusTabel) bungkusTabel.className = 'pb-4'; // Buang overflow scroll
+                if (tabelPkl) tabelPkl.className = 'w-full text-sm md:text-base'; // Buang min-width 700px
 
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
-                // 4. Seting PDF, arahkan html2pdf untuk memotret "wadahRahasia" yang lebarnya sudah pasti 800px
                 const opsiPDF = {
                     margin:       [10, 10, 15, 10], 
                     filename:     namaFile,
@@ -742,25 +730,42 @@
                     html2canvas:  { 
                         scale: 2, 
                         useCORS: true,
-                        scrollY: 0, 
-                        scrollX: 0, 
-                        windowWidth: 800 
+                        scrollY: 0,
+                        windowWidth: 800 // Kunci ukuran jepretan kamera persis sama dengan ukuran yang kita paksa
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
-                // PENTING: .from(wadahRahasia) bukan (cloneDOM)
-                html2pdf().set(opsiPDF).from(wadahRahasia).save().then(() => {
-                    document.body.removeChild(wadahRahasia);
+                html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
+                    // 3. KEMBALIKAN KE NORMAL SETELAH DOWNLOAD SELESAI
+                    elemenCetak.setAttribute('style', originalCetakStyle);
+                    document.getElementById('kontenTabelId').setAttribute('style', originalKontenTabelStyle);
+                    
+                    if (bungkusTabel) bungkusTabel.className = originalBungkusStyle;
+                    if (tabelPkl) tabelPkl.className = originalTabelStyle;
+
+                    watermark.style.display = 'block';
+                    elemenNoPrint.forEach(el => el.style.display = '');
+
                     if (teksPencarianSaatIni !== '') {
                         inputPencarian.value = teksPencarianSaatIni;
                         renderSemuaData();
                     }
+
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 }).catch(err => {
-                    document.body.removeChild(wadahRahasia);
+                    // KEMBALIKAN KE NORMAL JUGA JIKA TERJADI ERROR
+                    elemenCetak.setAttribute('style', originalCetakStyle);
+                    document.getElementById('kontenTabelId').setAttribute('style', originalKontenTabelStyle);
+                    
+                    if (bungkusTabel) bungkusTabel.className = originalBungkusStyle;
+                    if (tabelPkl) tabelPkl.className = originalTabelStyle;
+
+                    watermark.style.display = 'block';
+                    elemenNoPrint.forEach(el => el.style.display = '');
+
                     alert("Gagal membuat PDF.");
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
