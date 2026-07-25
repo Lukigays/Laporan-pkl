@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tag Meta untuk PWA -->
     <meta name="theme-color" content="#3b82f6">
     <link rel="manifest" href="manifest.json">
     
@@ -131,7 +130,6 @@
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
-            .overflow-x-auto { overflow-x: visible !important; }
         }
     </style>
 </head>
@@ -242,6 +240,17 @@
             </div>
         </div>
 
+        <!-- PANEL MANAJEMEN AKSI DILUAR TABEL (KHUSUS HP/WEB) -->
+        <div class="glass-panel rounded-2xl p-4 no-print space-y-3">
+            <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                ⚙️ Daftar Pengelolaan Data (Edit / Hapus per Baris)
+            </h3>
+            <div id="panelAksiContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1">
+                <!-- Tombol aksi per baris akan muncul di sini secara otomatis -->
+            </div>
+        </div>
+
+        <!-- AREA KERTAS BERSIH TANPA KOLOM AKSI -->
         <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
@@ -251,16 +260,15 @@
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
-                <div id="bungkusTabel" class="overflow-x-auto pb-4">
-                    <table id="tabelPkl" class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
+                <div>
+                    <table id="tabelPkl" class="w-full text-sm md:text-base" style="color: black !important; table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th class="w-10 text-center">No</th>
-                                <th class="w-24">Hari</th>
-                                <th class="w-32">Tanggal</th>
-                                <th>Uraian kegiatan pkl</th>
-                                <th class="w-48 text-center">Foto kegiatan</th>
-                                <th class="w-20 text-center no-print kolom-aksi">Aksi</th>
+                                <th class="w-[8%] text-center">No</th>
+                                <th class="w-[15%]">Hari</th>
+                                <th class="w-[18%]">Tanggal</th>
+                                <th class="w-[39%]">Uraian kegiatan pkl</th>
+                                <th class="w-[20%] text-center">Foto kegiatan</th>
                             </tr>
                         </thead>
                         <tbody id="tabelBody">
@@ -273,7 +281,6 @@
     </div>
 
     <script>
-        // === LOGIKA PWA & INSTALL APP ===
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
 
@@ -302,7 +309,6 @@
                     .catch(err => console.log('Service Worker gagal didaftarkan', err));
             });
         }
-        // ================================
 
         let dataLaporan = [];
         let indexEditMode = -1; 
@@ -526,7 +532,10 @@
 
             const filterAktif = selectFilter.value;
             const tbody = document.getElementById('tabelBody');
+            const panelAksi = document.getElementById('panelAksiContainer');
+            
             tbody.innerHTML = ''; 
+            panelAksi.innerHTML = '';
             
             let noUrut = 1;
             let dataDitemukan = false;
@@ -540,31 +549,45 @@
 
                 if (cocokBulan && cocokPencarian) {
                     dataDitemukan = true;
-                    const tr = document.createElement('tr');
                     
+                    // 1. Render Tabel Bersih (Tanpa kolom Aksi)
+                    const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity" style="max-width: 120px; max-height: 120px; display: block; margin: 0 auto; border-radius: 4px;" alt="foto">` : '';
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity mx-auto rounded" style="max-width: 90px; max-height: 90px; display: block;" alt="foto">` : '-';
 
                     tr.innerHTML = `
-                        <td class="text-center font-bold" style="color: black !important;">${noUrut}</td>
-                        <td style="color: black !important;">${item.hari}</td>
-                        <td style="color: black !important;">${item.tanggal}</td>
-                        <td style="color: black !important;">${uraianFormatted}</td>
+                        <td class="text-center font-bold" style="color: black !important; word-break: break-word;">${noUrut}</td>
+                        <td style="color: black !important; word-break: break-word;">${item.hari}</td>
+                        <td style="color: black !important; word-break: break-word;">${item.tanggal}</td>
+                        <td style="color: black !important; word-break: break-word; white-space: pre-wrap;">${uraianFormatted}</td>
                         <td class="text-center align-middle">${fotoHtml}</td>
-                        <td class="text-center align-middle no-print kolom-aksi">
-                            <button onclick="editBaris(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs mb-2 w-full hover:bg-blue-200 font-semibold font-sans">Edit</button>
-                            <button onclick="hapusBaris(${index})" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs w-full hover:bg-red-200 font-semibold font-sans">Hapus</button>
-                        </td>
                     `;
                     tbody.appendChild(tr);
+
+                    // 2. Render Panel Tombol Aksi di Luar Tabel
+                    const cardAksi = document.createElement('div');
+                    cardAksi.className = "flex justify-between items-center bg-white/70 border border-gray-200 p-2.5 rounded-xl shadow-sm text-xs";
+                    cardAksi.innerHTML = `
+                        <span class="font-semibold text-gray-700 truncate max-w-[140px]">#${noUrut} - ${item.tanggal}</span>
+                        <div class="flex gap-1.5">
+                            <button onclick="editBaris(${index})" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg font-semibold hover:bg-blue-200">Edit</button>
+                            <button onclick="hapusBaris(${index})" class="bg-red-100 text-red-700 px-2.5 py-1 rounded-lg font-semibold hover:bg-red-200">Hapus</button>
+                        </div>
+                    `;
+                    panelAksi.appendChild(cardAksi);
+
                     noUrut++; 
                 }
             });
 
             if (!dataDitemukan && dataLaporan.length > 0) {
                  const tr = document.createElement('tr');
-                 tr.innerHTML = `<td colspan="6" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
+                 tr.innerHTML = `<td colspan="5" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
                  tbody.appendChild(tr);
+                 
+                 panelAksi.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-2">Tidak ada aksi tersedia.</p>`;
+            } else if (dataLaporan.length === 0) {
+                panelAksi.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-2">Belum ada data kegiatan.</p>`;
             }
 
             if (filterAktif === 'SEMUA') {
@@ -676,13 +699,11 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- SOLUSI STRETCH: AMAN DARI BLANK DAN POTONG KANAN ---
+        // --- DOWNLOAD PDF AMAN TANPA TABEL MELUBER ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
             const elemenCetak = document.getElementById('areaCetak');
-            const bungkusTabel = document.getElementById('bungkusTabel');
-            const tabelPkl = document.getElementById('tabelPkl');
             const watermark = document.getElementById('teksWatermark');
 
             btn.innerHTML = "⏳ Memproses PDF...";
@@ -696,29 +717,8 @@
             }
 
             setTimeout(() => {
-                // Sembunyikan elemen yang tidak perlu
                 watermark.style.display = 'none';
-                const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
-                elemenNoPrint.forEach(el => el.style.display = 'none');
-
-                // 1. Simpan gaya asli agar bisa dikembalikan nanti
-                const originalCetakStyle = elemenCetak.getAttribute('style') || '';
-                const originalBungkusStyle = bungkusTabel ? bungkusTabel.className : '';
-                const originalTabelStyle = tabelPkl ? tabelPkl.className : '';
-                const originalKontenTabelStyle = document.getElementById('kontenTabelId').getAttribute('style') || '';
-
-                // 2. PAKSA elemen melebar jadi 800px persis seukuran desktop/A4
-                // Scroll dipaksa ke paling atas untuk hilangkan margin atas
                 window.scrollTo(0, 0); 
-                
-                elemenCetak.style.width = '800px';
-                elemenCetak.style.maxWidth = 'none';
-                elemenCetak.style.margin = '0';
-                
-                document.getElementById('kontenTabelId').style.padding = '20px'; // Buat padding rapi
-
-                if (bungkusTabel) bungkusTabel.className = 'pb-4'; // Buang overflow scroll
-                if (tabelPkl) tabelPkl.className = 'w-full text-sm md:text-base'; // Buang min-width 700px
 
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
@@ -731,22 +731,14 @@
                         scale: 2, 
                         useCORS: true,
                         scrollY: 0,
-                        windowWidth: 800 // Kunci ukuran jepretan kamera persis sama dengan ukuran yang kita paksa
+                        windowWidth: 794 // Ukuran pas standar A4 dalam pixel web
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
                 html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
-                    // 3. KEMBALIKAN KE NORMAL SETELAH DOWNLOAD SELESAI
-                    elemenCetak.setAttribute('style', originalCetakStyle);
-                    document.getElementById('kontenTabelId').setAttribute('style', originalKontenTabelStyle);
-                    
-                    if (bungkusTabel) bungkusTabel.className = originalBungkusStyle;
-                    if (tabelPkl) tabelPkl.className = originalTabelStyle;
-
                     watermark.style.display = 'block';
-                    elemenNoPrint.forEach(el => el.style.display = '');
 
                     if (teksPencarianSaatIni !== '') {
                         inputPencarian.value = teksPencarianSaatIni;
@@ -756,16 +748,7 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 }).catch(err => {
-                    // KEMBALIKAN KE NORMAL JUGA JIKA TERJADI ERROR
-                    elemenCetak.setAttribute('style', originalCetakStyle);
-                    document.getElementById('kontenTabelId').setAttribute('style', originalKontenTabelStyle);
-                    
-                    if (bungkusTabel) bungkusTabel.className = originalBungkusStyle;
-                    if (tabelPkl) tabelPkl.className = originalTabelStyle;
-
                     watermark.style.display = 'block';
-                    elemenNoPrint.forEach(el => el.style.display = '');
-
                     alert("Gagal membuat PDF.");
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
