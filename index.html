@@ -677,72 +677,95 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- UPDATE FINAL: FIX BUG KEPOTONG/MARGIN ATAS TERLALU JAUH ---
+        // --- TRIK CLONE BAYANGAN: SOLUSI PASTI BUG MARGIN & POTONG ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
-            const elemenCetak = document.getElementById('areaCetak');
-            const watermark = document.getElementById('teksWatermark');
-            const bungkusTabel = document.getElementById('bungkusTabel');
-            const tabel = document.querySelector('table');
             const textAsli = btn.innerHTML;
-            
-            // 1. PAKSA LAYAR KEMBALI KE PALING ATAS AGAR TIDAK ADA JARAK KOSONG
-            window.scrollTo(0, 0); 
             
             btn.innerHTML = "⏳ Memproses PDF...";
             btn.disabled = true;
-            watermark.style.display = 'none';
 
-            // Sembunyikan tombol aksi
-            const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
-            elemenNoPrint.forEach(el => el.style.display = 'none');
+            // Reset teks pencarian agar semua data pada filter bulan ikut ter-print
+            const inputPencarian = document.getElementById('inputPencarian');
+            const teksPencarianSaatIni = inputPencarian ? inputPencarian.value : '';
+            if (teksPencarianSaatIni !== '') {
+                inputPencarian.value = '';
+                renderSemuaData();
+            }
 
-            // Matikan semua pembatas konten
-            if (bungkusTabel) bungkusTabel.classList.remove('overflow-x-auto');
-            if (tabel) tabel.classList.remove('min-w-[700px]');
-            elemenCetak.classList.remove('overflow-hidden');
-
+            // Tunggu sebentar agar reset tabel selesai dirender browser
             setTimeout(() => {
-                const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
-                if(teksPencarianSaatIni !== '') {
-                    document.getElementById('inputPencarian').value = '';
-                    renderSemuaData();
-                }
+                // 1. Ambil area asli yang ingin kita cetak
+                const elemenCetakAsli = document.getElementById('areaCetak');
+                
+                // 2. Buat "Kloning" (Copy-an persis) dari tabel tersebut
+                const cloneDOM = elemenCetakAsli.cloneNode(true);
+                
+                // 3. Bersihkan elemen yang tidak boleh ikut terprint pada clone
+                cloneDOM.querySelectorAll('.no-print').forEach(el => el.remove()); // Hapus div no-print
+                cloneDOM.querySelectorAll('.kolom-aksi').forEach(el => el.remove()); // Hapus kolom Edit/Hapus
+                
+                // Matikan Watermark saat di print
+                const watermark = cloneDOM.querySelector('.watermark');
+                if (watermark) watermark.remove();
+                
+                // Hapus efek scroll di HP pada clone agar tabel memanjang penuh (tidak potong)
+                const bungkusTabel = cloneDOM.querySelector('#bungkusTabel');
+                if (bungkusTabel) bungkusTabel.classList.remove('overflow-x-auto');
+
+                // 4. BUAT WADAH RAHASIA DI KOORDINAT 0,0
+                // Ini memaksa sistem memotret dari ujung paling atas tanpa terpengaruh posisi scroll layarmu saat ini.
+                const wadahRahasia = document.createElement('div');
+                wadahRahasia.style.position = 'absolute';
+                wadahRahasia.style.top = '0';
+                wadahRahasia.style.left = '0';
+                wadahRahasia.style.width = '850px'; // Paksa lebar 850px agar tabel super lega dan tidak potong kanan
+                wadahRahasia.style.backgroundColor = 'white';
+                wadahRahasia.style.zIndex = '-9999'; // Sembunyikan jauh di balik layar
+                
+                // Masukkan tabel clone ke dalam wadah rahasia
+                wadahRahasia.appendChild(cloneDOM);
+                document.body.appendChild(wadahRahasia);
 
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
 
+                // 5. SETTING PDF
                 const opsiPDF = {
                     margin:       [10, 10, 15, 10], 
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    // 2. TAMBAHKAN scrollY: 0 AGAR TITIK AWAL FOTO BENAR-BENAR DI ATAS
-                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, scrollY: 0 }, 
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true,
+                        scrollY: 0, // Kunci paksa titik awal foto ke Y:0
+                        scrollX: 0, // Kunci paksa titik awal foto ke X:0
+                        windowWidth: 850 // Samakan dengan lebar wadahRahasia
+                    }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
-                html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
-                    watermark.style.display = 'block';
-                    elemenNoPrint.forEach(el => el.style.display = '');
-                    if (bungkusTabel) bungkusTabel.classList.add('overflow-x-auto');
-                    if (tabel) tabel.classList.add('min-w-[700px]');
-                    elemenCetak.classList.add('overflow-hidden');
+                // 6. GENERATE PDF DARI CLONE BAYANGAN
+                html2pdf().set(opsiPDF).from(cloneDOM).save().then(() => {
+                    // HANCURKAN WADAH RAHASIA SETELAH SELESAI AGAR WEB KEMBALI NORMAL
+                    document.body.removeChild(wadahRahasia);
                     
-                    if(teksPencarianSaatIni !== '') {
-                        document.getElementById('inputPencarian').value = teksPencarianSaatIni;
+                    // Kembalikan filter pencarian jika sebelumnya kamu sedang mencari sesuatu
+                    if (teksPencarianSaatIni !== '') {
+                        inputPencarian.value = teksPencarianSaatIni;
                         renderSemuaData();
                     }
 
+                    // Kembalikan status tombol
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 }).catch(err => {
+                    console.error("PDF Error: ", err);
                     alert("Gagal membuat PDF.");
-                    watermark.style.display = 'block';
-                    elemenNoPrint.forEach(el => el.style.display = '');
-                    if (bungkusTabel) bungkusTabel.classList.add('overflow-x-auto');
-                    if (tabel) tabel.classList.add('min-w-[700px]');
-                    elemenCetak.classList.add('overflow-hidden');
+                    
+                    // Jaga-jaga jika error, wadah rahasia tetap harus dibersihkan
+                    document.body.removeChild(wadahRahasia);
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 });
