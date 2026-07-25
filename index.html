@@ -251,7 +251,8 @@
                     <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
                 </div>
 
-                <div class="overflow-x-auto pb-4">
+                <!-- TAMBAHAN ID BUNGKUS TABEL -->
+                <div id="bungkusTabel" class="overflow-x-auto pb-4">
                     <table class="w-full text-sm md:text-base min-w-[700px]" style="color: black !important;">
                         <thead>
                             <tr>
@@ -273,7 +274,6 @@
     </div>
 
     <script>
-        // === LOGIKA PWA & INSTALL APP ===
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
 
@@ -302,7 +302,6 @@
                     .catch(err => console.log('Service Worker gagal didaftarkan', err));
             });
         }
-        // ================================
 
         let dataLaporan = [];
         let indexEditMode = -1; 
@@ -676,72 +675,75 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // --- FIX BUG PDF (Menghapus class scroll sementara sebelum download) ---
+        // --- UPDATE TERBARU: SOLUSI PDF TERPOTONG / BLANK ---
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const elemenCetak = document.getElementById('areaCetak');
             const watermark = document.getElementById('teksWatermark');
+            const bungkusTabel = document.getElementById('bungkusTabel');
+            const tabel = document.querySelector('table');
             const textAsli = btn.innerHTML;
             
-            btn.innerHTML = "⏳ Mengunduh...";
+            btn.innerHTML = "⏳ Memproses PDF...";
             btn.disabled = true;
             watermark.style.display = 'none';
 
+            // Sembunyikan tombol aksi
             const elemenNoPrint = document.querySelectorAll('.kolom-aksi');
             elemenNoPrint.forEach(el => el.style.display = 'none');
 
-            // Kita matikan sementara fitur scroll horizontal agar PDF membaca full tabel
-            const pembungkusTabel = document.querySelector('.overflow-x-auto');
-            if (pembungkusTabel) {
-                pembungkusTabel.classList.remove('overflow-x-auto');
-            }
+            // 1. MATIKAN SEMUA PEMBATAS KONTEN YANG MEMBUAT PDF BLANK
+            if (bungkusTabel) bungkusTabel.classList.remove('overflow-x-auto');
+            if (tabel) tabel.classList.remove('min-w-[700px]');
+            elemenCetak.classList.remove('overflow-hidden');
 
-            const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
-            if(teksPencarianSaatIni !== '') {
-                document.getElementById('inputPencarian').value = '';
-                renderSemuaData();
-            }
-
-            const filterAktif = document.getElementById('filterBulan').value;
-            const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
-
-            const opsiPDF = {
-                margin:       [10, 10, 15, 10], 
-                filename:     namaFile,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'] } 
-            };
-
-            html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
-                watermark.style.display = 'block';
-                elemenNoPrint.forEach(el => el.style.display = '');
-                
-                // Kembalikan fitur scroll setelah selesai
-                if (pembungkusTabel) {
-                    pembungkusTabel.classList.add('overflow-x-auto');
-                }
-                
+            // 2. GUNAKAN SET TIMEOUT AGAR DOM SEMPAT TER-REFRESH
+            setTimeout(() => {
+                const teksPencarianSaatIni = document.getElementById('inputPencarian').value;
                 if(teksPencarianSaatIni !== '') {
-                    document.getElementById('inputPencarian').value = teksPencarianSaatIni;
+                    document.getElementById('inputPencarian').value = '';
                     renderSemuaData();
                 }
 
-                btn.innerHTML = textAsli;
-                btn.disabled = false;
-            }).catch(err => {
-                alert("Gagal membuat PDF.");
-                watermark.style.display = 'block';
-                elemenNoPrint.forEach(el => el.style.display = '');
-                
-                if (pembungkusTabel) {
-                    pembungkusTabel.classList.add('overflow-x-auto');
-                }
-                
-                btn.innerHTML = textAsli;
-                btn.disabled = false;
-            });
+                const filterAktif = document.getElementById('filterBulan').value;
+                const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
+
+                const opsiPDF = {
+                    margin:       [10, 10, 15, 10], 
+                    filename:     namaFile,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    // Setel windowWidth agar hasil screenshot html2canvas membaca tabel penuh
+                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 }, 
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: ['css', 'legacy'] } 
+                };
+
+                html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
+                    // KEMBALIKAN SEMUA CLASS SEPERTI SEMULA SETELAH SELESAI
+                    watermark.style.display = 'block';
+                    elemenNoPrint.forEach(el => el.style.display = '');
+                    if (bungkusTabel) bungkusTabel.classList.add('overflow-x-auto');
+                    if (tabel) tabel.classList.add('min-w-[700px]');
+                    elemenCetak.classList.add('overflow-hidden');
+                    
+                    if(teksPencarianSaatIni !== '') {
+                        document.getElementById('inputPencarian').value = teksPencarianSaatIni;
+                        renderSemuaData();
+                    }
+
+                    btn.innerHTML = textAsli;
+                    btn.disabled = false;
+                }).catch(err => {
+                    alert("Gagal membuat PDF.");
+                    watermark.style.display = 'block';
+                    elemenNoPrint.forEach(el => el.style.display = '');
+                    if (bungkusTabel) bungkusTabel.classList.add('overflow-x-auto');
+                    if (tabel) tabel.classList.add('min-w-[700px]');
+                    elemenCetak.classList.add('overflow-hidden');
+                    btn.innerHTML = textAsli;
+                    btn.disabled = false;
+                });
+            }, 500); // Tunggu 0.5 detik
         }
     </script>
 </body>

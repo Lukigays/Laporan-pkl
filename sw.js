@@ -1,10 +1,9 @@
-const CACHE_NAME = 'pkl-app-lukyy-v1';
+const CACHE_NAME = 'pkl-app-lukyy-v2'; // UBAH KE V2 UNTUK MEMAKSA UPDATE
 const urlsToCache = [
   './index.html',
   './manifest.json'
 ];
 
-// Menginstall service worker dan cache file penting
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -14,12 +13,26 @@ self.addEventListener('install', event => {
   );
 });
 
-// Memberikan respon dari cache saat offline
+// FUNGSI BARU: Hapus file cache lama secara paksa
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Menghapus cache lama:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Kembalikan file dari cache jika ada, jika tidak ambil dari internet
         return response || fetch(event.request);
       })
   );
