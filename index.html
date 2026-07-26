@@ -11,112 +11,108 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f2f2f7; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc; 
             background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+                radial-gradient(at 10% 10%, hsla(228, 100%, 74%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, hsla(278, 100%, 74%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, hsla(168, 100%, 74%, 0.2) 0px, transparent 50%);
             background-attachment: fixed;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
+        /* Dark Mode Aesthetic */
         body.dark-mode {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            background-image: none;
+            background-color: #0b1120;
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(at 10% 10%, hsla(228, 100%, 40%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, hsla(278, 100%, 40%, 0.15) 0px, transparent 50%);
         }
+        
         body.dark-mode .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
         body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
-            background: rgba(15, 23, 42, 0.6) !important;
+            background: rgba(30, 41, 59, 0.7) !important;
             color: #ffffff !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         body.dark-mode input::placeholder, body.dark-mode textarea::placeholder {
-            color: #94a3b8;
+            color: #64748b;
         }
-        body.dark-mode .text-gray-700, body.dark-mode .text-gray-500, body.dark-mode .text-gray-600 {
-            color: #cbd5e1 !important;
-        }
-        body.dark-mode .bg-white\/50 {
-            background: rgba(30, 41, 59, 0.4) !important;
-        }
-        body.dark-mode .bg-white {
-            background: #1e293b !important;
-            color: #f1f5f9;
-        }
-        body.dark-mode .border-gray-200 {
-            border-color: #334155 !important;
-        }
+        body.dark-mode .text-gray-700, body.dark-mode .text-gray-600 { color: #cbd5e1 !important; }
+        body.dark-mode .text-gray-500 { color: #94a3b8 !important; }
+        body.dark-mode .bg-white\/50 { background: rgba(30, 41, 59, 0.5) !important; border-color: rgba(255, 255, 255, 0.05); }
+        body.dark-mode .bg-white { background: #1e293b !important; color: #f1f5f9; }
+        body.dark-mode .border-gray-200 { border-color: #334155 !important; }
+        body.dark-mode .text-gray-800 { color: #f8fafc !important; }
 
+        /* Modern Glassmorphism */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
         }
 
         input[type="date"], input[type="text"], input[type="file"], textarea, select {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
         }
         input:focus, textarea:focus, select:focus {
             outline: none;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
             border-color: #3b82f6;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         button {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         button:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
 
+        /* Area Kertas (Khusus Print/PDF) */
         .area-kertas {
             font-family: "Times New Roman", Times, serif;
             background-color: white !important;
             color: black !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
         }
         
         .area-kertas table {
             border: 1px solid black !important;
             border-collapse: collapse !important;
-            font-size: 10px !important;
+            font-size: 11px !important;
             width: 100%;
             table-layout: fixed;
         }
-        .area-kertas th,
-        .area-kertas td {
+        .area-kertas th, .area-kertas td {
             border: 1px solid black !important;
-            padding: 4px 6px !important;
+            padding: 6px 8px !important;
             vertical-align: top;
             color: black !important;
             word-break: break-word;
         }
         .area-kertas th {
-            background-color: #f0f0f0 !important;
-            font-weight: 600;
+            background-color: #f8f9fa !important;
+            font-weight: bold;
             text-align: center;
         }
         .area-kertas table tbody tr:last-child td {
             border-bottom: 2px solid black !important;
         }
-
-        .area-kertas table tr {
-            page-break-inside: avoid !important;
-        }
-        .area-kertas table {
+        .area-kertas table tr, .area-kertas table {
             page-break-inside: avoid !important;
         }
 
@@ -125,20 +121,21 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 4rem;
-            color: rgba(0, 0, 0, 0.08);
-            font-weight: bold;
+            font-size: 5rem;
+            color: rgba(0, 0, 0, 0.04);
+            font-weight: 800;
             white-space: nowrap;
             pointer-events: none;
             z-index: 1;
             user-select: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.1em;
         }
         
         .konten-tabel { position: relative; z-index: 10; }
         
         @media (min-width: 768px) {
-            .watermark { font-size: 6rem; }
+            .watermark { font-size: 7rem; }
         }
 
         @media print {
@@ -147,167 +144,201 @@
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
         }
 
+        /* Custom Animasi Judul */
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb, #7c3aed, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% 300%;
+            animation: gradientMove 5s ease infinite;
+        }
+        body.dark-mode .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+            -webkit-background-clip: text;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         /* Tombol hapus di form */
         .btn-hapus {
-            background-color: #fef2f2;
+            background-color: #fee2e2;
             color: #dc2626;
-            border: 1px solid #fca5a5;
+            border: 1px solid #fecaca;
             font-weight: 600;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 16px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .btn-hapus:hover {
-            background-color: #fee2e2;
+            background-color: #fca5a5;
+            color: white;
             border-color: #ef4444;
         }
         body.dark-mode .btn-hapus {
-            background-color: #2a1212;
+            background-color: rgba(220, 38, 38, 0.1);
             color: #f87171;
-            border-color: #7f1d1d;
+            border-color: rgba(248, 113, 113, 0.2);
         }
         body.dark-mode .btn-hapus:hover {
-            background-color: #3f1a1a;
+            background-color: #dc2626;
+            color: white;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 text-gray-800 antialiased">
+<body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen">
 
-    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
-        <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 text-4xl font-bold transition-colors">&times;</button>
-        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
+        <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 text-5xl font-light transition-colors">&times;</button>
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
-    <div class="max-w-4xl mx-auto space-y-6">
+    <div class="max-w-5xl mx-auto space-y-8">
         
-        <div class="flex justify-between items-center mb-2 no-print mt-4">
+        <!-- HEADER KEREN BY LUKYY -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 no-print mt-6 mb-8 text-center md:text-left">
             <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight drop-shadow-sm">Laporan PKL Generator</h1>
-                <p class="text-gray-500 text-xs md:text-sm font-medium">Create, manage, and export your reports easily.</p>
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
+                    <span>Laporan PKL by</span> 
+                    <span class="gradient-text">LUKYY</span>
+                    <span class="text-2xl md:text-3xl">✨</span>
+                </h1>
+                <p class="text-gray-500 font-medium mt-1">Sistem Manajemen & Generator Laporan Profesional</p>
             </div>
             
-            <div class="flex gap-2">
-                <button id="btnInstall" class="hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-semibold">
-                    📱 <span class="hidden md:inline">Install App</span>
+            <div class="flex gap-3">
+                <button id="btnInstall" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-1 flex items-center gap-2 text-sm font-bold">
+                    📱 <span>Install App</span>
                 </button>
                 
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel p-3 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-semibold">
-                    🌙 <span class="hidden md:inline">Mode Gelap</span>
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-5 py-3 rounded-2xl shadow-sm hover:-translate-y-1 flex items-center gap-2 text-sm font-bold">
+                    🌙 <span>Mode Gelap</span>
                 </button>
             </div>
         </div>
 
-        <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print">
-            <h2 class="text-lg font-bold mb-5 flex items-center gap-2 text-blue-600" id="judulForm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+        <!-- FORM INPUT -->
+        <div class="glass-panel rounded-[2rem] p-6 md:p-8 relative z-20 no-print">
+            <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-blue-600 dark:text-blue-400" id="judulForm">
+                <span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </span>
                 Input Kegiatan Baru
             </h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
-                    <select id="pilihEdit" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm" onchange="pilihTanggalEdit()">
-                        <option value="baru">+ Tambah Baru</option>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="lg:col-span-1">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
+                    <select id="pilihEdit" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                        <option value="baru">+ Tambah Laporan Baru</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                    <input type="date" id="inputTanggal" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm">
+                <div class="lg:col-span-1">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
+                    <input type="date" id="inputTanggal" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Uraian Kegiatan</label>
-                    <textarea id="inputUraian" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm" rows="3" placeholder="Contoh: Membersihkan transmisi..."></textarea>
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Uraian Kegiatan</label>
+                    <textarea id="inputUraian" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2" id="labelFoto">Foto Kegiatan</label>
-                    <input type="file" id="inputFoto" accept="image/*" class="w-full border-0 bg-white/60 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="text-xs text-blue-500 mt-2 font-medium" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tetap sama</p>
+                <div class="lg:col-span-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2" id="labelFoto">Upload Foto Bukti Kegiatan</label>
+                    <div class="flex items-center gap-4">
+                        <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/70 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
+                        <p class="text-sm text-blue-500 font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-6 flex flex-wrap gap-3 items-center">
-                <button onclick="tambahBaris()" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50" id="btnTambah">
-                    ✨ Tambah Laporan
-                </button>
-                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-2xl hover:bg-gray-300">
-                    Batal Edit
-                </button>
-                <!-- Tombol Hapus, hanya muncul saat mode edit -->
-                <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden">
-                    🗑️ Hapus Data
+            <div class="mt-8 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-6">
+                <button onclick="tambahBaris()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 flex items-center gap-2" id="btnTambah">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    Tambah Laporan
                 </button>
                 
-                <button onclick="downloadPDF()" id="btnDownload" class="ml-auto bg-white border border-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-2xl shadow-sm hover:bg-gray-50 flex items-center gap-2">
+                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-200 text-gray-700 font-bold py-3.5 px-8 rounded-2xl hover:bg-gray-300">
+                    Batal
+                </button>
+                
+                <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    Hapus
+                </button>
+                
+                <button onclick="downloadPDF()" id="btnDownload" class="ml-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white font-bold py-3.5 px-8 rounded-2xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 hover:-translate-y-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    Simpan PDF
+                    Export ke PDF
                 </button>
             </div>
         </div>
 
-        <div class="glass-panel rounded-2xl p-4 space-y-4 no-print relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4 flex-wrap">
+        <!-- FILTER & TOOLS -->
+        <div class="glass-panel rounded-3xl p-5 md:p-6 space-y-5 no-print relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-5 flex-wrap">
                 
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <span class="p-2 bg-blue-100 text-blue-600 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
-                    <select id="filterBulan" onchange="renderSemuaData()" class="border-0 bg-white/70 rounded-xl p-2.5 text-sm font-semibold text-gray-700 w-full md:w-48 shadow-sm">
-                        <option value="SEMUA">Semua Bulan</option>
+                    <span class="p-2.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
+                    <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-blue-500">
+                        <option value="SEMUA">Filter: Semua Bulan</option>
                     </select>
                 </div>
 
-                <div class="relative w-full md:flex-1 max-w-sm">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <div class="relative w-full md:flex-1 max-w-md">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                         <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                         </svg>
                     </div>
-                    <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="border-0 bg-white/70 rounded-xl p-2.5 pl-10 text-sm font-semibold text-gray-700 w-full shadow-sm" placeholder="Cari uraian, tanggal, atau hari...">
+                    <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-blue-500" placeholder="Cari uraian, tanggal, hari...">
                 </div>
                 
-                <div class="flex flex-wrap gap-2 w-full md:w-auto md:justify-end">
-                    <button onclick="backupData()" class="bg-white border border-gray-200 text-gray-600 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-gray-50 shadow-sm">
+                <div class="flex flex-wrap gap-3 w-full md:w-auto md:justify-end">
+                    <button onclick="backupData()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all hover:scale-105">
                         💾 Backup (.json)
                     </button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-white border border-gray-200 text-gray-600 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-gray-50 shadow-sm">
+                    <button onclick="document.getElementById('importFile').click()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all hover:scale-105">
                         📂 Restore
                     </button>
                     <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
-                    <button onclick="hapusSemuaData()" class="bg-red-50 text-red-600 border border-red-100 text-sm font-semibold py-2 px-4 rounded-xl hover:bg-red-100">
-                        Kosongkan Data
+                    <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-sm font-bold py-3 px-5 rounded-xl hover:bg-red-100 transition-all">
+                        Reset Data
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white/50 rounded-xl p-3 border border-white/60 text-xs flex flex-col gap-1.5">
-                <div class="flex justify-between font-semibold text-gray-600">
-                    <span id="labelKapasitasTeks">Kapasitas Penyimpanan Browser (IndexedDB):</span>
-                    <span id="persenMemori">Menganalisis...</span>
+            <div class="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-4 border border-white/80 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-sm">
+                <div class="flex justify-between font-bold text-gray-700 dark:text-gray-300">
+                    <span id="labelKapasitasTeks" class="flex items-center gap-1">🗄️ Kapasitas Penyimpanan (IndexedDB):</span>
+                    <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">Menganalisis...</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div id="barMemori" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+                    <div id="barMemori" class="bg-blue-600 h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
                 </div>
             </div>
         </div>
 
-        <!-- AREA KERTAS (TANPA KOLOM AKSI) -->
+        <!-- AREA KERTAS (CETAK) -->
         <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
-            <div class="konten-tabel p-4 md:p-8 bg-white/50" id="kontenTabelId" style="background: white !important; color: black !important;">
-                <div class="mb-4 text-base font-bold" style="color: black !important;">
-                    <p class="mb-0.5">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
-                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan">...</span></p>
+            <div class="konten-tabel p-6 md:p-10 bg-white" id="kontenTabelId" style="background: white !important; color: black !important;">
+                <div class="mb-5 text-base font-bold tracking-wide" style="color: black !important;">
+                    <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
+                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="uppercase">...</span></p>
                 </div>
 
                 <div>
-                    <table id="tabelPkl" class="w-full" style="color: black !important; table-layout: fixed;">
+                    <table id="tabelPkl" class="w-full border-collapse" style="color: black !important; table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th class="w-[8%] text-center">No</th>
-                                <th class="w-[15%]">Hari</th>
-                                <th class="w-[18%]">Tanggal</th>
-                                <th class="w-[39%]">Uraian kegiatan pkl</th>
-                                <th class="w-[20%] text-center">Foto kegiatan</th>
+                                <th class="w-[6%] text-center uppercase py-2">No</th>
+                                <th class="w-[14%] uppercase py-2">Hari</th>
+                                <th class="w-[16%] uppercase py-2">Tanggal</th>
+                                <th class="w-[44%] uppercase py-2">Uraian Kegiatan PKL</th>
+                                <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
                             </tr>
                         </thead>
                         <tbody id="tabelBody">
@@ -319,6 +350,7 @@
 
     </div>
 
+    <!-- LOGIKA JAVASCRIPT TETAP SAMA (TIDAK DIUBAH AGAR FUNGSI AMAN) -->
     <script>
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
@@ -355,7 +387,7 @@
         window.onload = async function() {
             if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('btnDarkMode').innerHTML = '☀️ <span class="hidden md:inline">Mode Terang</span>';
+                document.getElementById('btnDarkMode').innerHTML = '☀️ <span>Mode Terang</span>';
             }
 
             try {
@@ -400,9 +432,9 @@
             
             const btn = document.getElementById('btnDarkMode');
             if (isDark) {
-                btn.innerHTML = '☀️ <span class="hidden md:inline">Mode Terang</span>';
+                btn.innerHTML = '☀️ <span>Mode Terang</span>';
             } else {
-                btn.innerHTML = '🌙 <span class="hidden md:inline">Mode Gelap</span>';
+                btn.innerHTML = '🌙 <span>Mode Gelap</span>';
             }
         }
 
@@ -425,27 +457,26 @@
                     teksPersen.innerText = `${persentase.toFixed(2)}% terpakai (${usageMB} MB)`;
 
                     if (persentase < 60) {
-                        bar.className = "bg-green-500 h-2 rounded-full transition-all duration-500";
-                        teksInfo.innerText = "Kapasitas Storage Browser: Sangat Aman 🟢";
+                        bar.className = "bg-green-500 h-2.5 rounded-full transition-all duration-700 ease-out";
+                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: Sangat Aman 🟢";
                     } else if (persentase < 85) {
-                        bar.className = "bg-yellow-500 h-2 rounded-full transition-all duration-500";
-                        teksInfo.innerText = "Kapasitas Storage Browser: Mulai Penuh 🟡";
+                        bar.className = "bg-yellow-500 h-2.5 rounded-full transition-all duration-700 ease-out";
+                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: Mulai Penuh 🟡";
                     } else {
-                        bar.className = "bg-red-500 h-2 rounded-full transition-all duration-500";
-                        teksInfo.innerText = "Kapasitas Storage Browser: HAMPIR PENUH 🔴";
+                        bar.className = "bg-red-500 h-2.5 rounded-full transition-all duration-700 ease-out";
+                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: HAMPIR PENUH 🔴";
                     }
                 } catch (e) {
                     console.error("Gagal menghitung memori", e);
                 }
             } else {
-                document.getElementById('labelKapasitasTeks').innerText = "Kapasitas Storage Browser: Menggunakan IndexedDB (Super Besar)";
+                document.getElementById('labelKapasitasTeks').innerText = "🗄️ Kapasitas Storage Browser: Menggunakan IndexedDB (Super Besar)";
                 document.getElementById('persenMemori').innerText = "Aman";
                 document.getElementById('barMemori').style.width = '10%';
-                document.getElementById('barMemori').className = "bg-green-500 h-2 rounded-full transition-all duration-500";
+                document.getElementById('barMemori').className = "bg-green-500 h-2.5 rounded-full transition-all duration-700 ease-out";
             }
         }
 
-        // ========== FUNGSI PILIH TANGGAL EDIT ==========
         function pilihTanggalEdit() {
             const select = document.getElementById('pilihEdit');
             const val = select.value;
@@ -454,8 +485,8 @@
                 document.getElementById('inputTanggal').value = '';
                 document.getElementById('inputUraian').value = '';
                 document.getElementById('inputFoto').value = '';
-                document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
-                document.getElementById('judulForm').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Input Kegiatan Baru';
+                document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Tambah Laporan';
+                document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
                 document.getElementById('btnBatalEdit').classList.add('hidden');
                 document.getElementById('btnHapusEdit').classList.add('hidden');
                 document.getElementById('infoFotoEdit').style.display = 'none';
@@ -470,15 +501,14 @@
             const parts = item.tanggal.split('/');
             document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
             document.getElementById('inputUraian').value = item.uraian;
-            document.getElementById('judulForm').innerHTML = "✏️ Edit Kegiatan PKL";
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-amber-100 dark:bg-amber-900/50 text-amber-600 rounded-xl">✏️</span> Edit Kegiatan PKL';
             document.getElementById('btnTambah').innerHTML = "💾 Update Laporan";
             document.getElementById('btnBatalEdit').classList.remove('hidden');
-            document.getElementById('btnHapusEdit').classList.remove('hidden'); // Tampilkan tombol hapus
+            document.getElementById('btnHapusEdit').classList.remove('hidden');
             document.getElementById('infoFotoEdit').style.display = 'block';
             document.getElementById('inputFoto').value = '';
         }
 
-        // ========== TAMBAH / UPDATE ==========
         function tambahBaris() {
             const btn = document.getElementById('btnTambah');
             const tanggalInput = document.getElementById('inputTanggal').value;
@@ -577,7 +607,7 @@
                 
                 document.getElementById('inputUraian').value = '';
                 document.getElementById('inputFoto').value = '';
-                document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
+                document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Tambah Laporan';
                 document.getElementById('pilihEdit').value = 'baru';
                 batalEdit();
             } catch (e) {
@@ -586,7 +616,6 @@
             }
         }
 
-        // ========== HAPUS DATA YANG SEDANG DIEDIT ==========
         async function hapusDataYangDiedit() {
             if (indexEditMode === -1) {
                 alert('Tidak ada data yang dipilih untuk dihapus.');
@@ -601,11 +630,10 @@
             cekKapasitasMemori();
         }
 
-        // ========== RENDER DATA ==========
         function renderSemuaData() {
             const selectFilter = document.getElementById('filterBulan');
             const currentFilter = selectFilter.value;
-            selectFilter.innerHTML = '<option value="SEMUA">Semua Bulan</option>';
+            selectFilter.innerHTML = '<option value="SEMUA">Filter: Semua Bulan</option>';
             
             const inputPencarian = document.getElementById('inputPencarian');
             const kataKunci = inputPencarian ? inputPencarian.value.toLowerCase() : '';
@@ -624,14 +652,13 @@
                 selectFilter.value = 'SEMUA';
             }
 
-            // Update dropdown edit
             const selectEdit = document.getElementById('pilihEdit');
             const currentEditVal = selectEdit.value;
-            selectEdit.innerHTML = '<option value="baru">+ Tambah Baru</option>';
+            selectEdit.innerHTML = '<option value="baru">+ Tambah Laporan Baru</option>';
             dataLaporan.forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.tanggal;
-                opt.innerText = item.tanggal + ' - ' + item.uraian.substring(0,15);
+                opt.innerText = item.tanggal + ' - ' + item.uraian.substring(0,25) + '...';
                 selectEdit.appendChild(opt);
             });
             if (dataLaporan.some(item => item.tanggal === currentEditVal)) {
@@ -659,13 +686,13 @@
                     
                     const tr = document.createElement('tr');
                     const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-opacity mx-auto rounded" style="max-width: 70px; max-height: 70px; display: block;" alt="foto">` : '-';
+                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 hover:scale-105 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
 
                     tr.innerHTML = `
                         <td class="text-center font-bold" style="color: black !important; word-break: break-word;">${noUrut}</td>
                         <td style="color: black !important; word-break: break-word;">${item.hari}</td>
                         <td style="color: black !important; word-break: break-word;">${item.tanggal}</td>
-                        <td style="color: black !important; word-break: break-word; white-space: pre-wrap;">${uraianFormatted}</td>
+                        <td style="color: black !important; word-break: break-word; white-space: pre-wrap;" class="leading-relaxed">${uraianFormatted}</td>
                         <td class="text-center align-middle">${fotoHtml}</td>
                     `;
                     tbody.appendChild(tr);
@@ -684,11 +711,11 @@
 
             if (!dataDitemukan && dataLaporan.length > 0) {
                  const tr = document.createElement('tr');
-                 tr.innerHTML = `<td colspan="5" class="text-center py-4 text-gray-500 font-medium italic">Data tidak ditemukan.</td>`;
+                 tr.innerHTML = `<td colspan="5" class="text-center py-8 text-gray-500 font-medium italic">Pencarian tidak ditemukan.</td>`;
                  tbody.appendChild(tr);
             } else if (dataLaporan.length === 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="5" class="text-center py-4 text-gray-400 italic">Belum ada data kegiatan.</td>`;
+                tr.innerHTML = `<td colspan="5" class="text-center py-8 text-gray-400 font-medium italic">Belum ada data kegiatan. Yuk tambah laporan barumu!</td>`;
                 tbody.appendChild(tr);
             }
 
@@ -699,11 +726,10 @@
             }
         }
 
-        // ========== BATAL EDIT ==========
         function batalEdit() {
             indexEditMode = -1;
-            document.getElementById('judulForm').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Input Kegiatan Baru';
-            document.getElementById('btnTambah').innerHTML = "✨ Tambah Laporan";
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
+            document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Tambah Laporan';
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('btnHapusEdit').classList.add('hidden');
             document.getElementById('infoFotoEdit').style.display = "none";
@@ -713,11 +739,6 @@
             document.getElementById('pilihEdit').value = 'baru';
         }
 
-        // ========== HAPUS BARIS (legacy, tidak dipakai lagi) ==========
-        // Fungsi ini tidak lagi digunakan karena sekarang pakai hapusDataYangDiedit()
-        // Tetapi saya biarkan untuk kompatibilitas jika ada tombol lain yang memanggil
-
-        // ========== BACKUP / RESTORE ==========
         function backupData() {
             if(dataLaporan.length === 0) {
                 alert("Tabel masih kosong.");
@@ -729,7 +750,7 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = "Backup_Data_PKL.json";
+            a.download = "Backup_Data_PKL_LUKYY.json";
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -750,7 +771,7 @@
 
                         renderSemuaData();
                         cekKapasitasMemori();
-                        alert("✅ Restore berhasil!");
+                        alert("✅ Restore data berhasil!");
                     } else {
                         alert("❌ File tidak valid.");
                     }
@@ -763,7 +784,7 @@
         }
 
         async function hapusSemuaData() {
-            if(confirm("⚠️ Yakin kosongkan data?")) {
+            if(confirm("⚠️ Yakin kosongkan semua data laporan? Aksi ini tidak dapat dibatalkan!")) {
                 await localforage.removeItem('laporanPKL');
                 dataLaporan = [];
                 batalEdit();
@@ -778,14 +799,13 @@
             return `${namaBulan[indexBulan]} ${tahun}`;
         }
 
-        // ========== DOWNLOAD PDF ==========
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
             const elemenCetak = document.getElementById('areaCetak');
             const watermark = document.getElementById('teksWatermark');
 
-            btn.innerHTML = "⏳ Memproses PDF...";
+            btn.innerHTML = "⏳ Generating PDF...";
             btn.disabled = true;
 
             const inputPencarian = document.getElementById('inputPencarian');
@@ -800,12 +820,12 @@
                 window.scrollTo(0, 0); 
 
                 const filterAktif = document.getElementById('filterBulan').value;
-                const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL.pdf' : `Laporan_PKL_${filterAktif}.pdf`;
+                const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
-                    margin:       [5, 5, 5, 5],
+                    margin:       [10, 5, 10, 5],
                     filename:     namaFile,
-                    image:        { type: 'jpeg', quality: 0.98 },
+                    image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
                         scale: 2, 
                         useCORS: true,
@@ -833,7 +853,7 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 });
-            }, 500); 
+            }, 600); 
         }
     </script>
 </body>
