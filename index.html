@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#3b82f6">
-    <link rel="manifest" href="manifest.json">
     
     <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -509,7 +508,6 @@
                     dataDitemukan = true;
                     
                     const containerBulan = document.createElement('div');
-                    // class "bulan-container" disetup khusus agar beda halaman di PDF
                     containerBulan.className = 'mb-12 bulan-container'; 
                     
                     let htmlTabel = `
@@ -609,18 +607,13 @@
             }
         }
 
-        // ==========================================
-        // FUNGSI EXPORT PDF MUTLAK (FIX HP KEPOTONG)
-        // DENGAN PERINGATAN SITUS DESKTOP
-        // ==========================================
         function downloadPDF() {
-            // Deteksi jika user membuka web dari perangkat mobile/HP
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
                 const lanjutExport = confirm("⚠️ PERHATIAN UNTUK PENGGUNA HP ⚠️\n\nJika hasil PDF terpotong atau tabel kosong, mohon AKTIFKAN fitur 'Situs Desktop' (Desktop Site) di pengaturan browser Anda (titik tiga di pojok kanan atas) sebelum menekan tombol Export.\n\nApakah Anda ingin melanjutkan export PDF sekarang?");
                 if (!lanjutExport) {
-                    return; // Batalkan proses jika user memilih 'Batal'
+                    return; 
                 }
             }
 
@@ -632,7 +625,6 @@
             const inputPencarian = document.getElementById('inputPencarian');
             const teksPencarianSaatIni = inputPencarian ? inputPencarian.value : '';
             
-            // Hapus pencarian sementara agar data full sesuai filter bulan yang aktif
             if (teksPencarianSaatIni !== '') {
                 inputPencarian.value = '';
                 renderSemuaData(); 
@@ -640,18 +632,14 @@
 
             setTimeout(() => {
                 const elemenAsli = document.getElementById('areaCetak');
-                
-                // Simpan style asli mobile
                 const originalWidth = elemenAsli.style.width;
                 const originalMaxWidth = elemenAsli.style.maxWidth;
                 const originalOverflow = elemenAsli.style.overflow;
                 
-                // Paksa ukuran desktop sesaat sebelum screenshot diambil
                 elemenAsli.style.width = '794px';
                 elemenAsli.style.maxWidth = '794px';
                 elemenAsli.style.overflow = 'visible';
 
-                // Penamaan file mengikuti filter bulan yang sedang aktif
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
@@ -672,7 +660,6 @@
                 };
 
                 html2pdf().set(opsiPDF).from(elemenAsli).save().then(() => {
-                    // Kembalikan style ke kondisi semula (mobile friendly)
                     elemenAsli.style.width = originalWidth;
                     elemenAsli.style.maxWidth = originalMaxWidth;
                     elemenAsli.style.overflow = originalOverflow;
@@ -685,7 +672,6 @@
                     btn.disabled = false;
                     
                 }).catch(err => {
-                    // Jika gagal, pastikan tetap kembali ke tampilan awal
                     elemenAsli.style.width = originalWidth;
                     elemenAsli.style.maxWidth = originalMaxWidth;
                     elemenAsli.style.overflow = originalOverflow;
