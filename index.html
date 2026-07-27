@@ -9,6 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <!-- Library Animasi Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -272,7 +274,6 @@
             cekKapasitasMemori();
         };
 
-        // --- FUNGSI PINDAH TAB (BARU) ---
         function switchTab(tabName) {
             const tabInput = document.getElementById('tabInput');
             const tabLaporan = document.getElementById('tabLaporan');
@@ -294,7 +295,6 @@
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        // --------------------------------
 
         function bukaLightbox(src) {
             const lightbox = document.getElementById('lightbox');
@@ -454,7 +454,13 @@
                 cekKapasitasMemori();
                 batalEdit();
                 
-                // Pindah ke Tab Laporan secara otomatis setelah berhasil simpan
+                // Efek Confetti Sukses Simpan Data ✨
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
                 switchTab('laporan'); 
             } catch (e) {
                 alert("⚠️ Gagal menyimpan! Storage browser penuh.");
@@ -693,6 +699,13 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                     
+                    // Efek Confetti Sukses Export PDF 🎉
+                    confetti({
+                        particleCount: 100,
+                        spread: 90,
+                        origin: { y: 0.5 }
+                    });
+
                 }).catch(err => {
                     elemenAsli.style.width = originalWidth;
                     elemenAsli.style.maxWidth = originalMaxWidth;
