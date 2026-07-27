@@ -328,32 +328,14 @@
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
             <div class="konten-tabel p-6 md:p-10 bg-white" id="kontenTabelId" style="background: white !important; color: black !important;">
-                <div class="mb-5 text-base font-bold tracking-wide" style="color: black !important;">
-                    <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
-                    <p>b. &nbsp;&nbsp;Bulan <span id="labelBulan" class="uppercase">...</span></p>
-                </div>
-
-                <div>
-                    <table id="tabelPkl" class="w-full border-collapse" style="color: black !important; table-layout: fixed;">
-                        <thead>
-                            <tr>
-                                <th class="w-[6%] text-center uppercase py-2">No</th>
-                                <th class="w-[14%] uppercase py-2">Hari</th>
-                                <th class="w-[16%] uppercase py-2">Tanggal</th>
-                                <th class="w-[44%] uppercase py-2">Uraian Kegiatan PKL</th>
-                                <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelBody">
-                        </tbody>
-                    </table>
-                </div>
+                <!-- Tabel dinamis akan dirender di sini oleh JavaScript -->
+                <div id="wadahTabelBulan"></div>
             </div>
         </div>
 
     </div>
 
-    <!-- LOGIKA JAVASCRIPT TETAP SAMA (TIDAK DIUBAH AGAR FUNGSI AMAN) -->
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
@@ -655,6 +637,7 @@
                 selectFilter.value = 'SEMUA';
             }
 
+            // Update Opsi Edit
             const selectEdit = document.getElementById('pilihEdit');
             const currentEditVal = selectEdit.value;
             selectEdit.innerHTML = '<option value="baru">+ Tambah Laporan Baru</option>';
@@ -671,61 +654,85 @@
             }
 
             const filterAktif = selectFilter.value;
-            const tbody = document.getElementById('tabelBody');
-            tbody.innerHTML = '';
+            const wadahTabel = document.getElementById('wadahTabelBulan');
+            wadahTabel.innerHTML = '';
             
-            let noUrut = 1;
             let dataDitemukan = false;
-            let barisTerakhir = null;
 
-            dataLaporan.forEach((item, index) => {
-                const cocokBulan = (filterAktif === 'SEMUA' || item.bulanLabel === filterAktif);
-                const cocokPencarian = item.uraian.toLowerCase().includes(kataKunci) || 
-                                       item.tanggal.includes(kataKunci) || 
-                                       item.hari.toLowerCase().includes(kataKunci);
+            // Jika kosong total
+            if (dataLaporan.length === 0) {
+                wadahTabel.innerHTML = '<div class="text-center py-8 text-gray-400 font-medium italic">Belum ada data kegiatan. Yuk tambah laporan barumu!</div>';
+                return;
+            }
 
-                if (cocokBulan && cocokPencarian) {
+            // Tentukan list bulan yang akan di-render tabelnya
+            let bulanYangDirender = filterAktif === 'SEMUA' ? daftarBulanUnik : [filterAktif];
+
+            // Loop untuk membuat tabel terpisah di setiap bulan
+            bulanYangDirender.forEach(bulan => {
+                // Saring data khusus untuk bulan ini beserta filter pencarian
+                const dataBulanIni = dataLaporan.filter(item => {
+                    const cocokPencarian = item.uraian.toLowerCase().includes(kataKunci) || 
+                                           item.tanggal.includes(kataKunci) || 
+                                           item.hari.toLowerCase().includes(kataKunci);
+                    return item.bulanLabel === bulan && cocokPencarian;
+                });
+
+                if (dataBulanIni.length > 0) {
                     dataDitemukan = true;
                     
-                    const tr = document.createElement('tr');
-                    const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                    const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 hover:scale-105 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
-
-                    tr.innerHTML = `
-                        <td class="text-center font-bold" style="color: black !important; word-break: break-word;">${noUrut}</td>
-                        <td style="color: black !important; word-break: break-word;">${item.hari}</td>
-                        <td style="color: black !important; word-break: break-word;">${item.tanggal}</td>
-                        <td style="color: black !important; word-break: break-word; white-space: pre-wrap;" class="leading-relaxed">${uraianFormatted}</td>
-                        <td class="text-center align-middle">${fotoHtml}</td>
+                    const containerBulan = document.createElement('div');
+                    containerBulan.className = 'mb-12'; 
+                    
+                    let htmlTabel = `
+                        <div class="mb-4 text-base font-bold tracking-wide" style="color: black !important;">
+                            <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
+                            <p>b. &nbsp;&nbsp;Bulan <span class="uppercase">${bulan}</span></p>
+                        </div>
+                        <table class="w-full border-collapse" style="color: black !important; table-layout: fixed; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th class="w-[6%] text-center uppercase py-2">No</th>
+                                    <th class="w-[14%] uppercase py-2">Hari</th>
+                                    <th class="w-[16%] uppercase py-2">Tanggal</th>
+                                    <th class="w-[44%] uppercase py-2">Uraian Kegiatan PKL</th>
+                                    <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                     `;
-                    tbody.appendChild(tr);
-                    barisTerakhir = tr;
 
-                    noUrut++; 
+                    let noUrut = 1;
+                    dataBulanIni.forEach((item, index) => {
+                        const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
+                        const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 hover:scale-105 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
+
+                        // Beri border bottom tebal untuk baris terakhir dalam tabel bulan tersebut
+                        const styleBorderBottom = (index === dataBulanIni.length - 1) ? 'border-bottom: 2px solid black !important;' : '';
+
+                        htmlTabel += `
+                            <tr>
+                                <td class="text-center font-bold" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${noUrut}</td>
+                                <td style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.hari}</td>
+                                <td style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.tanggal}</td>
+                                <td style="color: black !important; word-break: break-word; white-space: pre-wrap; ${styleBorderBottom}" class="leading-relaxed">${uraianFormatted}</td>
+                                <td class="text-center align-middle" style="${styleBorderBottom}">${fotoHtml}</td>
+                            </tr>
+                        `;
+                        noUrut++;
+                    });
+
+                    htmlTabel += `
+                            </tbody>
+                        </table>
+                    `;
+                    containerBulan.innerHTML = htmlTabel;
+                    wadahTabel.appendChild(containerBulan);
                 }
             });
 
-            if (barisTerakhir) {
-                const semuaTd = barisTerakhir.querySelectorAll('td');
-                semuaTd.forEach(td => {
-                    td.style.borderBottom = '2px solid black !important';
-                });
-            }
-
             if (!dataDitemukan && dataLaporan.length > 0) {
-                 const tr = document.createElement('tr');
-                 tr.innerHTML = `<td colspan="5" class="text-center py-8 text-gray-500 font-medium italic">Pencarian tidak ditemukan.</td>`;
-                 tbody.appendChild(tr);
-            } else if (dataLaporan.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="5" class="text-center py-8 text-gray-400 font-medium italic">Belum ada data kegiatan. Yuk tambah laporan barumu!</td>`;
-                tbody.appendChild(tr);
-            }
-
-            if (filterAktif === 'SEMUA') {
-                document.getElementById('labelBulan').innerText = daftarBulanUnik.length ? daftarBulanUnik.join(' - ') : '...';
-            } else {
-                document.getElementById('labelBulan').innerText = filterAktif;
+                 wadahTabel.innerHTML = '<div class="text-center py-8 text-gray-500 font-medium italic">Pencarian tidak ditemukan.</div>';
             }
         }
 
