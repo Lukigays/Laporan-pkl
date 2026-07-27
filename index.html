@@ -328,7 +328,6 @@
             <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
 
             <div class="konten-tabel p-6 md:p-10 bg-white" id="kontenTabelId" style="background: white !important; color: black !important;">
-                <!-- Tabel dinamis akan dirender di sini oleh JavaScript -->
                 <div id="wadahTabelBulan"></div>
             </div>
         </div>
@@ -637,7 +636,6 @@
                 selectFilter.value = 'SEMUA';
             }
 
-            // Update Opsi Edit
             const selectEdit = document.getElementById('pilihEdit');
             const currentEditVal = selectEdit.value;
             selectEdit.innerHTML = '<option value="baru">+ Tambah Laporan Baru</option>';
@@ -659,18 +657,14 @@
             
             let dataDitemukan = false;
 
-            // Jika kosong total
             if (dataLaporan.length === 0) {
                 wadahTabel.innerHTML = '<div class="text-center py-8 text-gray-400 font-medium italic">Belum ada data kegiatan. Yuk tambah laporan barumu!</div>';
                 return;
             }
 
-            // Tentukan list bulan yang akan di-render tabelnya
             let bulanYangDirender = filterAktif === 'SEMUA' ? daftarBulanUnik : [filterAktif];
 
-            // Loop untuk membuat tabel terpisah di setiap bulan
             bulanYangDirender.forEach(bulan => {
-                // Saring data khusus untuk bulan ini beserta filter pencarian
                 const dataBulanIni = dataLaporan.filter(item => {
                     const cocokPencarian = item.uraian.toLowerCase().includes(kataKunci) || 
                                            item.tanggal.includes(kataKunci) || 
@@ -707,7 +701,6 @@
                         const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
                         const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 hover:scale-105 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
 
-                        // Beri border bottom tebal untuk baris terakhir dalam tabel bulan tersebut
                         const styleBorderBottom = (index === dataBulanIni.length - 1) ? 'border-bottom: 2px solid black !important;' : '';
 
                         htmlTabel += `
@@ -827,28 +820,43 @@
 
             setTimeout(() => {
                 watermark.style.display = 'none';
+
+                // --- METODE ANTI-KEPOTONG ---
+                // Menyimpan gaya asli sebelum diedit
+                const originalStyle = elemenCetak.getAttribute('style') || '';
+                
+                // Memaksa elemen cetak agar berperilaku seperti layar desktop (800px) secara statis
+                elemenCetak.style.width = '800px';
+                elemenCetak.style.maxWidth = '800px';
+                elemenCetak.style.margin = '0';
+                elemenCetak.style.padding = '0';
+                
+                // Scroll dipaksa ke atas dan ke kiri secara absolut sebelum screenshot diambil
                 window.scrollTo(0, 0); 
 
                 const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
-                    margin:       [10, 5, 10, 5],
+                    margin:       [10, 10, 10, 10], // Margin keliling (mm) agar tabel tidak mepet tepi kertas
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
                         scale: 2, 
                         useCORS: true,
                         scrollY: 0,
-                        windowWidth: 794,
-                        letterRendering: true
+                        scrollX: 0,
+                        windowWidth: 1024, // Membuat kanvas virtual seukuran layar desktop standar
+                        width: 800 // Memaksa width penangkapan sama persis dengan width elemen
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: 'avoid-all' }
                 };
 
                 html2pdf().set(opsiPDF).from(elemenCetak).save().then(() => {
+                    // Mengembalikan layout seperti semula untuk penggunaan normal
                     watermark.style.display = 'block';
+                    elemenCetak.setAttribute('style', originalStyle);
 
                     if (teksPencarianSaatIni !== '') {
                         inputPencarian.value = teksPencarianSaatIni;
@@ -858,8 +866,11 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 }).catch(err => {
+                    // Mengembalikan layout jika terjadi kegagalan sistem
                     watermark.style.display = 'block';
-                    alert("Gagal membuat PDF.");
+                    elemenCetak.setAttribute('style', originalStyle);
+                    alert("Gagal membuat PDF. Coba gunakan browser yang berbeda.");
+                    console.error(err);
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                 });
