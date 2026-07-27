@@ -12,8 +12,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2525190538790152"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2525190538790152" crossorigin="anonymous"></script>
     
     <style>
         body {
@@ -59,88 +58,32 @@
         button { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         button:active { transform: scale(0.96); }
 
+        /* Jarak aman di mobile agar tidak tertutup nav bawah */
+        .pb-safe { padding-bottom: max(6rem, env(safe-area-inset-bottom)); }
+
         /* Style Area Print Mutlak */
-        .area-kertas {
-            font-family: "Times New Roman", Times, serif;
-            background-color: white !important;
-            color: black !important;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
-        }
-
-        /* --- TAMBAHAN UNTUK FIX MOBILE --- */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .area-kertas table {
-            border: 1px solid black !important;
-            border-collapse: collapse !important;
-            font-size: 11px !important;
-            width: 100%;
-            min-width: 650px; /* Memaksa tabel tidak menyusut terlalu kecil di HP */
-            table-layout: fixed;
-        }
-        
-        .area-kertas th, .area-kertas td {
-            border: 1px solid black !important;
-            padding: 6px 8px !important;
-            vertical-align: top;
-            color: black !important;
-            word-break: break-word;
-        }
-        
-        .area-kertas th {
-            background-color: #f8f9fa !important;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* Mencegah kolom No, Hari, dan Tanggal turun baris (terpotong) */
+        .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .area-kertas table { border: 1px solid black !important; border-collapse: collapse !important; font-size: 11px !important; width: 100%; min-width: 650px; table-layout: fixed; }
+        .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
+        .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
         .area-kertas th:nth-child(1), .area-kertas td:nth-child(1),
         .area-kertas th:nth-child(2), .area-kertas td:nth-child(2),
-        .area-kertas th:nth-child(3), .area-kertas td:nth-child(3) {
-            white-space: nowrap !important;
-        }
-        /* --------------------------------- */
+        .area-kertas th:nth-child(3), .area-kertas td:nth-child(3) { white-space: nowrap !important; }
 
-        /* AUTO PAGE BREAK ANTAR BULAN */
-        .bulan-container {
-            page-break-inside: auto;
-        }
-        .bulan-container:not(:first-child) {
-            break-before: page;
-            page-break-before: always; 
-        }
-        .bulan-container tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-        }
+        .bulan-container { page-break-inside: auto; }
+        .bulan-container:not(:first-child) { break-before: page; page-break-before: always; }
+        .bulan-container tr { page-break-inside: avoid; page-break-after: auto; }
 
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 5rem;
-            color: rgba(0, 0, 0, 0.04);
-            font-weight: 800;
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 1;
-            user-select: none;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            letter-spacing: 0.1em;
-        }
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
         .konten-tabel { position: relative; z-index: 10; }
         
         @media (min-width: 768px) { .watermark { font-size: 7rem; } }
         @media print {
             .no-print { display: none !important; }
-            body { background: white !important; color: black !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
-            .table-wrapper { overflow-x: visible !important; } /* Matikan scroll saat di-print PDF */
+            .table-wrapper { overflow-x: visible !important; } 
         }
 
         .gradient-text { background: linear-gradient(135deg, #2563eb, #7c3aed, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 300%; animation: gradientMove 5s ease infinite; }
@@ -153,7 +96,7 @@
         body.dark-mode .btn-hapus:hover { background-color: #dc2626; color: white; }
     </style>
 </head>
-<body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen">
+<body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen pb-safe md:pb-8">
 
     <!-- LIGHTBOX FOTO -->
     <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
@@ -161,115 +104,143 @@
         <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
-    <div class="max-w-5xl mx-auto space-y-8">
+    <!-- TAB NAVIGATION (Fixed di bawah untuk Mobile, Mengambang di atas untuk Desktop) -->
+    <nav class="no-print fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 p-2 md:relative md:border-none md:bg-transparent md:backdrop-blur-none md:p-0 md:mb-6 md:flex md:justify-center">
+        <div class="flex justify-around max-w-sm mx-auto w-full md:w-auto md:gap-4 md:bg-white/60 md:dark:bg-gray-800/60 md:p-1.5 md:rounded-2xl md:shadow-sm md:border md:border-white/20">
+            <button onclick="switchTab('input')" id="btnTabInput" class="flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all">
+                <span class="text-xl md:text-base">📝</span>
+                <span class="text-[11px] md:text-sm font-bold">Input Data</span>
+            </button>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl">
+                <span class="text-xl md:text-base">📋</span>
+                <span class="text-[11px] md:text-sm font-bold">Laporan</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto space-y-6">
         
         <!-- HEADER -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6 no-print mt-6 mb-8 text-center md:text-left">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 no-print mt-2 md:mt-0 mb-6 text-center md:text-left">
             <div>
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
                     <span>Laporan PKL by</span> 
                     <span class="gradient-text">LUKYY</span>
                     <span class="text-2xl md:text-3xl">✨</span>
                 </h1>
-                <p class="text-gray-500 font-medium mt-1">Sistem Manajemen & Generator Laporan Profesional</p>
+                <p class="text-gray-500 font-medium mt-1 text-sm md:text-base">Sistem Manajemen & Generator Laporan Profesional</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-5 py-3 rounded-2xl shadow-sm hover:-translate-y-1 flex items-center gap-2 text-sm font-bold">
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-4 py-2.5 rounded-2xl shadow-sm hover:-translate-y-1 flex items-center gap-2 text-sm font-bold">
                     🌙 <span>Mode Gelap</span>
                 </button>
             </div>
         </div>
 
-        <!-- FORM INPUT -->
-        <div class="glass-panel rounded-[2rem] p-6 md:p-8 relative z-20 no-print">
-            <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-blue-600 dark:text-blue-400" id="judulForm">
-                <span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                </span>
-                Input Kegiatan Baru
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
-                    <select id="pilihEdit" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
-                        <option value="baru">+ Tambah Laporan Baru</option>
-                    </select>
-                </div>
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
-                    <input type="date" id="inputTanggal" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm">
-                </div>
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Uraian Kegiatan</label>
-                    <textarea id="inputUraian" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
-                </div>
-                <div class="lg:col-span-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2" id="labelFoto">Upload Foto Bukti Kegiatan</label>
-                    <div class="flex items-center gap-4">
-                        <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/70 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
-                        <p class="text-sm text-blue-500 font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-8 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-6">
-                <button onclick="tambahBaris()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 flex items-center gap-2" id="btnTambah">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Tambah Laporan
-                </button>
-                <button onclick="batalEdit()" id="btnBatalEdit" class="hidden bg-gray-200 text-gray-700 font-bold py-3.5 px-8 rounded-2xl hover:bg-gray-300">Batal</button>
-                <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Hapus
-                </button>
+        <!-- TAB 1: FORM INPUT -->
+        <div id="tabInput" class="transition-opacity duration-300">
+            <div class="glass-panel rounded-[2rem] p-6 md:p-8 relative z-20 no-print">
+                <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-blue-600 dark:text-blue-400" id="judulForm">
+                    <span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </span>
+                    Input Kegiatan Baru
+                </h2>
                 
-                <!-- TOMBOL DOWNLOAD PDF -->
-                <button onclick="downloadPDF()" id="btnDownload" class="ml-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white font-bold py-3.5 px-8 rounded-2xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 hover:-translate-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    Export ke PDF
-                </button>
-            </div>
-        </div>
-
-        <!-- FILTER & TOOLS -->
-        <div class="glass-panel rounded-3xl p-5 md:p-6 space-y-5 no-print relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-5 flex-wrap">
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <span class="p-2.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
-                    <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-blue-500">
-                        <option value="SEMUA">Filter: Semua Bulan</option>
-                    </select>
-                </div>
-                <div class="relative w-full md:flex-1 max-w-md">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="lg:col-span-1">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
+                        <select id="pilihEdit" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                            <option value="baru">+ Tambah Laporan Baru</option>
+                        </select>
                     </div>
-                    <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-blue-500" placeholder="Cari uraian, tanggal, hari...">
+                    <div class="lg:col-span-1">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
+                        <input type="date" id="inputTanggal" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm">
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Uraian Kegiatan</label>
+                        <textarea id="inputUraian" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
+                    </div>
+                    <div class="lg:col-span-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2" id="labelFoto">Upload Foto Bukti Kegiatan</label>
+                        <div class="flex items-center gap-4">
+                            <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/70 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
+                            <p class="text-sm text-blue-500 font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-3 w-full md:w-auto md:justify-end">
-                    <button onclick="backupData()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all hover:scale-105">💾 Backup (.json)</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all hover:scale-105">📂 Restore</button>
-                    <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
-                    <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-sm font-bold py-3 px-5 rounded-xl hover:bg-red-100 transition-all">Reset Data</button>
-                </div>
-            </div>
-            
-            <div class="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-4 border border-white/80 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-sm">
-                <div class="flex justify-between font-bold text-gray-700 dark:text-gray-300">
-                    <span id="labelKapasitasTeks" class="flex items-center gap-1">🗄️ Kapasitas Penyimpanan (IndexedDB):</span>
-                    <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">Menganalisis...</span>
-                </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-                    <div id="barMemori" class="bg-blue-600 h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                
+                <div class="mt-8 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-6">
+                    <button onclick="tambahBaris()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 flex items-center justify-center gap-2" id="btnTambah">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Simpan Laporan
+                    </button>
+                    <button onclick="batalEdit()" id="btnBatalEdit" class="hidden w-full md:w-auto bg-gray-200 text-gray-700 font-bold py-3.5 px-8 rounded-2xl hover:bg-gray-300 text-center">Batal</button>
+                    <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden w-full md:w-auto flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Hapus
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- AREA KERTAS (TAMPILAN DI WEB) -->
-        <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
-            <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
-            <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
-                <div id="wadahTabelBulan"></div>
+        <!-- TAB 2: LAPORAN (Tabel & Export) -->
+        <div id="tabLaporan" class="hidden transition-opacity duration-300">
+            <!-- FILTER & TOOLS -->
+            <div class="glass-panel rounded-3xl p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
+                
+                <!-- Aksi Utama: Export, Backup, Restore -->
+                <div class="flex flex-col md:flex-row gap-3 w-full border-b border-gray-200/50 dark:border-white/10 pb-5">
+                    <button onclick="downloadPDF()" id="btnDownload" class="w-full md:w-auto md:flex-1 bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm hover:bg-red-50 dark:hover:bg-gray-700 flex justify-center items-center gap-2 hover:-translate-y-1 transition-all group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 group-hover:scale-110 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        Export PDF
+                    </button>
+                    <button onclick="backupData()" class="w-full md:w-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all flex justify-center items-center gap-2">
+                        💾 Backup Data
+                    </button>
+                    <button onclick="document.getElementById('importFile').click()" class="w-full md:w-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold py-3 px-5 rounded-xl hover:bg-gray-50 shadow-sm transition-all flex justify-center items-center gap-2">
+                        📂 Restore
+                    </button>
+                    <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
+                </div>
+
+                <!-- Filter & Pencarian -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-5 flex-wrap pt-2">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <span class="p-2.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
+                        <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-blue-500">
+                            <option value="SEMUA">Filter: Semua Bulan</option>
+                        </select>
+                    </div>
+                    <div class="relative w-full md:flex-1 max-w-md">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
+                        </div>
+                        <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-blue-500" placeholder="Cari uraian, tanggal, hari...">
+                    </div>
+                    <div class="w-full md:w-auto flex justify-end">
+                        <button onclick="hapusSemuaData()" class="w-full md:w-auto bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-sm font-bold py-3 px-5 rounded-xl hover:bg-red-100 transition-all">Reset DB</button>
+                    </div>
+                </div>
+                
+                <!-- Info Memori -->
+                <div class="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-4 border border-white/80 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-sm">
+                    <div class="flex justify-between font-bold text-gray-700 dark:text-gray-300">
+                        <span id="labelKapasitasTeks" class="flex items-center gap-1">🗄️ Storage:</span>
+                        <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">Menganalisis...</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+                        <div id="barMemori" class="bg-blue-600 h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AREA KERTAS (TAMPILAN DI WEB) -->
+            <div class="area-kertas rounded-xl relative overflow-hidden" id="areaCetak">
+                <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
+                <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
+                    <div id="wadahTabelBulan"></div>
+                </div>
             </div>
         </div>
 
@@ -303,6 +274,30 @@
             renderSemuaData();
             cekKapasitasMemori();
         };
+
+        // --- FUNGSI PINDAH TAB (BARU) ---
+        function switchTab(tabName) {
+            const tabInput = document.getElementById('tabInput');
+            const tabLaporan = document.getElementById('tabLaporan');
+            const btnInput = document.getElementById('btnTabInput');
+            const btnLaporan = document.getElementById('btnTabLaporan');
+
+            if(tabName === 'input') {
+                tabInput.classList.remove('hidden');
+                tabLaporan.classList.add('hidden');
+                
+                btnInput.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all";
+                btnLaporan.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl";
+            } else {
+                tabLaporan.classList.remove('hidden');
+                tabInput.classList.add('hidden');
+
+                btnLaporan.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all";
+                btnInput.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl";
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // --------------------------------
 
         function bukaLightbox(src) {
             const lightbox = document.getElementById('lightbox');
@@ -347,13 +342,13 @@
 
                     if (persentase < 60) {
                         bar.className = "bg-green-500 h-2.5 rounded-full transition-all duration-700 ease-out";
-                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: Sangat Aman 🟢";
+                        teksInfo.innerHTML = "🗄️ Storage Browser: Sangat Aman 🟢";
                     } else if (persentase < 85) {
                         bar.className = "bg-yellow-500 h-2.5 rounded-full transition-all duration-700 ease-out";
-                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: Mulai Penuh 🟡";
+                        teksInfo.innerHTML = "🗄️ Storage Browser: Mulai Penuh 🟡";
                     } else {
                         bar.className = "bg-red-500 h-2.5 rounded-full transition-all duration-700 ease-out";
-                        teksInfo.innerHTML = "🗄️ Kapasitas Storage Browser: HAMPIR PENUH 🔴";
+                        teksInfo.innerHTML = "🗄️ Storage Browser: HAMPIR PENUH 🔴";
                     }
                 } catch (e) { console.error("Gagal menghitung memori", e); }
             }
@@ -461,6 +456,9 @@
                 renderSemuaData();
                 cekKapasitasMemori();
                 batalEdit();
+                
+                // Pindah ke Tab Laporan secara otomatis setelah berhasil simpan
+                switchTab('laporan'); 
             } catch (e) {
                 alert("⚠️ Gagal menyimpan! Storage browser penuh.");
                 dataLaporan = JSON.parse(backupDataSebelumError); 
@@ -530,7 +528,6 @@
                     const containerBulan = document.createElement('div');
                     containerBulan.className = 'mb-12 bulan-container'; 
                     
-                    // --- BUNGKUS TABEL DENGAN DIV TABLE-WRAPPER DI SINI ---
                     let htmlTabel = `
                         <div class="mb-4 text-base font-bold tracking-wide" style="color: black !important;">
                             <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
@@ -567,7 +564,7 @@
                         `;
                         noUrut++;
                     });
-                    htmlTabel += `</tbody></table></div>`; // --- TUTUP DIV TABLE-WRAPPER DI SINI ---
+                    htmlTabel += `</tbody></table></div>`;
                     containerBulan.innerHTML = htmlTabel;
                     wadahTabel.appendChild(containerBulan);
                 }
@@ -579,7 +576,7 @@
         function batalEdit() {
             indexEditMode = -1;
             document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
-            document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Tambah Laporan';
+            document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Simpan Laporan';
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('btnHapusEdit').classList.add('hidden');
             document.getElementById('infoFotoEdit').style.display = "none";
@@ -630,19 +627,17 @@
         }
 
         function downloadPDF() {
-            // --- WAJIB PILIH BULAN DULU SEBELUM EXPORT ---
             const filterAktif = document.getElementById('filterBulan').value;
             if (filterAktif === 'SEMUA') {
                 alert("⚠️ Harap pilih spesifik 'Bulan' pada menu Filter sebelum meng-export PDF!");
                 document.getElementById('filterBulan').focus();
-                return; // Batalkan proses jika belum memilih bulan
+                return; 
             }
-            // ---------------------------------------------
 
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
-                const lanjutExport = confirm("⚠️ PERHATIAN UNTUK PENGGUNA HP ⚠️\n\nJika hasil PDF terpotong atau tabel kosong, mohon AKTIFKAN fitur 'Situs Desktop' (Desktop Site) di pengaturan browser Anda (titik tiga di pojok kanan atas) sebelum menekan tombol Export.\n\nApakah Anda ingin melanjutkan export PDF sekarang?");
+                const lanjutExport = confirm("⚠️ PERHATIAN UNTUK PENGGUNA HP ⚠️\n\nJika hasil PDF terpotong atau tabel kosong, mohon AKTIFKAN fitur 'Situs Desktop' (Desktop Site) di browser Anda sebelum menekan tombol Export.\n\nLanjutkan export PDF?");
                 if (!lanjutExport) {
                     return; 
                 }
