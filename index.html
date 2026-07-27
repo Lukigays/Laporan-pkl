@@ -66,13 +66,23 @@
             color: black !important;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
         }
+
+        /* --- TAMBAHAN UNTUK FIX MOBILE --- */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .area-kertas table {
             border: 1px solid black !important;
             border-collapse: collapse !important;
             font-size: 11px !important;
             width: 100%;
+            min-width: 650px; /* Memaksa tabel tidak menyusut terlalu kecil di HP */
             table-layout: fixed;
         }
+        
         .area-kertas th, .area-kertas td {
             border: 1px solid black !important;
             padding: 6px 8px !important;
@@ -80,11 +90,20 @@
             color: black !important;
             word-break: break-word;
         }
+        
         .area-kertas th {
             background-color: #f8f9fa !important;
             font-weight: bold;
             text-align: center;
         }
+
+        /* Mencegah kolom No, Hari, dan Tanggal turun baris (terpotong) */
+        .area-kertas th:nth-child(1), .area-kertas td:nth-child(1),
+        .area-kertas th:nth-child(2), .area-kertas td:nth-child(2),
+        .area-kertas th:nth-child(3), .area-kertas td:nth-child(3) {
+            white-space: nowrap !important;
+        }
+        /* --------------------------------- */
 
         /* AUTO PAGE BREAK ANTAR BULAN */
         .bulan-container {
@@ -121,6 +140,7 @@
             .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            .table-wrapper { overflow-x: visible !important; } /* Matikan scroll saat di-print PDF */
         }
 
         .gradient-text { background: linear-gradient(135deg, #2563eb, #7c3aed, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 300%; animation: gradientMove 5s ease infinite; }
@@ -510,22 +530,24 @@
                     const containerBulan = document.createElement('div');
                     containerBulan.className = 'mb-12 bulan-container'; 
                     
+                    // --- BUNGKUS TABEL DENGAN DIV TABLE-WRAPPER DI SINI ---
                     let htmlTabel = `
                         <div class="mb-4 text-base font-bold tracking-wide" style="color: black !important;">
                             <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
                             <p>b. &nbsp;&nbsp;Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
-                        <table class="w-full border-collapse" style="color: black !important; table-layout: fixed; width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th class="w-[6%] text-center uppercase py-2">No</th>
-                                    <th class="w-[14%] uppercase py-2">Hari</th>
-                                    <th class="w-[16%] uppercase py-2">Tanggal</th>
-                                    <th class="w-[44%] uppercase py-2">Uraian Kegiatan PKL</th>
-                                    <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <div class="table-wrapper">
+                            <table class="w-full border-collapse" style="color: black !important; table-layout: fixed; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="w-[6%] text-center uppercase py-2">No</th>
+                                        <th class="w-[14%] uppercase py-2">Hari</th>
+                                        <th class="w-[18%] uppercase py-2">Tanggal</th>
+                                        <th class="w-[42%] uppercase py-2">Uraian Kegiatan PKL</th>
+                                        <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                     `;
 
                     let noUrut = 1;
@@ -545,7 +567,7 @@
                         `;
                         noUrut++;
                     });
-                    htmlTabel += `</tbody></table>`;
+                    htmlTabel += `</tbody></table></div>`; // --- TUTUP DIV TABLE-WRAPPER DI SINI ---
                     containerBulan.innerHTML = htmlTabel;
                     wadahTabel.appendChild(containerBulan);
                 }
@@ -608,6 +630,15 @@
         }
 
         function downloadPDF() {
+            // --- WAJIB PILIH BULAN DULU SEBELUM EXPORT ---
+            const filterAktif = document.getElementById('filterBulan').value;
+            if (filterAktif === 'SEMUA') {
+                alert("⚠️ Harap pilih spesifik 'Bulan' pada menu Filter sebelum meng-export PDF!");
+                document.getElementById('filterBulan').focus();
+                return; // Batalkan proses jika belum memilih bulan
+            }
+            // ---------------------------------------------
+
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
@@ -640,7 +671,6 @@
                 elemenAsli.style.maxWidth = '794px';
                 elemenAsli.style.overflow = 'visible';
 
-                const filterAktif = document.getElementById('filterBulan').value;
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
