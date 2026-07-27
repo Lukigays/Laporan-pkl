@@ -58,9 +58,6 @@
         button { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         button:active { transform: scale(0.96); }
 
-        /* Jarak aman di mobile agar tidak tertutup nav bawah */
-        .pb-safe { padding-bottom: max(6rem, env(safe-area-inset-bottom)); }
-
         /* Style Area Print Mutlak */
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -96,7 +93,7 @@
         body.dark-mode .btn-hapus:hover { background-color: #dc2626; color: white; }
     </style>
 </head>
-<body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen pb-safe md:pb-8">
+<body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen pb-32 md:pb-8">
 
     <!-- LIGHTBOX FOTO -->
     <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
