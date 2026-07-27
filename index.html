@@ -552,7 +552,7 @@
                     let noUrut = 1;
                     dataBulanIni.forEach((item, index) => {
                         const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                        const fotoHtml = item.foto ? `<img src="${item.foto}" width="70" height="70" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="display: block; width: 70px; height: auto;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
+                        const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
                         const styleBorderBottom = (index === dataBulanIni.length - 1) ? 'border-bottom: 2px solid black !important;' : '';
 
                         htmlTabel += `
@@ -628,7 +628,7 @@
             }
         }
 
-        // --- PERBAIKAN TOTAL EKSPOR KE WORD (MENGGUNAKAN XML TABEL ASLI WORD) ---
+        // --- FIX EKSPOR KE WORD (FOTO & TABEL RAPI SEPERTI PDF) ---
         function downloadWord() {
             const filterAktif = document.getElementById('filterBulan').value;
             if (filterAktif === 'SEMUA') {
@@ -651,7 +651,7 @@
                 const wrappers = elemenCetak.querySelectorAll('.table-wrapper');
                 wrappers.forEach(w => { w.style.overflowX = 'visible'; w.style.width = '100%'; });
 
-                // Paksa ukuran tabel dan border agar terdeteksi sempurna di WPS / Ms Word
+                // Mengatur tabel agar tegas terbaca oleh WPS/Word
                 const tables = elemenCetak.querySelectorAll('table');
                 tables.forEach(t => {
                     t.setAttribute('border', '1');
@@ -659,7 +659,6 @@
                     t.setAttribute('cellspacing', '0');
                     t.style.borderCollapse = 'collapse';
                     t.style.width = '100%';
-                    t.style.border = '1px solid black';
                 });
 
                 const cells = elemenCetak.querySelectorAll('th, td');
@@ -668,17 +667,21 @@
                     c.style.padding = '6px';
                 });
 
+                // Memastikan gambar dibaca dengan ukuran pasti dalam format Base64 asli
                 const images = elemenCetak.querySelectorAll('img');
                 images.forEach(img => {
-                    img.setAttribute('width', '65');
-                    img.setAttribute('height', '65');
-                    img.style.width = '65px';
-                    img.style.height = '65px';
+                    const srcAsli = img.getAttribute('src');
+                    img.setAttribute('src', srcAsli); // Mempertahankan data Base64 utuh
+                    img.setAttribute('width', '70');
+                    img.setAttribute('height', '70');
+                    img.style.width = '70px';
+                    img.style.height = '70px';
+                    img.style.display = 'block';
+                    img.style.margin = '0 auto';
                 });
 
                 const kontenHtml = elemenCetak.innerHTML;
                 
-                // Header XML khusus Word agar tabel tidak hancur/berantakan
                 const htmlLengkap = `
                     <html xmlns:o='urn:schemas-microsoft-com:office:office' 
                           xmlns:w='urn:schemas-microsoft-com:office:word' 
@@ -688,8 +691,8 @@
                         <title>Laporan PKL</title>
                         <style>
                             body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: black; }
-                            table { border-collapse: collapse; width: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-                            th, td { border: 1.5px solid black; padding: 6px 8px; vertical-align: top; }
+                            table { border-collapse: collapse; width: 100%; }
+                            th, td { border: 1px solid black; padding: 6px 8px; vertical-align: top; }
                             th { background-color: #f8f9fa; text-align: center; font-weight: bold; }
                         </style>
                     </head>
