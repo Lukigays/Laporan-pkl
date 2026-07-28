@@ -22,7 +22,7 @@
             --ring-color: rgba(10, 132, 255, 0.25);
         }
 
-        /* Animated Gradient Background */
+        /* Super Smooth Animated Gradient Background */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f2f2f7; 
@@ -32,8 +32,8 @@
                 radial-gradient(at 50% 100%, rgba(50, 215, 75, 0.12) 0px, transparent 55%);
             background-attachment: fixed;
             background-size: 200% 200%;
-            animation: bgShift 15s ease-in-out infinite;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            animation: bgShift 18s ease-in-out infinite;
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.dark-mode {
@@ -51,19 +51,19 @@
             100% { background-position: 0% 0%; }
         }
         
-        /* Apple iOS Liquid Glass Style Panels + Hover Animation */
+        /* Apple iOS Liquid Glass Style Panels + Smooth Hover */
         .glass-panel {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(40px) saturate(200%);
             -webkit-backdrop-filter: blur(40px) saturate(200%);
             border: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-            transition: all 0.4s cubic-bezier(0.25, 1.05, 0.5, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
         }
 
         .glass-panel:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         body.dark-mode .glass-panel { 
@@ -73,7 +73,7 @@
         }
 
         body.dark-mode .glass-panel:hover {
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         /* Inputs & Buttons Animation */
@@ -88,11 +88,10 @@
         body.dark-mode #loading-screen { background-color: #000000; }
         body.dark-mode #loading-screen h2 { color: #ffffff; }
 
-        input[type="date"], input[type="text"], input[type="file"], textarea, select { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
-        input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.95); transform: translateY(-2px); }
-        button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        button:active { transform: scale(0.92); }
-        button:hover { filter: brightness(1.1); }
+        input[type="date"], input[type="text"], input[type="file"], textarea, select { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; }
+        input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.95); transform: translateY(-1px); }
+        button { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        button:active { transform: scale(0.95); }
 
         /* Style Area Print Mutlak */
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
@@ -138,13 +137,13 @@
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .btn-hapus { background-color: rgba(255, 69, 58, 0.15); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3); font-weight: 600; padding: 12px 24px; border-radius: 16px; cursor: pointer; }
-        .btn-hapus:hover { background-color: #ff453a; color: white; transform: scale(1.05); }
+        .btn-hapus:hover { background-color: #ff453a; color: white; transform: scale(1.02); }
 
-        /* Animasi Transisi Tab Halus */
+        /* Super Smooth Tab Transitions */
         .tab-content {
             opacity: 0;
-            transform: translateY(20px) scale(0.98);
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(15px) scale(0.99);
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: absolute;
             width: 100%;
             pointer-events: none;
@@ -159,17 +158,17 @@
         }
 
         #toast-container {
-            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.4s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
         }
 
-        /* Cascade Fade In Animation for List Items */
-        @keyframes cascadeFade {
-            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+        /* Fluid Cascade Staggered Animation */
+        @keyframes fluidFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         .animate-item {
             opacity: 0;
-            animation: cascadeFade 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            animation: fluidFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .no-animation .animate-item {
             animation: none;
@@ -183,40 +182,40 @@
     <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-[#f2f2f7] dark:bg-[#000000] backdrop-blur-2xl transition-opacity duration-700 ease-out">
         <div class="relative flex justify-center items-center">
-            <div class="absolute w-24 h-24 rounded-full border-4 border-gray-300 dark:border-gray-800"></div>
-            <div class="absolute w-24 h-24 rounded-full border-4 border-transparent border-t-[#0a84ff] border-b-[#5e5ce6] animate-spin"></div>
-            <span class="text-3xl animate-bounce mt-1 drop-shadow-lg">✨</span>
+            <div class="absolute w-20 h-20 rounded-full border-4 border-gray-300 dark:border-gray-800"></div>
+            <div class="absolute w-20 h-20 rounded-full border-4 border-transparent border-t-[#0a84ff] border-b-[#5e5ce6] animate-spin"></div>
+            <span class="text-2xl animate-bounce mt-1">✨</span>
         </div>
-        <h2 class="mt-8 text-xl font-extrabold tracking-tight text-gray-800 dark:text-white drop-shadow-sm animate-pulse">Menyiapkan Workspace</h2>
-        <p class="font-bold mt-2 text-sm tracking-widest gradient-text">LUKYY</p>
+        <h2 class="mt-8 text-xl font-extrabold tracking-tight text-gray-800 dark:text-white drop-shadow-sm">Menyiapkan Workspace</h2>
+        <p class="font-bold mt-1 text-sm tracking-widest gradient-text animate-pulse">LUKYY</p>
     </div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed bottom-24 right-4 md:bottom-10 md:right-10 z-[110] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
-        <div id="toast-box" class="glass-panel px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/40 dark:border-white/10 scale-100 hover:scale-105 transition-transform">
-            <span id="toast-icon" class="text-2xl drop-shadow-md">✅</span>
+    <div id="toast-container" class="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[110] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="toast-box" class="glass-panel px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-white/40 dark:border-white/10">
+            <span id="toast-icon" class="text-xl">✅</span>
             <p id="toast-message" class="text-sm font-bold text-gray-800 dark:text-gray-100">Pesan notifikasi...</p>
         </div>
     </div>
 
     <!-- LIGHTBOX FOTO -->
-    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 backdrop-blur-xl flex justify-center items-center p-4 transition-opacity duration-400" onclick="tutupLightbox()">
-        <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 hover:rotate-90 text-5xl font-light transition-all duration-300">&times;</button>
-        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-90 transition-transform duration-500 cubic-bezier(0.175, 0.885, 0.32, 1.275)" onclick="event.stopPropagation()">
+    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 backdrop-blur-xl flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
+        <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 text-5xl font-light transition-colors">&times;</button>
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
     <!-- MODAL PRATINJAU CETAK / PRINT PREVIEW -->
-    <div id="modalPreview" class="fixed inset-0 z-[95] hidden bg-black/70 backdrop-blur-2xl flex justify-center items-center p-2 md:p-6 transition-all duration-500 opacity-0">
-        <div class="glass-panel w-full max-w-4xl h-[90vh] rounded-[2.5xl] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-500" id="modalBox">
+    <div id="modalPreview" class="fixed inset-0 z-[95] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-2 md:p-6 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-4xl h-[90vh] rounded-[2.5xl] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400" id="modalBox">
             <div class="p-4 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
-                <div class="flex items-center gap-3">
-                    <span class="text-3xl drop-shadow-md">🔍</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🔍</span>
                     <h3 class="font-extrabold text-lg text-gray-800 dark:text-white">Pratinjau Hasil Laporan</h3>
                 </div>
-                <button onclick="tutupPreview()" class="text-gray-500 hover:text-red-500 hover:rotate-90 text-3xl font-light transition-all duration-300">&times;</button>
+                <button onclick="tutupPreview()" class="text-gray-500 hover:text-red-500 text-3xl font-light transition-colors">&times;</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-black/5 flex justify-center">
-                <div class="w-full max-w-[794px] bg-white text-black p-8 rounded-xl shadow-2xl area-kertas relative" id="areaPreviewIsiUtama" style="min-height: 1056px;">
+                <div class="w-full max-w-[794px] bg-white text-black p-8 rounded shadow-lg area-kertas relative" id="areaPreviewIsiUtama" style="min-height: 1056px;">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel">
                         <div id="wadahPreviewTabel"></div>
@@ -224,21 +223,21 @@
                 </div>
             </div>
             <div class="p-4 md:p-6 border-t border-gray-200/50 dark:border-gray-800/50 flex justify-end gap-3 bg-white/40 dark:bg-gray-900/40">
-                <button onclick="tutupPreview()" class="px-5 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-sm hover:scale-105 transition-transform">Tutup</button>
-                <button onclick="eksekusiDownloadDariPreview()" class="px-6 py-3 bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] hover:opacity-90 text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-all">📥 Unduh PDF Sekarang</button>
+                <button onclick="tutupPreview()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-sm">Tutup</button>
+                <button onclick="eksekusiDownloadDariPreview()" class="px-6 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-blue-500/30">📥 Unduh PDF Sekarang</button>
             </div>
         </div>
     </div>
 
     <!-- TAB NAVIGATION (iOS Floating Dock Style) -->
     <nav class="no-print fixed bottom-4 left-4 right-4 z-50 flex justify-center">
-        <div class="glass-panel p-2 rounded-3xl shadow-2xl flex gap-3 max-w-sm w-full justify-around border border-white/50 dark:border-white/10 hover:shadow-[0_30px_60px_rgba(0,0,0,0.2)] transition-shadow">
-            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm transform hover:scale-105">
-                <span class="text-xl mb-1 transition-transform">📝</span>
+        <div class="glass-panel p-2 rounded-3xl shadow-2xl flex gap-3 max-w-sm w-full justify-around border border-white/50 dark:border-white/10">
+            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm">
+                <span class="text-lg">📝</span>
                 <span class="text-[11px] font-bold">Input Data</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl transform hover:scale-105">
-                <span class="text-xl mb-1 transition-transform">📋</span>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl">
+                <span class="text-lg">📋</span>
                 <span class="text-[11px] font-bold">Laporan</span>
             </button>
         </div>
@@ -247,19 +246,19 @@
     <div class="max-w-5xl mx-auto space-y-6 relative">
         
         <!-- HEADER -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 no-print mt-2 md:mt-0 mb-8 text-center md:text-left">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 no-print mt-2 md:mt-0 mb-6 text-center md:text-left">
             <div class="animate-item" style="animation-delay: 0.1s;">
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
                     <span>Laporan PKL by</span> 
                     <span class="gradient-text font-extrabold select-none">LUKYY</span>
-                    <span class="text-2xl md:text-3xl animate-pulse">✨</span>
+                    <span class="text-2xl md:text-3xl">✨</span>
                 </h1>
-                <p class="text-gray-500 font-medium mt-2 text-sm md:text-base">Sistem Manajemen & Generator Laporan Profesional</p>
+                <p class="text-gray-500 font-medium mt-1 text-sm md:text-base">Sistem Manajemen & Generator Laporan Profesional</p>
             </div>
             
             <!-- CONTROLS: DARK MODE -->
             <div class="flex flex-wrap gap-2 items-center justify-center animate-item" style="animation-delay: 0.2s;">
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-5 py-3 rounded-2xl shadow-md hover:scale-110 hover:shadow-lg transition-all flex items-center gap-2 text-sm font-bold">
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-4 py-2.5 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-bold">
                     🌙 <span>Mode Gelap</span>
                 </button>
             </div>
@@ -271,45 +270,45 @@
             <!-- TAB 1: FORM INPUT -->
             <div id="tabInput" class="tab-content active">
                 <div class="glass-panel rounded-[2.5rem] p-6 md:p-8 relative z-20 no-print animate-item" style="animation-delay: 0.3s;">
-                    <h2 class="text-2xl font-extrabold mb-8 flex items-center gap-3 text-[#0a84ff]" id="judulForm">
-                        <span class="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl shadow-inner">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-[#0a84ff]" id="judulForm">
+                        <span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </span>
                         Input Kegiatan Baru
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="lg:col-span-1 group">
-                            <label class="block text-sm font-bold text-gray-700 mb-2 group-hover:text-[#0a84ff] transition-colors">Pilih Tanggal (Edit)</label>
-                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-4 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                        <div class="lg:col-span-1">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
+                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
                                 <option value="baru">+ Tambah Laporan Baru</option>
                             </select>
                         </div>
-                        <div class="lg:col-span-1 group">
-                            <label class="block text-sm font-bold text-gray-700 mb-2 group-hover:text-[#0a84ff] transition-colors">Tanggal Pelaksanaan</label>
-                            <input type="date" id="inputTanggal" class="w-full bg-white/75 rounded-2xl p-4 shadow-sm text-sm">
+                        <div class="lg:col-span-1">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
+                            <input type="date" id="inputTanggal" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm">
                         </div>
-                        <div class="lg:col-span-2 group">
-                            <label class="block text-sm font-bold text-gray-700 mb-2 group-hover:text-[#0a84ff] transition-colors">Uraian Kegiatan</label>
-                            <textarea id="inputUraian" class="w-full bg-white/75 rounded-2xl p-4 shadow-sm text-sm resize-none" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Uraian Kegiatan</label>
+                            <textarea id="inputUraian" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
                         </div>
-                        <div class="lg:col-span-4 group">
-                            <label class="block text-sm font-bold text-gray-700 mb-2 group-hover:text-[#0a84ff] transition-colors" id="labelFoto">Upload Foto Bukti Kegiatan</label>
+                        <div class="lg:col-span-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-2" id="labelFoto">Upload Foto Bukti Kegiatan</label>
                             <div class="flex items-center gap-4">
-                                <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/75 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#0a84ff] file:text-white hover:file:bg-[#0071e3] transition-all cursor-pointer">
+                                <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/75 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#0a84ff] file:text-white hover:file:bg-[#0071e3] transition-all cursor-pointer">
                                 <p class="text-sm text-[#0a84ff] font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mt-10 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-8">
-                        <button onclick="tambahBaris()" class="w-full md:w-auto bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] hover:from-[#0071e3] hover:to-[#4a48c4] text-white font-bold py-4 px-10 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 hover:shadow-2xl flex items-center justify-center gap-3 transition-all duration-300" id="btnTambah">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                    <div class="mt-8 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-6">
+                        <button onclick="tambahBaris()" class="w-full md:w-auto bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] hover:opacity-90 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2" id="btnTambah">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                             Simpan Laporan
                         </button>
-                        <button onclick="batalEdit()" id="btnBatalEdit" class="hidden w-full md:w-auto bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold py-4 px-10 rounded-2xl hover:bg-gray-300 dark:hover:bg-gray-700 text-center transition-all hover:-translate-y-1">Batal</button>
-                        <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden w-full md:w-auto flex items-center justify-center gap-2 hover:-translate-y-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Hapus
+                        <button onclick="batalEdit()" id="btnBatalEdit" class="hidden w-full md:w-auto bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold py-3.5 px-8 rounded-2xl hover:opacity-80 text-center">Batal</button>
+                        <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden w-full md:w-auto flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Hapus
                         </button>
                     </div>
                 </div>
@@ -317,59 +316,57 @@
 
             <!-- TAB 2: LAPORAN -->
             <div id="tabLaporan" class="tab-content">
-                <div class="glass-panel rounded-[2.5rem] p-5 md:p-8 mb-6 space-y-6 no-print relative z-10">
+                <div class="glass-panel rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full border-b border-gray-200/50 dark:border-white/10 pb-6">
-                        <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-blue-500/20 flex justify-center items-center gap-3 hover:-translate-y-1 transition-all duration-300">
-                            <span class="text-xl">🔍</span> Pratinjau Cetak (Preview)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full border-b border-gray-200/50 dark:border-white/10 pb-5">
+                        <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/20 flex justify-center items-center gap-2 hover:-translate-y-0.5 transition-all">
+                            🔍 Pratinjau Cetak (Preview)
                         </button>
-                        <button onclick="downloadPDF()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white font-bold py-4 px-6 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 flex justify-center items-center gap-3 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        <button onclick="downloadPDF()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm hover:opacity-80 flex justify-center items-center gap-2 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                             Export ke PDF
                         </button>
                     </div>
 
                     <div class="flex flex-wrap gap-3 justify-end pb-2 border-b border-gray-200/50 dark:border-white/10 pb-4">
-                        <button onclick="backupData()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-3 px-5 rounded-xl hover:scale-105 shadow-sm transition-transform">💾 Backup Data</button>
-                        <button onclick="document.getElementById('importFile').click()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-3 px-5 rounded-xl hover:scale-105 shadow-sm transition-transform">📂 Restore</button>
+                        <button onclick="backupData()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 shadow-sm transition-all">💾 Backup Data</button>
+                        <button onclick="document.getElementById('importFile').click()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 shadow-sm transition-all">📂 Restore</button>
                         <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
-                        <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-bold py-3 px-5 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/60 hover:scale-105 transition-all">Reset DB</button>
+                        <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 transition-all">Reset DB</button>
                     </div>
 
                     <!-- Filter & Pencarian -->
                     <div class="flex flex-col md:flex-row justify-between items-center gap-5 flex-wrap pt-2">
                         <div class="flex items-center gap-3 w-full md:w-auto">
-                            <span class="p-3 bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] rounded-2xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
-                            <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-2xl p-4 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-4 focus:ring-blue-500/20 cursor-pointer">
+                            <span class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
+                            <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-[#0a84ff]">
                                 <option value="SEMUA">Filter: Semua Bulan</option>
                             </select>
                         </div>
-                        <div class="relative w-full md:flex-1 max-w-md group">
+                        <div class="relative w-full md:flex-1 max-w-md">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-[#0a84ff] transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
+                                <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
                             </div>
-                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-2xl p-4 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-4 focus:ring-blue-500/20 transition-shadow" placeholder="Cari uraian, tanggal, hari...">
+                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-[#0a84ff]" placeholder="Cari uraian, tanggal, hari...">
                         </div>
                     </div>
                     
                     <!-- Info Memori -->
-                    <div class="bg-white/50 dark:bg-gray-800/50 rounded-2xl p-5 border border-white/60 dark:border-gray-700 text-xs flex flex-col gap-3 backdrop-blur-md shadow-inner">
+                    <div class="bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-white/60 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-md">
                         <div class="flex justify-between font-bold text-gray-700 dark:text-gray-300">
-                            <span id="labelKapasitasTeks" class="flex items-center gap-2 text-sm">🗄️ Storage:</span>
-                            <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-lg shadow-sm">Menganalisis...</span>
+                            <span id="labelKapasitasTeks" class="flex items-center gap-1">🗄️ Storage:</span>
+                            <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">Menganalisis...</span>
                         </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner relative">
-                            <div id="barMemori" class="bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] h-3 rounded-full transition-all duration-1000 ease-out relative" style="width: 0%">
-                                <div class="absolute top-0 left-0 bottom-0 right-0 bg-white/20 animate-pulse"></div>
-                            </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+                            <div id="barMemori" class="bg-[#0a84ff] h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAMPILAN MOBILE (CARD VIEW) & DESKTOP (TABEL) -->
-                <div class="block md:hidden space-y-5 mb-10" id="wadahCardMobile"></div>
+                <div class="block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
-                <div class="area-kertas rounded-2xl relative overflow-hidden hidden md:block transition-all" id="areaCetak">
+                <div class="area-kertas rounded-xl relative overflow-hidden hidden md:block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
                         <div id="wadahTabelBulan"></div>
@@ -413,7 +410,7 @@
             setTimeout(() => {
                 loader.style.opacity = '0'; 
                 setTimeout(() => { loader.classList.add('hidden'); }, 700); 
-            }, 800); // Slightly longer for the nice animation to play out
+            }, 600); 
         };
 
         function showToast(message, type = 'success') {
@@ -428,7 +425,7 @@
             
             setTimeout(() => {
                 container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-            }, 3500);
+            }, 3000);
         }
 
         function switchTab(tabName) {
@@ -441,24 +438,20 @@
                 tabInput.classList.add('active');
                 tabLaporan.classList.remove('active');
                 
-                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl shadow-md transform scale-105 transition-all";
-                btnInput.querySelector('span').classList.add('scale-125');
-                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl transform hover:scale-105 opacity-70 hover:opacity-100";
-                btnLaporan.querySelector('span').classList.remove('scale-125');
+                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm";
+                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl";
             } else {
                 tabLaporan.classList.add('active');
                 tabInput.classList.remove('active');
 
-                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl shadow-md transform scale-105 transition-all";
-                btnLaporan.querySelector('span').classList.add('scale-125');
-                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl transform hover:scale-105 opacity-70 hover:opacity-100";
-                btnInput.querySelector('span').classList.remove('scale-125');
+                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm";
+                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl";
                 
-                // Retrigger animations
+                // Trigger staggered re-animation smoothly
                 const items = document.querySelectorAll('#tabLaporan .animate-item');
                 items.forEach(el => {
                     el.style.animation = 'none';
-                    el.offsetHeight; /* trigger reflow */
+                    el.offsetHeight; 
                     el.style.animation = null; 
                 });
             }
@@ -470,14 +463,14 @@
             const img = document.getElementById('lightboxImg');
             img.src = src;
             lightbox.classList.remove('hidden');
-            setTimeout(() => { img.classList.replace('scale-90', 'scale-100'); }, 10);
+            setTimeout(() => { img.classList.replace('scale-95', 'scale-100'); }, 10);
         }
 
         function tutupLightbox() {
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightboxImg');
-            img.classList.replace('scale-100', 'scale-90');
-            setTimeout(() => { lightbox.classList.add('hidden'); }, 300);
+            img.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => { lightbox.classList.add('hidden'); }, 150);
         }
 
         function toggleDarkMode() {
@@ -506,13 +499,13 @@
                     teksPersen.innerText = `${persentase.toFixed(2)}% terpakai (${usageMB} MB)`;
 
                     if (persentase < 60) {
-                        bar.className = "bg-gradient-to-r from-green-400 to-green-500 h-3 rounded-full transition-all duration-1000 ease-out";
+                        bar.className = "bg-green-500 h-2.5 rounded-full transition-all duration-700 ease-out";
                         teksInfo.innerHTML = "🗄️ Storage Browser: Sangat Aman 🟢";
                     } else if (persentase < 85) {
-                        bar.className = "bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-1000 ease-out";
+                        bar.className = "bg-yellow-500 h-2.5 rounded-full transition-all duration-700 ease-out";
                         teksInfo.innerHTML = "🗄️ Storage Browser: Mulai Penuh 🟡";
                     } else {
-                        bar.className = "bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-1000 ease-out animate-pulse";
+                        bar.className = "bg-red-500 h-2.5 rounded-full transition-all duration-700 ease-out";
                         teksInfo.innerHTML = "🗄️ Storage Browser: HAMPIR PENUH 🔴";
                     }
                 } catch (e) { console.error("Gagal menghitung memori", e); }
@@ -532,9 +525,8 @@
             const parts = item.tanggal.split('/');
             document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
             document.getElementById('inputUraian').value = item.uraian;
-            document.getElementById('judulForm').innerHTML = '<span class="p-3 bg-amber-100 dark:bg-amber-900/40 text-amber-600 rounded-2xl shadow-inner">✏️</span> Edit Kegiatan PKL';
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-amber-100 dark:bg-amber-900/40 text-amber-600 rounded-xl">✏️</span> Edit Kegiatan PKL';
             document.getElementById('btnTambah').innerHTML = "💾 Update Laporan";
-            document.getElementById('btnTambah').className = "w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-90 text-white font-bold py-4 px-10 rounded-2xl shadow-xl shadow-orange-500/30 hover:-translate-y-1 hover:shadow-2xl flex items-center justify-center gap-3 transition-all duration-300";
             document.getElementById('btnBatalEdit').classList.remove('hidden');
             document.getElementById('btnHapusEdit').classList.remove('hidden');
             document.getElementById('infoFotoEdit').style.display = 'block';
@@ -552,7 +544,6 @@
                 return;
             }
 
-            const originalBtnHtml = btn.innerHTML;
             btn.innerHTML = "⏳ Memproses...";
             btn.disabled = true;
 
@@ -570,7 +561,8 @@
 
             if (indexEditMode > -1 && (!fotoInput.files || fotoInput.files.length === 0)) {
                 const fotoLama = dataLaporan[indexEditMode].foto;
-                simpanKeArray(hari, tanggalFormat, uraian, fotoLama, labelBulan, originalBtnHtml);
+                simpanKeArray(hari, tanggalFormat, uraian, fotoLama, labelBulan);
+                btn.disabled = false;
                 return;
             }
 
@@ -587,17 +579,18 @@
                         if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        simpanKeArray(hari, tanggalFormat, uraian, canvas.toDataURL('image/jpeg', 0.6), labelBulan, originalBtnHtml);
+                        simpanKeArray(hari, tanggalFormat, uraian, canvas.toDataURL('image/jpeg', 0.6), labelBulan);
+                        btn.disabled = false;
                     }
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan, originalBtnHtml);
+                simpanKeArray(hari, tanggalFormat, uraian, '', labelBulan);
+                btn.disabled = false;
             }
         }
 
-        async function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan, originalBtnHtml) {
-            const btn = document.getElementById('btnTambah');
+        async function simpanKeArray(hari, tanggal, uraian, fotoBase64, labelBulan) {
             const dataBaru = { hari: hari, tanggal: tanggal, uraian: uraian, foto: fotoBase64, bulanLabel: labelBulan };
             const backupDataSebelumError = JSON.stringify(dataLaporan);
             
@@ -620,15 +613,12 @@
                 cekKapasitasMemori();
                 batalEdit();
                 
-                confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 }, colors: ['#0a84ff', '#5e5ce6', '#30d158'] });
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
                 showToast(isEdit ? 'Laporan berhasil diperbarui! 📝' : 'Laporan baru berhasil disimpan! 🎉');
                 switchTab('laporan'); 
             } catch (e) {
                 showToast('Gagal menyimpan! Storage browser penuh.', 'error');
                 dataLaporan = JSON.parse(backupDataSebelumError); 
-            } finally {
-                btn.disabled = false;
-                if (!isEdit) { btn.innerHTML = originalBtnHtml; }
             }
         }
 
@@ -680,14 +670,14 @@
             wadahCardMobile.innerHTML = '';
             
             if (dataLaporan.length === 0) {
-                wadahTabel.innerHTML = '<div class="text-center py-10 text-gray-400 font-medium italic animate-item">Belum ada data kegiatan.</div>';
-                wadahCardMobile.innerHTML = '<div class="text-center py-10 text-gray-400 font-medium italic glass-panel rounded-2xl p-8 animate-item">Belum ada data kegiatan.</div>';
+                wadahTabel.innerHTML = '<div class="text-center py-8 text-gray-400 font-medium italic animate-item">Belum ada data kegiatan.</div>';
+                wadahCardMobile.innerHTML = '<div class="text-center py-8 text-gray-400 font-medium italic glass-panel rounded-2xl p-6 animate-item">Belum ada data kegiatan.</div>';
                 return;
             }
 
             let bulanYangDirender = filterAktif === 'SEMUA' ? daftarBulanUnik : [filterAktif];
             let dataDitemukan = false;
-            let cascadeIndex = 0; // For animation stagger
+            let cascadeIndex = 0;
 
             bulanYangDirender.forEach((bulan) => {
                 const dataBulanIni = dataLaporan.filter(item => {
@@ -702,60 +692,58 @@
                     containerBulan.className = 'mb-12 bulan-container'; 
                     
                     let htmlTabel = `
-                        <div class="mb-5 text-base font-bold tracking-wide animate-item" style="color: black !important; animation-delay: ${cascadeIndex * 0.05}s;">
+                        <div class="mb-4 text-base font-bold tracking-wide animate-item" style="color: black !important; animation-delay: ${cascadeIndex * 0.04}s;">
                             <p class="mb-1">1. &nbsp;&nbsp;Laporan Kegiatan Harian</p>
                             <p>b. &nbsp;&nbsp;Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
-                        <div class="table-wrapper animate-item" style="animation-delay: ${(cascadeIndex + 1) * 0.05}s;">
+                        <div class="table-wrapper animate-item" style="animation-delay: ${(cascadeIndex + 1) * 0.04}s;">
                             <table class="w-full border-collapse" style="color: black !important; table-layout: fixed; width: 100%;">
                                 <thead>
                                     <tr>
-                                        <th class="w-[6%] text-center uppercase py-3">No</th>
-                                        <th class="w-[14%] uppercase py-3">Hari</th>
-                                        <th class="w-[18%] uppercase py-3">Tanggal</th>
-                                        <th class="w-[42%] uppercase py-3">Uraian Kegiatan PKL</th>
-                                        <th class="w-[20%] text-center uppercase py-3">Foto Kegiatan</th>
+                                        <th class="w-[6%] text-center uppercase py-2">No</th>
+                                        <th class="w-[14%] uppercase py-2">Hari</th>
+                                        <th class="w-[18%] uppercase py-2">Tanggal</th>
+                                        <th class="w-[42%] uppercase py-2">Uraian Kegiatan PKL</th>
+                                        <th class="w-[20%] text-center uppercase py-2">Foto Kegiatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                     `;
 
                     let htmlCard = `
-                        <div class="mb-4 animate-item" style="animation-delay: ${cascadeIndex * 0.05}s;">
-                            <h3 class="font-extrabold text-sm text-[#0a84ff] uppercase tracking-wider mb-4 pl-2 border-l-4 border-[#0a84ff]">📅 Bulan: ${bulan}</h3>
+                        <div class="mb-4 animate-item" style="animation-delay: ${cascadeIndex * 0.04}s;">
+                            <h3 class="font-extrabold text-sm text-[#0a84ff] uppercase tracking-wider mb-3">📅 Bulan: ${bulan}</h3>
                         </div>
                     `;
 
                     let noUrut = 1;
                     dataBulanIni.forEach((item, index) => {
                         const uraianFormatted = item.uraian.replace(/\n/g, '<br>');
-                        const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:scale-110 hover:shadow-lg transition-transform mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
+                        const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
                         const styleBorderBottom = (index === dataBulanIni.length - 1) ? 'border-bottom: 2px solid black !important;' : '';
 
                         htmlTabel += `
                             <tr>
-                                <td class="text-center font-bold py-3" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${noUrut}</td>
-                                <td class="py-3" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.hari}</td>
-                                <td class="py-3" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.tanggal}</td>
-                                <td class="py-3" style="color: black !important; word-break: break-word; white-space: pre-wrap; ${styleBorderBottom}" class="leading-relaxed">${uraianFormatted}</td>
-                                <td class="text-center align-middle py-3" style="${styleBorderBottom}">${fotoHtml}</td>
+                                <td class="text-center font-bold" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${noUrut}</td>
+                                <td style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.hari}</td>
+                                <td style="color: black !important; word-break: break-word; ${styleBorderBottom}">${item.tanggal}</td>
+                                <td style="color: black !important; word-break: break-word; white-space: pre-wrap; ${styleBorderBottom}" class="leading-relaxed">${uraianFormatted}</td>
+                                <td class="text-center align-middle" style="${styleBorderBottom}">${fotoHtml}</td>
                             </tr>
                         `;
 
-                        const fotoCardHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer rounded-xl w-24 h-24 object-cover shadow-md hover:scale-105 transition-transform border border-gray-200 dark:border-gray-700">` : '<div class="w-24 h-24 rounded-xl bg-gray-100/50 dark:bg-gray-800/50 flex items-center justify-center text-xs text-gray-400 italic border border-dashed border-gray-300 dark:border-gray-700">No foto</div>';
+                        const fotoCardHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer rounded-xl w-20 h-20 object-cover shadow-sm border border-gray-200 dark:border-gray-700">` : '<div class="w-20 h-20 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-400 italic">No foto</div>';
                         
-                        // Cascade timing calculation for smooth pop-ins
-                        let delay = (cascadeIndex + index) * 0.08;
-                        
+                        let cardDelay = (cascadeIndex + index) * 0.05;
                         htmlCard += `
-                            <div class="glass-panel p-5 rounded-2xl mb-4 space-y-4 border border-white/40 dark:border-white/10 shadow-sm animate-item group" style="animation-delay: ${delay}s;">
-                                <div class="flex justify-between items-center border-b border-gray-200/50 dark:border-gray-800 pb-3">
-                                    <span class="text-xs font-extrabold bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] px-3 py-1.5 rounded-lg group-hover:bg-[#0a84ff] group-hover:text-white transition-colors">#${noUrut} - ${item.hari}</span>
-                                    <span class="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">${item.tanggal}</span>
+                            <div class="glass-panel p-4 rounded-2xl mb-3 space-y-3 border border-white/40 dark:border-white/10 shadow-sm animate-item" style="animation-delay: ${cardDelay}s;">
+                                <div class="flex justify-between items-center border-b border-gray-200/50 dark:border-gray-800 pb-2">
+                                    <span class="text-xs font-extrabold bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] px-2.5 py-1 rounded-lg">#${noUrut} - ${item.hari}</span>
+                                    <span class="text-xs font-bold text-gray-500">${item.tanggal}</span>
                                 </div>
-                                <div class="flex gap-4 items-start">
+                                <div class="flex gap-3 items-start">
                                     <div class="flex-1 text-sm leading-relaxed text-gray-700 dark:text-gray-200 whitespace-pre-wrap">${item.uraian}</div>
-                                    <div class="flex-shrink-0">${fotoCardHtml}</div>
+                                    <div>${fotoCardHtml}</div>
                                 </div>
                             </div>
                         `;
@@ -763,8 +751,7 @@
                         noUrut++;
                     });
                     
-                    cascadeIndex += dataBulanIni.length; // Update cascade for next month if loop continues
-                    
+                    cascadeIndex += dataBulanIni.length;
                     htmlTabel += `</tbody></table></div>`;
                     containerBulan.innerHTML = htmlTabel;
                     wadahTabel.appendChild(containerBulan);
@@ -776,16 +763,15 @@
             });
 
             if (!dataDitemukan) {
-                wadahTabel.innerHTML = '<div class="text-center py-10 text-gray-500 font-medium italic animate-item">Pencarian tidak ditemukan.</div>';
-                wadahCardMobile.innerHTML = '<div class="text-center py-10 text-gray-500 font-medium italic glass-panel rounded-2xl p-8 animate-item">Pencarian tidak ditemukan.</div>';
+                wadahTabel.innerHTML = '<div class="text-center py-8 text-gray-500 font-medium italic animate-item">Pencarian tidak ditemukan.</div>';
+                wadahCardMobile.innerHTML = '<div class="text-center py-8 text-gray-500 font-medium italic glass-panel rounded-2xl p-6 animate-item">Pencarian tidak ditemukan.</div>';
             }
         }
 
         function batalEdit() {
             indexEditMode = -1;
-            document.getElementById('judulForm').innerHTML = '<span class="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-2xl shadow-inner"><svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
-            document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Simpan Laporan';
-            document.getElementById('btnTambah').className = "w-full md:w-auto bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] hover:from-[#0071e3] hover:to-[#4a48c4] text-white font-bold py-4 px-10 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 hover:shadow-2xl flex items-center justify-center gap-3 transition-all duration-300";
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
+            document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Simpan Laporan';
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('btnHapusEdit').classList.add('hidden');
             document.getElementById('infoFotoEdit').style.display = "none";
@@ -845,19 +831,16 @@
                 return; 
             }
             
-            // Remove animation classes temporarily for print view clone to prevent weird glitches in clone
             const areaCetak = document.getElementById('areaCetak');
             areaCetak.classList.add('no-animation');
             const kontenUtama = areaCetak.innerHTML;
             areaCetak.classList.remove('no-animation');
-            
+
             document.getElementById('wadahPreviewTabel').innerHTML = kontenUtama;
             
             const modal = document.getElementById('modalPreview');
             const box = document.getElementById('modalBox');
-            
             modal.classList.remove('hidden');
-            // Trigger animation
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 box.classList.remove('scale-95');
@@ -867,13 +850,11 @@
         function tutupPreview() {
             const modal = document.getElementById('modalPreview');
             const box = document.getElementById('modalBox');
-            
             modal.classList.add('opacity-0');
             box.classList.add('scale-95');
-            
             setTimeout(() => {
                 modal.classList.add('hidden');
-            }, 400); // Wait for transition
+            }, 300);
         }
 
         function eksekusiDownloadDariPreview() {
@@ -903,15 +884,11 @@
 
             setTimeout(() => {
                 const elemenAsli = document.getElementById('areaCetak');
-                
-                // Remove animations for printing
                 elemenAsli.classList.add('no-animation');
                 
-                // === FINAL FIX: HILANGKAN PHANTOM SCROLLBAR & BAYANGAN ===
                 const originalClasses = elemenAsli.className;
                 const originalCssText = elemenAsli.style.cssText;
                 
-                // Menambahkan mode export khusus yang mematikan overflow (penyebab utama garis)
                 elemenAsli.className = 'area-kertas relative pdf-export-mode no-animation'; 
                 elemenAsli.style.display = 'block';
                 elemenAsli.style.width = '794px';
@@ -940,7 +917,6 @@
                 };
 
                 html2pdf().set(opsiPDF).from(elemenAsli).save().then(() => {
-                    // Kembalikan ke style original web view
                     elemenAsli.className = originalClasses;
                     elemenAsli.style.cssText = originalCssText;
                     elemenAsli.classList.remove('no-animation');
@@ -952,7 +928,7 @@
                     btn.innerHTML = textAsli;
                     btn.disabled = false;
                     
-                    confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, colors: ['#0a84ff', '#30d158'] });
+                    confetti({ particleCount: 100, spread: 90, origin: { y: 0.5 } });
                     showToast("PDF berhasil di-download! 📥");
 
                 }).catch(err => {
