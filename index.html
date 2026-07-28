@@ -91,6 +91,21 @@
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
         .konten-tabel { position: relative; z-index: 10; }
         
+        /* FIX GARIS KANAN/ARTIFAK SCROLLBAR SAAT EXPORT */
+        .pdf-export-mode {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+            margin: 0 !important;
+            background: white !important;
+        }
+        .pdf-export-mode .table-wrapper {
+            overflow-x: visible !important;
+            -webkit-overflow-scrolling: auto !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
         @media (min-width: 768px) { .watermark { font-size: 7rem; } }
         @media print {
             .no-print { display: none !important; }
@@ -809,23 +824,18 @@
             setTimeout(() => {
                 const elemenAsli = document.getElementById('areaCetak');
                 
-                // === FIX BUG PDF KOSONG / GARIS VERTIKAL BAYANGAN ===
+                // === FINAL FIX: HILANGKAN PHANTOM SCROLLBAR & BAYANGAN ===
                 const originalClasses = elemenAsli.className;
                 const originalCssText = elemenAsli.style.cssText;
                 
-                // Hapus shadow, rounded corners, dan border agar html2canvas tidak membuat artefak garis hitam vertikal 
-                elemenAsli.className = 'area-kertas relative bg-white'; 
+                // Menambahkan mode export khusus yang mematikan overflow (penyebab utama garis)
+                elemenAsli.className = 'area-kertas relative pdf-export-mode'; 
                 elemenAsli.style.display = 'block';
                 elemenAsli.style.width = '794px';
                 elemenAsli.style.maxWidth = '794px';
                 elemenAsli.style.height = 'auto';      
                 elemenAsli.style.overflow = 'visible'; 
                 
-                // Pembersihan styling penyebab bug render
-                elemenAsli.style.boxShadow = 'none'; 
-                elemenAsli.style.borderRadius = '0';
-                elemenAsli.style.border = 'none';
-
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
@@ -839,7 +849,8 @@
                         width: 794, 
                         scrollY: 0, 
                         scrollX: 0,
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
+                        logging: false
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
