@@ -44,6 +44,11 @@
         body.dark-mode .bg-white { background: #1e293b !important; color: #f1f5f9; }
         body.dark-mode .border-gray-200 { border-color: #334155 !important; }
         body.dark-mode .text-gray-800 { color: #f8fafc !important; }
+        
+        /* Tambahan style dark-mode spesifik untuk loading screen agar mengikuti tombol manual */
+        body.dark-mode #loading-screen { background-color: #0b1120; }
+        body.dark-mode #loading-screen h2 { color: #ffffff; }
+        body.dark-mode #loading-screen .border-gray-200 { border-color: #1e293b; }
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.6);
@@ -95,6 +100,25 @@
     </style>
 </head>
 <body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen pb-32 md:pb-8">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-[#f8fafc] dark:bg-[#0b1120] transition-opacity duration-700 ease-out">
+        <div class="relative flex justify-center items-center">
+            <!-- Background Ring -->
+            <div class="absolute w-20 h-20 rounded-full border-4 border-gray-200 dark:border-gray-800"></div>
+            <!-- Spinning Gradient Ring -->
+            <div class="absolute w-20 h-20 rounded-full border-4 border-transparent border-t-blue-600 border-b-indigo-600 animate-spin"></div>
+            <!-- Center Icon -->
+            <span class="text-2xl animate-bounce mt-1">✨</span>
+        </div>
+        
+        <h2 class="mt-8 text-xl font-extrabold tracking-tight text-gray-800 dark:text-white drop-shadow-sm">
+            Menyiapkan Workspace
+        </h2>
+        <p class="font-bold mt-1 text-sm tracking-widest gradient-text animate-pulse">
+            LUKYY
+        </p>
+    </div>
 
     <!-- LIGHTBOX FOTO -->
     <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
@@ -268,6 +292,15 @@
 
             renderSemuaData();
             cekKapasitasMemori();
+
+            // --- LOGIKA LOADING SCREEN ---
+            const loader = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loader.style.opacity = '0'; 
+                setTimeout(() => {
+                    loader.classList.add('hidden'); 
+                }, 700); 
+            }, 600); 
         };
 
         function switchTab(tabName) {
