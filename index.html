@@ -164,7 +164,8 @@
                 <button onclick="tutupPreview()" class="text-gray-500 hover:text-red-500 text-3xl font-light transition-colors">&times;</button>
             </div>
             <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-black/5 flex justify-center">
-                <div class="w-full max-w-[794px] bg-white text-black p-8 rounded shadow-lg area-kertas relative" id="areaPreviewIsi" style="min-height: 1056px;">
+                <!-- Tambahkan ID agar tidak double dengan konten asli -->
+                <div class="w-full max-w-[794px] bg-white text-black p-8 rounded shadow-lg area-kertas relative" id="areaPreviewIsiUtama" style="min-height: 1056px;">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel">
                         <div id="wadahPreviewTabel"></div>
@@ -199,6 +200,7 @@
             <div>
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
                     <span>Laporan PKL by</span> 
+                    <!-- Nama dipatenkan sesuai permintaan -->
                     <span class="gradient-text font-extrabold select-none">LUKYY</span>
                     <span class="text-2xl md:text-3xl">✨</span>
                 </h1>
@@ -313,8 +315,11 @@
                 </div>
 
                 <!-- TAMPILAN MOBILE (CARD VIEW) & DESKTOP (TABEL) -->
+                <!-- Di Mobile tabel akan disembunyikan agar responsive, diganti jadi Card UI -->
                 <div class="block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
+                <!-- AREA CETAK FORMAL / PDF UTAMA -->
+                <!-- PENTING: Class 'hidden' di sini pada HP membuat bug PDF kosong, akan di-overwrite otomatis via JS saat download -->
                 <div class="area-kertas rounded-xl relative overflow-hidden hidden md:block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
@@ -789,12 +794,6 @@
                 return; 
             }
 
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile) {
-                const lanjutExport = confirm("⚠️ PERHATIAN UNTUK PENGGUNA HP ⚠️\n\nJika hasil PDF terpotong atau tabel kosong, mohon AKTIFKAN fitur 'Situs Desktop' (Desktop Site) di browser Anda sebelum menekan tombol Export.\n\nLanjutkan export PDF?");
-                if (!lanjutExport) return; 
-            }
-
             const btn = document.getElementById('btnDownload');
             const textAsli = btn.innerHTML;
             btn.innerHTML = "⏳ Generating PDF...";
@@ -809,29 +808,45 @@
 
             setTimeout(() => {
                 const elemenAsli = document.getElementById('areaCetak');
-                const originalWidth = elemenAsli.style.width;
-                const originalMaxWidth = elemenAsli.style.maxWidth;
-                const originalOverflow = elemenAsli.style.overflow;
                 
+                // === FIX BUG PDF KOSONG / KEPOTONG (TERUTAMA DI MOBILE) ===
+                // 1. Simpan class dan style bawaan agar bisa dikembalikan nanti
+                const originalClasses = elemenAsli.className;
+                const originalCssText = elemenAsli.style.cssText;
+                
+                // 2. Timpa className sepenuhnya, buang class "hidden md:block" dan "overflow-hidden"
+                elemenAsli.className = 'area-kertas rounded-xl relative bg-white'; 
+                
+                // 3. Paksa dimensi spesifik A4 dan izinkan konten luber ke bawah
+                elemenAsli.style.display = 'block';
                 elemenAsli.style.width = '794px';
                 elemenAsli.style.maxWidth = '794px';
-                elemenAsli.style.overflow = 'visible';
+                elemenAsli.style.height = 'auto';      // Membiarkan konten memanjang sepuasnya
+                elemenAsli.style.overflow = 'visible'; // Cegah konten terpotong pembungkus
 
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
-                    margin:       10,
+                    margin:       [10, 10, 10, 10], // Margin fix (Atas, Kanan, Bawah, Kiri)
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 1.0 },
-                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 794, width: 794, scrollY: 0, scrollX: 0 }, 
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        windowWidth: 794, 
+                        width: 794, 
+                        scrollY: 0, 
+                        scrollX: 0,
+                        backgroundColor: '#ffffff' // Pastikan PDF solid putih
+                    }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
                 html2pdf().set(opsiPDF).from(elemenAsli).save().then(() => {
-                    elemenAsli.style.width = originalWidth;
-                    elemenAsli.style.maxWidth = originalMaxWidth;
-                    elemenAsli.style.overflow = originalOverflow;
+                    // KEMBALIKAN SEMUA STYLE DAN KONDISI KE ASALNYA
+                    elemenAsli.className = originalClasses;
+                    elemenAsli.style.cssText = originalCssText;
 
                     if (teksPencarianSaatIni !== '') {
                         inputPencarian.value = teksPencarianSaatIni;
@@ -844,9 +859,10 @@
                     showToast("PDF berhasil di-download! 📥");
 
                 }).catch(err => {
-                    elemenAsli.style.width = originalWidth;
-                    elemenAsli.style.maxWidth = originalMaxWidth;
-                    elemenAsli.style.overflow = originalOverflow;
+                    // JIKA GAGAL, TETAP KEMBALIKAN STYLE KE ASAL
+                    elemenAsli.className = originalClasses;
+                    elemenAsli.style.cssText = originalCssText;
+
                     showToast("Gagal membuat PDF. Coba kembali.", "error");
                     console.error(err);
                     btn.innerHTML = textAsli;
