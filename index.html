@@ -809,25 +809,27 @@
             setTimeout(() => {
                 const elemenAsli = document.getElementById('areaCetak');
                 
-                // === FIX BUG PDF KOSONG / KEPOTONG (TERUTAMA DI MOBILE) ===
-                // 1. Simpan class dan style bawaan agar bisa dikembalikan nanti
+                // === FIX BUG PDF KOSONG / GARIS VERTIKAL BAYANGAN ===
                 const originalClasses = elemenAsli.className;
                 const originalCssText = elemenAsli.style.cssText;
                 
-                // 2. Timpa className sepenuhnya, buang class "hidden md:block" dan "overflow-hidden"
-                elemenAsli.className = 'area-kertas rounded-xl relative bg-white'; 
-                
-                // 3. Paksa dimensi spesifik A4 dan izinkan konten luber ke bawah
+                // Hapus shadow, rounded corners, dan border agar html2canvas tidak membuat artefak garis hitam vertikal 
+                elemenAsli.className = 'area-kertas relative bg-white'; 
                 elemenAsli.style.display = 'block';
                 elemenAsli.style.width = '794px';
                 elemenAsli.style.maxWidth = '794px';
-                elemenAsli.style.height = 'auto';      // Membiarkan konten memanjang sepuasnya
-                elemenAsli.style.overflow = 'visible'; // Cegah konten terpotong pembungkus
+                elemenAsli.style.height = 'auto';      
+                elemenAsli.style.overflow = 'visible'; 
+                
+                // Pembersihan styling penyebab bug render
+                elemenAsli.style.boxShadow = 'none'; 
+                elemenAsli.style.borderRadius = '0';
+                elemenAsli.style.border = 'none';
 
                 const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
 
                 const opsiPDF = {
-                    margin:       [10, 10, 10, 10], // Margin fix (Atas, Kanan, Bawah, Kiri)
+                    margin:       [10, 10, 10, 10], 
                     filename:     namaFile,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
@@ -837,14 +839,14 @@
                         width: 794, 
                         scrollY: 0, 
                         scrollX: 0,
-                        backgroundColor: '#ffffff' // Pastikan PDF solid putih
+                        backgroundColor: '#ffffff'
                     }, 
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
                 html2pdf().set(opsiPDF).from(elemenAsli).save().then(() => {
-                    // KEMBALIKAN SEMUA STYLE DAN KONDISI KE ASALNYA
+                    // Kembalikan ke style original web view
                     elemenAsli.className = originalClasses;
                     elemenAsli.style.cssText = originalCssText;
 
@@ -859,7 +861,6 @@
                     showToast("PDF berhasil di-download! 📥");
 
                 }).catch(err => {
-                    // JIKA GAGAL, TETAP KEMBALIKAN STYLE KE ASAL
                     elemenAsli.className = originalClasses;
                     elemenAsli.style.cssText = originalCssText;
 
