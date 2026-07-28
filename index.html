@@ -145,7 +145,9 @@
             <span class="text-2xl animate-bounce mt-1">✨</span>
         </div>
         <h2 class="mt-8 text-xl font-extrabold tracking-tight text-gray-800 dark:text-white drop-shadow-sm">Menyiapkan Workspace</h2>
-        <p class="font-bold mt-1 text-sm tracking-widest gradient-text animate-pulse">LUKYY</p>
+        <p class="font-bold mt-1 text-sm tracking-widest gradient-text animate-pulse">
+            <span id="labelLoadingNama" class="editable-name" contenteditable="true" onblur="updateNamaGlobal(this.innerText)" title="Klik untuk edit teks">LUKYY</span>
+        </p>
     </div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
@@ -174,7 +176,7 @@
             </div>
             <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-100 dark:bg-gray-950 flex justify-center">
                 <div class="w-full max-w-[794px] bg-white text-black p-8 rounded shadow-lg area-kertas relative" id="areaPreviewIsi" style="min-height: 1056px;">
-                    <div class="watermark">LAPORAN PKL BY LUKYY</div>
+                    <div class="watermark" id="teksWatermarkPreview">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel">
                         <div id="wadahPreviewTabel"></div>
                     </div>
@@ -208,7 +210,7 @@
             <div>
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
                     <span>Laporan PKL by</span> 
-                    <span class="gradient-text">LUKYY</span>
+                    <span class="gradient-text outline-none border-b border-dashed border-blue-400/50 px-1 cursor-text" contenteditable="true" onblur="updateNamaGlobal(this.innerText)" id="labelHeaderNama" title="Klik untuk mengubah teks LUKYY">LUKYY</span>
                     <span class="text-2xl md:text-3xl">✨</span>
                 </h1>
                 <p class="text-gray-500 font-medium mt-1 text-sm md:text-base">Sistem Manajemen & Generator Laporan Profesional</p>
@@ -361,6 +363,12 @@
                 document.getElementById('btnDarkMode').innerHTML = '☀️ <span>Mode Terang</span>';
             }
 
+            // Load saved custom name if exists
+            const savedNama = localStorage.getItem('customNamaLain');
+            if(savedNama) {
+                updateSemuaTeksNama(savedNama, false);
+            }
+
             try {
                 const dataDariIndexedDB = await localforage.getItem('laporanPKL');
                 if (dataDariIndexedDB !== null) {
@@ -384,6 +392,29 @@
                 setTimeout(() => { loader.classList.add('hidden'); }, 700); 
             }, 600); 
         };
+
+        // --- UPDATE NAMA DINAMIS (BISA DIEDIT LANGSUNG) ---
+        function updateNamaGlobal(teksBaru) {
+            const bersih = teksBaru.trim() || "LUKYY";
+            localStorage.setItem('customNamaLain', bersih);
+            updateSemuaTeksNama(bersih, true);
+        }
+
+        function updateSemuaTeksNama(nama, denganNotif = false) {
+            const headerEl = document.getElementById('labelHeaderNama');
+            const loadingEl = document.getElementById('labelLoadingNama');
+            const watermarkEl = document.getElementById('teksWatermark');
+            const watermarkPreviewEl = document.getElementById('teksWatermarkPreview');
+
+            if (headerEl && headerEl.innerText !== nama) headerEl.innerText = nama;
+            if (loadingEl && loadingEl.innerText !== nama) loadingEl.innerText = nama;
+            if (watermarkEl) watermarkEl.innerText = `LAPORAN PKL BY ${nama.toUpperCase()}`;
+            if (watermarkPreviewEl) watermarkPreviewEl.innerText = `LAPORAN PKL BY ${nama.toUpperCase()}`;
+
+            if(denganNotif) {
+                showToast(`Nama diubah menjadi: ${nama} ✍️`);
+            }
+        }
 
         // --- COLOR ACCENT PICKER ---
         function changeTheme(themeName, showToastMsg = true) {
@@ -860,7 +891,10 @@
                 elemenAsli.style.maxWidth = '794px';
                 elemenAsli.style.overflow = 'visible';
 
-                const namaFile = filterAktif === 'SEMUA' ? 'Laporan_PKL_LUKYY.pdf' : `Laporan_PKL_LUKYY_${filterAktif}.pdf`;
+                // Ambil nama dari teks yang sedang aktif di header
+                const namaAktif = document.getElementById('labelHeaderNama').innerText.trim() || "LUKYY";
+                const namaFileClean = namaAktif.replace(/[^a-zA-Z0-9]/g, '_');
+                const namaFile = filterAktif === 'SEMUA' ? `Laporan_PKL_${namaFileClean}.pdf` : `Laporan_PKL_${namaFileClean}_${filterAktif}.pdf`;
 
                 const opsiPDF = {
                     margin:       10,
