@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#3b82f6">
+    <meta name="theme-color" content="#0f172a">
     
     <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,63 +17,57 @@
     
     <style>
         :root {
-            --accent-primary: #3b82f6;
-            --accent-secondary: #6366f1;
-            --ring-color: rgba(59, 130, 246, 0.15);
-        }
-
-        body.theme-emerald {
-            --accent-primary: #10b981;
-            --accent-secondary: #059669;
-            --ring-color: rgba(16, 185, 129, 0.15);
-        }
-
-        body.theme-purple {
-            --accent-primary: #8b5cf6;
-            --accent-secondary: #7c3aed;
-            --ring-color: rgba(139, 92, 246, 0.15);
+            --accent-primary: #0a84ff;
+            --accent-secondary: #5e5ce6;
+            --ring-color: rgba(10, 132, 255, 0.25);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc; 
+            background-color: #f2f2f7; 
             background-image: 
-                radial-gradient(at 10% 10%, hsla(228, 100%, 74%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 90% 90%, hsla(278, 100%, 74%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, hsla(168, 100%, 74%, 0.2) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.18) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(94, 92, 230, 0.18) 0px, transparent 55%),
+                radial-gradient(at 50% 100%, rgba(50, 215, 75, 0.12) 0px, transparent 55%);
             background-attachment: fixed;
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         body.dark-mode {
-            background-color: #0b1120;
-            color: #f8fafc;
+            background-color: #000000;
+            color: #f5f5f7;
             background-image: 
-                radial-gradient(at 10% 10%, hsla(228, 100%, 40%, 0.15) 0px, transparent 50%),
-                radial-gradient(at 90% 90%, hsla(278, 100%, 40%, 0.15) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.22) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(94, 92, 230, 0.22) 0px, transparent 55%),
+                radial-gradient(at 50% 100%, rgba(48, 209, 88, 0.15) 0px, transparent 55%);
         }
         
-        body.dark-mode .glass-panel { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
-        body.dark-mode input, body.dark-mode textarea, body.dark-mode select { background: rgba(30, 41, 59, 0.7) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
-        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #64748b; }
-        body.dark-mode .text-gray-700, body.dark-mode .text-gray-600 { color: #cbd5e1 !important; }
-        body.dark-mode .text-gray-500 { color: #94a3b8 !important; }
-        body.dark-mode .bg-white\/50 { background: rgba(30, 41, 59, 0.5) !important; border-color: rgba(255, 255, 255, 0.05); }
-        body.dark-mode .bg-white { background: #1e293b !important; color: #f1f5f9; }
-        body.dark-mode .border-gray-200 { border-color: #334155 !important; }
-        body.dark-mode .text-gray-800 { color: #f8fafc !important; }
-        
-        body.dark-mode #loading-screen { background-color: #0b1120; }
-        body.dark-mode #loading-screen h2 { color: #ffffff; }
-
+        /* Apple iOS Liquid Glass Style Panels */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
+
+        body.dark-mode .glass-panel { 
+            background: rgba(28, 28, 30, 0.55); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1); 
+        }
+
+        body.dark-mode input, body.dark-mode textarea, body.dark-mode select { background: rgba(44, 44, 46, 0.6) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; }
+        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #8e8e93; }
+        body.dark-mode .text-gray-700, body.dark-mode .text-gray-600 { color: #d1d1d6 !important; }
+        body.dark-mode .text-gray-500 { color: #8e8e93 !important; }
+        body.dark-mode .bg-white\/50 { background: rgba(44, 44, 46, 0.5) !important; border-color: rgba(255, 255, 255, 0.08); }
+        body.dark-mode .bg-white { background: #1c1c1e !important; color: #f5f5f7; }
+        body.dark-mode .border-gray-200 { border-color: #38383a !important; }
+        body.dark-mode .text-gray-800 { color: #f5f5f7 !important; }
+        body.dark-mode #loading-screen { background-color: #000000; }
+        body.dark-mode #loading-screen h2 { color: #ffffff; }
 
         input[type="date"], input[type="text"], input[type="file"], textarea, select { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
         input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.95); }
@@ -105,13 +99,11 @@
             .table-wrapper { overflow-x: visible !important; } 
         }
 
-        .gradient-text { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), #059669); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 300%; animation: gradientMove 5s ease infinite; }
+        .gradient-text { background: linear-gradient(135deg, #0a84ff, #5e5ce6, #30d158); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 300%; animation: gradientMove 6s ease infinite; }
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .btn-hapus { background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca; font-weight: 600; padding: 12px 24px; border-radius: 16px; cursor: pointer; }
-        .btn-hapus:hover { background-color: #fca5a5; color: white; border-color: #ef4444; }
-        body.dark-mode .btn-hapus { background-color: rgba(220, 38, 38, 0.1); color: #f87171; border-color: rgba(248, 113, 113, 0.2); }
-        body.dark-mode .btn-hapus:hover { background-color: #dc2626; color: white; }
+        .btn-hapus { background-color: rgba(255, 69, 58, 0.15); color: #ff453a; border: 1px solid rgba(255, 69, 58, 0.3); font-weight: 600; padding: 12px 24px; border-radius: 16px; cursor: pointer; }
+        .btn-hapus:hover { background-color: #ff453a; color: white; }
 
         /* Animasi Transisi Tab Halus */
         .tab-content {
@@ -129,7 +121,6 @@
             pointer-events: auto;
         }
 
-        /* Toast Notification Animation */
         #toast-container {
             transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
         }
@@ -138,10 +129,10 @@
 <body class="p-4 md:p-8 text-gray-800 antialiased min-h-screen pb-32 md:pb-8">
 
     <!-- LOADING SCREEN -->
-    <div id="loading-screen" class="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-[#f8fafc] dark:bg-[#0b1120] transition-opacity duration-700 ease-out">
+    <div id="loading-screen" class="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-[#f2f2f7] dark:bg-[#000000] backdrop-blur-2xl transition-opacity duration-700 ease-out">
         <div class="relative flex justify-center items-center">
-            <div class="absolute w-20 h-20 rounded-full border-4 border-gray-200 dark:border-gray-800"></div>
-            <div class="absolute w-20 h-20 rounded-full border-4 border-transparent border-t-blue-600 border-b-indigo-600 animate-spin"></div>
+            <div class="absolute w-20 h-20 rounded-full border-4 border-gray-300 dark:border-gray-800"></div>
+            <div class="absolute w-20 h-20 rounded-full border-4 border-transparent border-t-[#0a84ff] border-b-[#5e5ce6] animate-spin"></div>
             <span class="text-2xl animate-bounce mt-1">✨</span>
         </div>
         <h2 class="mt-8 text-xl font-extrabold tracking-tight text-gray-800 dark:text-white drop-shadow-sm">Menyiapkan Workspace</h2>
@@ -159,22 +150,22 @@
     </div>
 
     <!-- LIGHTBOX FOTO -->
-    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/95 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
+    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 backdrop-blur-xl flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
         <button onclick="tutupLightbox()" class="absolute top-5 right-5 md:top-10 md:right-10 text-white hover:text-red-500 text-5xl font-light transition-colors">&times;</button>
         <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
     <!-- MODAL PRATINJAU CETAK / PRINT PREVIEW -->
-    <div id="modalPreview" class="fixed inset-0 z-[95] hidden bg-black/80 backdrop-blur-md flex justify-center items-center p-2 md:p-6 transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-900 w-full max-w-4xl h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
-            <div class="p-4 md:p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+    <div id="modalPreview" class="fixed inset-0 z-[95] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-2 md:p-6 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-4xl h-[90vh] rounded-[2.5xl] shadow-2xl flex flex-col overflow-hidden border border-white/20">
+            <div class="p-4 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">🔍</span>
                     <h3 class="font-extrabold text-lg text-gray-800 dark:text-white">Pratinjau Hasil Laporan</h3>
                 </div>
                 <button onclick="tutupPreview()" class="text-gray-500 hover:text-red-500 text-3xl font-light transition-colors">&times;</button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-100 dark:bg-gray-950 flex justify-center">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-black/5 flex justify-center">
                 <div class="w-full max-w-[794px] bg-white text-black p-8 rounded shadow-lg area-kertas relative" id="areaPreviewIsi" style="min-height: 1056px;">
                     <div class="watermark" id="teksWatermarkPreview">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel">
@@ -182,23 +173,23 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 md:p-6 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-3 bg-gray-50 dark:bg-gray-800/50">
+            <div class="p-4 md:p-6 border-t border-gray-200/50 dark:border-gray-800/50 flex justify-end gap-3 bg-white/40 dark:bg-gray-900/40">
                 <button onclick="tutupPreview()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-sm">Tutup</button>
-                <button onclick="eksekusiDownloadDariPreview()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-red-500/20">📥 Unduh PDF Sekarang</button>
+                <button onclick="eksekusiDownloadDariPreview()" class="px-6 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-blue-500/30">📥 Unduh PDF Sekarang</button>
             </div>
         </div>
     </div>
 
-    <!-- TAB NAVIGATION -->
-    <nav class="no-print fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 p-2 md:relative md:border-none md:bg-transparent md:backdrop-blur-none md:p-0 md:mb-6 md:flex md:justify-center">
-        <div class="flex justify-around max-w-sm mx-auto w-full md:w-auto md:gap-4 md:bg-white/60 md:dark:bg-gray-800/60 md:p-1.5 md:rounded-2xl md:shadow-sm md:border md:border-white/20">
-            <button onclick="switchTab('input')" id="btnTabInput" class="flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all">
-                <span class="text-xl md:text-base">📝</span>
-                <span class="text-[11px] md:text-sm font-bold">Input Data</span>
+    <!-- TAB NAVIGATION (iOS Floating Dock Style) -->
+    <nav class="no-print fixed bottom-4 left-4 right-4 z-50 flex justify-center">
+        <div class="glass-panel p-2 rounded-3xl shadow-2xl flex gap-3 max-w-sm w-full justify-around border border-white/50 dark:border-white/10">
+            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm">
+                <span class="text-lg">📝</span>
+                <span class="text-[11px] font-bold">Input Data</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl">
-                <span class="text-xl md:text-base">📋</span>
-                <span class="text-[11px] md:text-sm font-bold">Laporan</span>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl">
+                <span class="text-lg">📋</span>
+                <span class="text-[11px] font-bold">Laporan</span>
             </button>
         </div>
     </nav>
@@ -210,35 +201,28 @@
             <div>
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
                     <span>Laporan PKL by</span> 
-                    <span class="gradient-text outline-none border-b border-dashed border-blue-400/50 px-1 cursor-text" contenteditable="true" onblur="updateNamaGlobal(this.innerText)" id="labelHeaderNama" title="Klik untuk mengubah teks LUKYY">LUKYY</span>
+                    <span class="gradient-text outline-none border-b border-dashed border-blue-400/50 px-1 cursor-text" contenteditable="true" onblur="updateNamaGlobal(this.innerText)" id="labelHeaderNama" title="Klik untuk mengubah teks">LUKYY</span>
                     <span class="text-2xl md:text-3xl">✨</span>
                 </h1>
                 <p class="text-gray-500 font-medium mt-1 text-sm md:text-base">Sistem Manajemen & Generator Laporan Profesional</p>
             </div>
             
-            <!-- CONTROLS: THEME & DARK MODE -->
+            <!-- CONTROLS: DARK MODE -->
             <div class="flex flex-wrap gap-2 items-center justify-center">
-                <!-- Color Theme Picker -->
-                <div class="glass-panel p-1.5 rounded-2xl flex items-center gap-1 shadow-sm">
-                    <button onclick="changeTheme('blue')" title="Blue Classic" class="w-6 h-6 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
-                    <button onclick="changeTheme('emerald')" title="Emerald Green" class="w-6 h-6 rounded-full bg-emerald-500 hover:scale-110 transition-transform"></button>
-                    <button onclick="changeTheme('purple')" title="Purple Indigo" class="w-6 h-6 rounded-full bg-purple-500 hover:scale-110 transition-transform"></button>
-                </div>
-                <!-- Dark Mode Button -->
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-4 py-2.5 rounded-2xl shadow-sm hover:-translate-y-1 flex items-center gap-2 text-sm font-bold">
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="glass-panel px-4 py-2.5 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-bold">
                     🌙 <span>Mode Gelap</span>
                 </button>
             </div>
         </div>
 
-        <!-- TAB CONTAINER (WADAH UTAMA ANIMASI TRANSISI) -->
+        <!-- TAB CONTAINER -->
         <div class="relative min-h-[500px]">
 
             <!-- TAB 1: FORM INPUT -->
             <div id="tabInput" class="tab-content active">
-                <div class="glass-panel rounded-[2rem] p-6 md:p-8 relative z-20 no-print">
-                    <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-blue-600 dark:text-blue-400" id="judulForm">
-                        <span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
+                <div class="glass-panel rounded-[2.5rem] p-6 md:p-8 relative z-20 no-print">
+                    <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-[#0a84ff]" id="judulForm">
+                        <span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </span>
                         Input Kegiatan Baru
@@ -247,33 +231,33 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
                             <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tanggal (Edit)</label>
-                            <select id="pilihEdit" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
                                 <option value="baru">+ Tambah Laporan Baru</option>
                             </select>
                         </div>
                         <div class="lg:col-span-1">
                             <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
-                            <input type="date" id="inputTanggal" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm">
+                            <input type="date" id="inputTanggal" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm">
                         </div>
                         <div class="lg:col-span-2">
                             <label class="block text-sm font-bold text-gray-700 mb-2">Uraian Kegiatan</label>
-                            <textarea id="inputUraian" class="w-full bg-white/70 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
+                            <textarea id="inputUraian" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Merakit jaringan komputer, mendesain logo..."></textarea>
                         </div>
                         <div class="lg:col-span-4">
                             <label class="block text-sm font-bold text-gray-700 mb-2" id="labelFoto">Upload Foto Bukti Kegiatan</label>
                             <div class="flex items-center gap-4">
-                                <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/70 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all cursor-pointer">
-                                <p class="text-sm text-blue-500 font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
+                                <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/75 rounded-2xl p-3 shadow-sm text-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#0a84ff] file:text-white hover:file:bg-[#0071e3] transition-all cursor-pointer">
+                                <p class="text-sm text-[#0a84ff] font-semibold animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="mt-8 flex flex-wrap gap-4 items-center border-t border-gray-200/50 dark:border-white/10 pt-6">
-                        <button onclick="tambahBaris()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/30 hover:-translate-y-1 flex items-center justify-center gap-2" id="btnTambah">
+                        <button onclick="tambahBaris()" class="w-full md:w-auto bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] hover:opacity-90 text-white font-bold py-3.5 px-8 rounded-2xl shadow-xl shadow-blue-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2" id="btnTambah">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                             Simpan Laporan
                         </button>
-                        <button onclick="batalEdit()" id="btnBatalEdit" class="hidden w-full md:w-auto bg-gray-200 text-gray-700 font-bold py-3.5 px-8 rounded-2xl hover:bg-gray-300 text-center">Batal</button>
+                        <button onclick="batalEdit()" id="btnBatalEdit" class="hidden w-full md:w-auto bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold py-3.5 px-8 rounded-2xl hover:opacity-80 text-center">Batal</button>
                         <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="btn-hapus hidden w-full md:w-auto flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Hapus
                         </button>
@@ -281,33 +265,32 @@
                 </div>
             </div>
 
-            <!-- TAB 2: LAPORAN (Tabel & Export) -->
+            <!-- TAB 2: LAPORAN -->
             <div id="tabLaporan" class="tab-content">
-                <!-- FILTER & TOOLS -->
-                <div class="glass-panel rounded-3xl p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
+                <div class="glass-panel rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full border-b border-gray-200/50 dark:border-white/10 pb-5">
-                        <button onclick="bukaPreview()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/25 flex justify-center items-center gap-2 hover:-translate-y-1 transition-all">
+                        <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/20 flex justify-center items-center gap-2 hover:-translate-y-0.5 transition-all">
                             🔍 Pratinjau Cetak (Preview)
                         </button>
-                        <button onclick="downloadPDF()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 border-2 border-red-100 dark:border-red-900/30 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm hover:bg-red-50 dark:hover:bg-gray-700 flex justify-center items-center gap-2 hover:-translate-y-1 transition-all group">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 group-hover:scale-110 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        <button onclick="downloadPDF()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm hover:opacity-80 flex justify-center items-center gap-2 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                             Export ke PDF
                         </button>
                     </div>
 
                     <div class="flex flex-wrap gap-3 justify-end pb-2 border-b border-gray-200/50 dark:border-white/10 pb-4">
-                        <button onclick="backupData()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 shadow-sm transition-all">💾 Backup Data</button>
-                        <button onclick="document.getElementById('importFile').click()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:bg-gray-50 shadow-sm transition-all">📂 Restore</button>
+                        <button onclick="backupData()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 shadow-sm transition-all">💾 Backup Data</button>
+                        <button onclick="document.getElementById('importFile').click()" class="bg-white/80 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 shadow-sm transition-all">📂 Restore</button>
                         <input type="file" id="importFile" accept=".json" class="hidden" onchange="restoreData(event)">
-                        <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-bold py-2.5 px-4 rounded-xl hover:bg-red-100 transition-all">Reset DB</button>
+                        <button onclick="hapusSemuaData()" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-bold py-2.5 px-4 rounded-xl hover:opacity-80 transition-all">Reset DB</button>
                     </div>
 
                     <!-- Filter & Pencarian -->
                     <div class="flex flex-col md:flex-row justify-between items-center gap-5 flex-wrap pt-2">
                         <div class="flex items-center gap-3 w-full md:w-auto">
-                            <span class="p-2.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
-                            <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-blue-500">
+                            <span class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] rounded-xl shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg></span>
+                            <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold text-gray-700 dark:text-gray-200 w-full md:w-56 shadow-sm border-0 focus:ring-2 focus:ring-[#0a84ff]">
                                 <option value="SEMUA">Filter: Semua Bulan</option>
                             </select>
                         </div>
@@ -315,27 +298,25 @@
                             <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
                             </div>
-                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-blue-500" placeholder="Cari uraian, tanggal, hari...">
+                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 pl-12 text-sm font-bold text-gray-700 dark:text-gray-200 w-full shadow-sm border-0 focus:ring-2 focus:ring-[#0a84ff]" placeholder="Cari uraian, tanggal, hari...">
                         </div>
                     </div>
                     
                     <!-- Info Memori -->
-                    <div class="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-4 border border-white/80 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-sm">
+                    <div class="bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-white/60 dark:border-gray-700 text-xs flex flex-col gap-2 backdrop-blur-md">
                         <div class="flex justify-between font-bold text-gray-700 dark:text-gray-300">
                             <span id="labelKapasitasTeks" class="flex items-center gap-1">🗄️ Storage:</span>
                             <span id="persenMemori" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">Menganalisis...</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
-                            <div id="barMemori" class="bg-blue-600 h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                            <div id="barMemori" class="bg-[#0a84ff] h-2.5 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- RESPONSIVE CARD VIEW KHUSUS MOBILE (TAMPILAN HP) & TABEL FORMAL (PDF/DESKTOP) -->
-                <!-- 1. Tampilan Card View (Hanya muncul di HP/Layar kecil) -->
+                <!-- TAMPILAN MOBILE (CARD VIEW) & DESKTOP (TABEL) -->
                 <div class="block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
-                <!-- 2. Area Kertas Formal (Tabel Asli untuk Cetak/PDF & Desktop) -->
                 <div class="area-kertas rounded-xl relative overflow-hidden hidden md:block" id="areaCetak">
                     <div class="watermark" id="teksWatermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
@@ -354,16 +335,11 @@
         let indexEditMode = -1; 
 
         window.onload = async function() {
-            // Load saved theme & dark mode
-            const savedTheme = localStorage.getItem('colorTheme') || 'blue';
-            changeTheme(savedTheme, false);
-
             if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('btnDarkMode').innerHTML = '☀️ <span>Mode Terang</span>';
             }
 
-            // Load saved custom name if exists
             const savedNama = localStorage.getItem('customNamaLain');
             if(savedNama) {
                 updateSemuaTeksNama(savedNama, false);
@@ -393,7 +369,6 @@
             }, 600); 
         };
 
-        // --- UPDATE NAMA DINAMIS (BISA DIEDIT LANGSUNG) ---
         function updateNamaGlobal(teksBaru) {
             const bersih = teksBaru.trim() || "LUKYY";
             localStorage.setItem('customNamaLain', bersih);
@@ -416,21 +391,6 @@
             }
         }
 
-        // --- COLOR ACCENT PICKER ---
-        function changeTheme(themeName, showToastMsg = true) {
-            document.body.classList.remove('theme-emerald', 'theme-purple');
-            if (themeName === 'emerald') {
-                document.body.classList.add('theme-emerald');
-            } else if (themeName === 'purple') {
-                document.body.classList.add('theme-purple');
-            }
-            localStorage.setItem('colorTheme', themeName);
-            if(showToastMsg) {
-                showToast(`Tema warna diubah ke ${themeName.toUpperCase()} 🎨`);
-            }
-        }
-
-        // --- TOAST NOTIFICATION SYSTEM ---
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const msgEl = document.getElementById('toast-message');
@@ -446,7 +406,6 @@
             }, 3000);
         }
 
-        // --- TAB TRANSITION HALUS ---
         function switchTab(tabName) {
             const tabInput = document.getElementById('tabInput');
             const tabLaporan = document.getElementById('tabLaporan');
@@ -457,14 +416,14 @@
                 tabInput.classList.add('active');
                 tabLaporan.classList.remove('active');
                 
-                btnInput.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all";
-                btnLaporan.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl";
+                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm";
+                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl";
             } else {
                 tabLaporan.classList.add('active');
                 tabInput.classList.remove('active');
 
-                btnLaporan.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-blue-600 bg-blue-50 dark:bg-blue-900/40 rounded-xl transition-all";
-                btnInput.className = "flex md:flex-row flex-col items-center justify-center gap-1 md:gap-2 p-2 w-full md:w-40 px-4 text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all rounded-xl";
+                btnLaporan.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-[#0a84ff] bg-white/80 dark:bg-white/10 rounded-2xl transition-all shadow-sm";
+                btnInput.className = "flex flex-col items-center justify-center gap-1 py-2 px-6 text-gray-500 dark:text-gray-400 hover:text-[#0a84ff] transition-all rounded-2xl";
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -536,7 +495,7 @@
             const parts = item.tanggal.split('/');
             document.getElementById('inputTanggal').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
             document.getElementById('inputUraian').value = item.uraian;
-            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-amber-100 dark:bg-amber-900/50 text-amber-600 rounded-xl">✏️</span> Edit Kegiatan PKL';
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-amber-100 dark:bg-amber-900/40 text-amber-600 rounded-xl">✏️</span> Edit Kegiatan PKL';
             document.getElementById('btnTambah').innerHTML = "💾 Update Laporan";
             document.getElementById('btnBatalEdit').classList.remove('hidden');
             document.getElementById('btnHapusEdit').classList.remove('hidden');
@@ -698,7 +657,6 @@
                 if (dataBulanIni.length > 0) {
                     dataDitemukan = true;
                     
-                    // --- 1. RENDER UNTUK DESKTOP / PDF (TABEL FORMAL) ---
                     const containerBulan = document.createElement('div');
                     containerBulan.className = 'mb-12 bulan-container'; 
                     
@@ -721,10 +679,9 @@
                                 <tbody>
                     `;
 
-                    // --- 2. RENDER UNTUK MOBILE (CARD VIEW) ---
                     let htmlCard = `
                         <div class="mb-4">
-                            <h3 class="font-extrabold text-sm text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-3">📅 Bulan: ${bulan}</h3>
+                            <h3 class="font-extrabold text-sm text-[#0a84ff] uppercase tracking-wider mb-3">📅 Bulan: ${bulan}</h3>
                         </div>
                     `;
 
@@ -734,7 +691,6 @@
                         const fotoHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer hover:opacity-80 transition-all mx-auto rounded-lg shadow-sm border border-gray-200" style="max-width: 80px; max-height: 80px; display: block;" alt="foto">` : '<span class="text-gray-400 italic text-xs">-</span>';
                         const styleBorderBottom = (index === dataBulanIni.length - 1) ? 'border-bottom: 2px solid black !important;' : '';
 
-                        // Tabel Desktop
                         htmlTabel += `
                             <tr>
                                 <td class="text-center font-bold" style="color: black !important; word-break: break-word; ${styleBorderBottom}">${noUrut}</td>
@@ -745,13 +701,12 @@
                             </tr>
                         `;
 
-                        // Card Mobile
                         const fotoCardHtml = item.foto ? `<img src="${item.foto}" onclick="bukaLightbox(this.src)" class="cursor-pointer rounded-xl w-20 h-20 object-cover shadow-sm border border-gray-200 dark:border-gray-700">` : '<div class="w-20 h-20 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-400 italic">No foto</div>';
                         
                         htmlCard += `
-                            <div class="glass-panel p-4 rounded-2xl mb-3 space-y-3 border border-white/60 dark:border-gray-800 shadow-sm">
+                            <div class="glass-panel p-4 rounded-2xl mb-3 space-y-3 border border-white/40 dark:border-white/10 shadow-sm">
                                 <div class="flex justify-between items-center border-b border-gray-200/50 dark:border-gray-800 pb-2">
-                                    <span class="text-xs font-extrabold bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded-lg">#${noUrut} - ${item.hari}</span>
+                                    <span class="text-xs font-extrabold bg-blue-100 dark:bg-blue-900/40 text-[#0a84ff] px-2.5 py-1 rounded-lg">#${noUrut} - ${item.hari}</span>
                                     <span class="text-xs font-bold text-gray-500">${item.tanggal}</span>
                                 </div>
                                 <div class="flex gap-3 items-start">
@@ -781,7 +736,7 @@
 
         function batalEdit() {
             indexEditMode = -1;
-            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
+            document.getElementById('judulForm').innerHTML = '<span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></span> Input Kegiatan Baru';
             document.getElementById('btnTambah').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Simpan Laporan';
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('btnHapusEdit').classList.add('hidden');
@@ -891,7 +846,6 @@
                 elemenAsli.style.maxWidth = '794px';
                 elemenAsli.style.overflow = 'visible';
 
-                // Ambil nama dari teks yang sedang aktif di header
                 const namaAktif = document.getElementById('labelHeaderNama').innerText.trim() || "LUKYY";
                 const namaFileClean = namaAktif.replace(/[^a-zA-Z0-9]/g, '_');
                 const namaFile = filterAktif === 'SEMUA' ? `Laporan_PKL_${namaFileClean}.pdf` : `Laporan_PKL_${namaFileClean}_${filterAktif}.pdf`;
