@@ -3,78 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1e293b">
+    <meta name="theme-color" content="#0f172a">
     
-    <title>PKL Workspace // LUKYY</title>
+    <title>LAPORAN PKL BY LUKYY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --accent-primary: #0a84ff;
+            --accent-secondary: #5e5ce6;
+            --ring-color: rgba(10, 132, 255, 0.25);
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #f2f2f7; 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.18) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(94, 92, 230, 0.18) 0px, transparent 55%),
+                radial-gradient(at 50% 100%, rgba(50, 215, 75, 0.12) 0px, transparent 55%);
+            background-attachment: fixed;
+            background-size: 200% 200%;
+            animation: bgShift 18s ease-in-out infinite;
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .code-font {
-            font-family: 'JetBrains Mono', monospace;
+        body.dark-mode {
+            background-color: #000000;
+            color: #f5f5f7;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.22) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(94, 92, 230, 0.22) 0px, transparent 55%),
+                radial-gradient(at 50% 100%, rgba(48, 209, 88, 0.15) 0px, transparent 55%);
         }
 
-        body.light-mode {
-            background-color: #f1f5f9;
-            color: #0f172a;
+        @keyframes bgShift { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+        
+        /* GAYA KACA BURAM */
+        .kaca-buram {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
 
-        /* UI Panel Profesional & Clean */
-        .pro-panel {
-            background: #1e293b;
-            border: 1px solid #334155;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
+        body.dark-mode .kaca-buram {
+            background: rgba(30, 30, 32, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
-        body.light-mode .pro-panel {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
-        /* Form Controls Pro */
-        input, textarea, select {
-            background: #0f172a !important;
-            color: #f8fafc !important;
-            border: 1px solid #334155 !important;
-            font-size: 13px !important;
-            border-radius: 6px !important;
-        }
+        body.dark-mode input, body.dark-mode textarea, body.dark-mode select { background: rgba(44, 44, 46, 0.8) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; }
+        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #aeaeb2 !important; opacity: 1 !important; }
+        body.dark-mode .text-gray-700, body.dark-mode .text-gray-600 { color: #e5e5ea !important; }
+        body.dark-mode .text-gray-500 { color: #d1d1d6 !important; }
+        body.dark-mode .bg-white { background: #1c1c1e !important; color: #f5f5f7; }
 
-        body.light-mode input, body.light-mode textarea, body.light-mode select {
-            background: #f8fafc !important;
-            color: #0f172a !important;
-            border: 1px solid #cbd5e1 !important;
-        }
+        input[type="date"], input[type="text"], input[type="file"], textarea, select { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; }
+        input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.95); transform: translateY(-1px); }
+        button { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        button:active { transform: scale(0.95); }
 
-        input:focus, textarea:focus, select:focus {
-            outline: none !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-        }
-
-        /* AREA PRINT & PDF */
-        .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; }
+        /* AREA PRINT MUTLAK */
+        .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .area-kertas table { border: 1px solid black !important; border-collapse: collapse !important; font-size: 11px !important; width: 100%; min-width: 650px; table-layout: fixed; margin-top: 10px; }
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
-        .area-kertas th { background-color: #f1f5f9 !important; font-weight: bold; text-align: center; }
+        .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
-        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.03); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; }
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
         
         .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
+        .pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
         .pdf-export-mode .watermark { display: none !important; }
         
+        /* HEADER KOVER (Hanya untuk Print/PDF) */
         .header-print {
             display: none;
             font-family: "Times New Roman", Times, serif;
@@ -87,6 +105,7 @@
         }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
 
+        /* KELAS PEMOTONG HALAMAN TUNGGAL */
         .pemisah-halaman {
             page-break-after: always;
             break-after: page;
@@ -95,311 +114,312 @@
         @media print {
             .no-print { display: none !important; }
             .watermark { display: none !important; }
-            body { background: white !important; color: black !important; padding: 0 !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; animation: none; }
             .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            .table-wrapper { overflow-x: visible !important; } 
             .header-print { display: block !important; } 
         }
         .pdf-export-mode .header-print { display: block !important; } 
 
-        .tab-content { opacity: 0; transform: translateY(8px); transition: opacity 0.2s ease, transform 0.2s ease; position: absolute; width: 100%; pointer-events: none; visibility: hidden; }
-        .tab-content.active { opacity: 1; transform: translateY(0); position: relative; pointer-events: auto; visibility: visible; }
+        .gradient-text { background: linear-gradient(135deg, #0a84ff, #5e5ce6, #30d158); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 300%; animation: gradientMove 6s ease infinite; }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .tab-content { opacity: 0; transform: translateY(15px) scale(0.99); transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; width: 100%; pointer-events: none; visibility: hidden; }
+        .tab-content.active { opacity: 1; transform: translateY(0) scale(1); position: relative; pointer-events: auto; visibility: visible; }
+        @keyframes fluidFadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .animate-item { opacity: 0; animation: fluidFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="p-4 md:p-6 antialiased min-h-screen pb-32">
+<body class="p-4 md:p-8 text-gray-800 dark:text-gray-100 antialiased min-h-screen pb-40 md:pb-32">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast-container" class="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-[110] transform translate-y-10 opacity-0 pointer-events-none transition-all duration-200">
-        <div id="toast-box" class="bg-slate-800 text-slate-100 border border-slate-700 px-4 py-2.5 rounded-lg flex items-center gap-3 shadow-lg">
-            <span id="toast-icon" class="text-base">🟢</span>
-            <p id="toast-message" class="text-xs font-medium">Log system updated.</p>
+    <div id="toast-container" class="fixed bottom-32 right-4 md:bottom-28 md:right-6 z-[110] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="toast-box" class="kaca-buram px-5 py-3.5 rounded-2xl flex items-center gap-3">
+            <span id="toast-icon" class="text-xl">✅</span>
+            <p id="toast-message" class="text-sm font-bold text-gray-800 dark:text-gray-100">Pesan...</p>
         </div>
     </div>
 
-    <!-- LIGHTBOX PREVIEW -->
-    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-slate-950/90 backdrop-blur-sm flex justify-center items-center p-4" onclick="tutupLightbox()">
-        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    <!-- LIGHTBOX & PREVIEW MODAL -->
+    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 backdrop-blur-xl flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
-    <!-- MODAL PDF OPSI -->
-    <div id="modalExportOpsi" class="fixed inset-0 z-[97] hidden bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4">
-        <div class="pro-panel w-full max-w-sm rounded-xl p-5 flex flex-col">
-            <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-700">
-                <h3 class="font-bold text-sm tracking-wide">EXPORT OPTIONS</h3>
-                <button onclick="tutupOpsiExport()" class="text-slate-400 hover:text-slate-200 text-lg">&times;</button>
-            </div>
-            <div class="space-y-3 mb-5 text-left text-xs">
-                <label class="flex items-start gap-2.5 p-3 rounded-lg bg-slate-900/50 border border-slate-700 cursor-pointer hover:border-blue-500">
-                    <input type="radio" name="opsiCover" value="dengan" checked class="mt-0.5">
+    <!-- MODAL PILIHAN OPSI EXPORT PDF -->
+    <div id="modalExportOpsi" class="fixed inset-0 z-[97] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400 p-6 text-center">
+            <div class="text-3xl mb-2">📑</div>
+            <h3 class="font-extrabold text-xl mb-2">Opsi Ekspor PDF</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Pilih format dokumen PDF yang ingin Anda unduh:</p>
+            
+            <div class="space-y-3 mb-6 text-left">
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
+                    <input type="radio" name="opsiCover" value="dengan" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <div>
-                        <p class="font-semibold text-slate-200">Full Dokumen (Cover + Tabel)</p>
-                        <p class="text-slate-400 text-[11px]">Sertakan halaman sampul depan.</p>
+                        <p class="font-bold text-sm">Dengan Judul & Kover Laporan</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Mencetak halaman kover lengkap beserta tabel.</p>
                     </div>
                 </label>
-                <label class="flex items-start gap-2.5 p-3 rounded-lg bg-slate-900/50 border border-slate-700 cursor-pointer hover:border-blue-500">
-                    <input type="radio" name="opsiCover" value="tanpa" class="mt-0.5">
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
+                    <input type="radio" name="opsiCover" value="tanpa" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <div>
-                        <p class="font-semibold text-slate-200">Data Tabel Saja</p>
-                        <p class="text-slate-400 text-[11px]">Langsung ke rincian harian.</p>
+                        <p class="font-bold text-sm">Hanya Tabel Saja</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Langsung mencetak halaman data tabel kegiatan harian.</p>
                     </div>
                 </label>
             </div>
-            <div class="flex gap-2">
-                <button onclick="tutupOpsiExport()" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-lg text-xs">Batal</button>
-                <button onclick="prosesEksekusiPDF()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs">Generate PDF</button>
+
+            <div class="flex gap-3">
+                <button onclick="tutupOpsiExport()" class="flex-1 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-2xl text-sm">Batal</button>
+                <button onclick="prosesEksekusiPDF()" class="flex-1 py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">Unduh PDF</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL SETTINGS & BACKUP -->
-    <div id="modalSettings" class="fixed inset-0 z-[96] hidden bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4">
-        <div class="pro-panel w-full max-w-md rounded-xl flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
-                <h3 class="font-bold text-sm tracking-wide">SYSTEM PREFERENCES & CONFIG</h3>
-                <button onclick="tutupSettings()" class="text-slate-400 hover:text-slate-200 text-lg">&times;</button>
+    <!-- MODAL PENGATURAN PROFIL & DATA -->
+    <div id="modalSettings" class="fixed inset-0 z-[96] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400" id="modalSettingsBox">
+            <div class="p-5 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
+                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan & Data</h3></div>
+                <button onclick="tutupSettings()" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
-            <div class="p-4 space-y-4 overflow-y-auto max-h-[65vh] text-xs">
-                <div class="space-y-2.5">
-                    <p class="font-bold text-blue-400 uppercase tracking-wider text-[10px]">Identitas Siswa</p>
+            <div class="p-5 md:p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                <div class="space-y-4">
+                    <h4 class="font-bold text-sm text-[#0a84ff]">Profil Pengguna</h4>
                     <div>
-                        <label class="block font-medium mb-1 text-slate-300">Nama Lengkap</label>
-                        <input type="text" id="setNama" class="w-full p-2" placeholder="LUKYY">
+                        <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                        <input type="text" id="setNama" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: LUKYY">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block font-medium mb-1 text-slate-300">Kelas</label>
-                            <input type="text" id="setKelas" class="w-full p-2" placeholder="XII">
+                            <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Kelas</label>
+                            <input type="text" id="setKelas" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: XII">
                         </div>
                         <div>
-                            <label class="block font-medium mb-1 text-slate-300">NIS / NISN</label>
-                            <input type="text" id="setNis" class="w-full p-2" placeholder="Nomor Induk">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-medium mb-1 text-slate-300">Lokasi / Instansi PKL</label>
-                        <input type="text" id="setAlamat" class="w-full p-2" placeholder="Nama Perusahaan">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-medium mb-1 text-slate-300">Program Keahlian</label>
-                            <input type="text" id="setProgKeahlian" class="w-full p-2" placeholder="Teknik...">
-                        </div>
-                        <div>
-                            <label class="block font-medium mb-1 text-slate-300">Konsentrasi</label>
-                            <input type="text" id="setKonsKeahlian" class="w-full p-2" placeholder="Keahlian...">
+                            <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">NIS / NISN</label>
+                            <input type="text" id="setNis" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: 1234567890">
                         </div>
                     </div>
                     <div>
-                        <label class="block font-medium mb-1 text-slate-300">Tahun Pelajaran</label>
-                        <input type="text" id="setTahun" class="w-full p-2" placeholder="2026/2027">
+                        <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Alamat Tempat PKL</label>
+                        <input type="text" id="setAlamat" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: PT. Teknologi Indonesia">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Program Keahlian</label>
+                            <input type="text" id="setProgKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Teknik Komputer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Konsentrasi Keahlian</label>
+                            <input type="text" id="setKonsKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Teknik Jaringan">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Tahun Pelajaran</label>
+                        <input type="text" id="setTahun" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: 2026/2027">
                     </div>
                 </div>
 
-                <div class="border-t border-slate-700 pt-3 space-y-2">
-                    <p class="font-bold text-blue-400 uppercase tracking-wider text-[10px]">Data Management (JSON)</p>
-                    <div class="flex gap-2">
-                        <button onclick="eksporDataJSON()" class="flex-1 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white font-semibold rounded-lg">Export Backup</button>
-                        <label class="flex-1 py-2 bg-blue-600/80 hover:bg-blue-600 text-white font-semibold rounded-lg text-center cursor-pointer">
-                            Import JSON
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm text-[#0a84ff]">Backup & Restore (JSON)</h4>
+                    <div class="flex gap-3">
+                        <button onclick="eksporDataJSON()" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                            📤 Ekspor Data
+                        </button>
+                        <label class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                            📥 Impor Data
                             <input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden">
                         </label>
                     </div>
                 </div>
 
-                <div class="border-t border-slate-700 pt-3 space-y-2 bg-red-950/20 p-3 rounded-lg border border-red-900/40">
-                    <p class="font-bold text-red-400 uppercase tracking-wider text-[10px]">Danger Zone</p>
-                    <p class="text-slate-400 text-[11px]">Ketik string <code class="text-red-400 code-font">HAPUS</code> untuk mengonfirmasi reset database lokal.</p>
-                    <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="w-full p-2" placeholder="Ketik HAPUS">
-                    <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="w-full py-2 bg-slate-800 text-slate-500 font-semibold rounded-lg cursor-not-allowed">Hapus Seluruh Data</button>
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <div class="space-y-2 bg-red-500/10 p-4 rounded-2xl border border-red-500/20">
+                    <h4 class="font-bold text-sm text-red-600 dark:text-red-400">Zona Bahaya: Hapus Semua Data</h4>
+                    <p class="text-xs text-gray-700 dark:text-gray-300">Tindakan ini akan menghapus seluruh laporan harian secara permanen. Ketik kata <strong class="text-red-600">HAPUS</strong> di bawah ini untuk mengaktifkan tombol konfirmasi:</p>
+                    <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="w-full bg-white/80 dark:bg-gray-800 rounded-xl p-2.5 text-xs border border-red-300" placeholder="Ketik HAPUS di sini...">
+                    <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="w-full py-2.5 bg-gray-300 dark:bg-gray-700 text-gray-500 font-bold rounded-xl text-xs cursor-not-allowed transition-all">
+                        🗑️ Hapus Seluruh Laporan
+                    </button>
                 </div>
             </div>
-            <div class="p-3 bg-slate-900/50 border-t border-slate-700 flex justify-end gap-2">
-                <button onclick="tutupSettings()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-lg text-xs">Batal</button>
-                <button onclick="simpanSettings()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs">Simpan</button>
+            <div class="p-4 md:p-6 flex justify-end gap-3 bg-white/40 dark:bg-gray-900/40 border-t border-gray-200/50 dark:border-gray-800/50">
+                <button onclick="tutupSettings()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-sm">Batal</button>
+                <button onclick="simpanSettings()" class="px-6 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-500/30">💾 Simpan Profil</button>
             </div>
         </div>
     </div>
 
-    <!-- PREVIEW MODAL -->
-    <div id="modalPreview" class="fixed inset-0 z-[95] hidden bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-2 md:p-6">
-        <div class="pro-panel w-full max-w-4xl h-[90vh] rounded-xl flex flex-col overflow-hidden">
-            <div class="p-3 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
-                <h3 class="font-bold text-xs tracking-wide">DOCUMENT PREVIEW</h3>
-                <button onclick="tutupPreview()" class="text-slate-400 hover:text-slate-200 text-lg">&times;</button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 bg-slate-950 flex justify-center">
-                <div class="w-full max-w-[794px] bg-white text-black p-8 shadow-lg area-kertas relative min-h-[1056px]">
-                    <div class="watermark">LAPORAN PKL BY LUKYY</div>
-                    <div id="wadahPreviewTabel"></div>
-                </div>
-            </div>
-            <div class="p-3 bg-slate-900/50 border-t border-slate-700 flex justify-end gap-2">
-                <button onclick="tutupPreview()" class="px-3 py-1.5 bg-slate-700 text-slate-200 font-semibold rounded-lg text-xs">Tutup</button>
-                <button onclick="eksekusiDownloadDariPreview()" class="px-4 py-1.5 bg-blue-600 text-white font-semibold rounded-lg text-xs">Download PDF</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NAVIGATION BAR BAWAH (PRO STYLE) -->
+    <!-- TAB NAVIGATION BAWAH -->
     <nav class="no-print fixed bottom-4 left-4 right-4 z-50 flex justify-center">
-        <div class="pro-panel p-1.5 rounded-xl flex gap-1 max-w-sm w-full justify-around items-center shadow-lg">
-            <button onclick="switchTab('input')" id="btnTabInput" class="flex items-center justify-center gap-1.5 py-2 px-3 text-blue-400 bg-slate-800/80 rounded-lg text-xs font-semibold flex-1">
-                <span>📝</span><span>Input Data</span>
+        <div class="kaca-buram p-2 rounded-3xl flex gap-2 max-w-md w-full justify-around items-center">
+            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-4 text-[#0a84ff] bg-white/60 dark:bg-white/10 rounded-2xl transition-all shadow-sm flex-1">
+                <span class="text-base">📝</span><span class="text-[11px] font-bold">Input Data</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex items-center justify-center gap-1.5 py-2 px-3 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-semibold flex-1">
-                <span>📊</span><span>Laporan</span>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-4 text-gray-700 dark:text-gray-300 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
+                <span class="text-base">📋</span><span class="text-[11px] font-bold">Laporan</span>
             </button>
-            <button onclick="bukaSettings()" class="flex items-center justify-center gap-1.5 py-2 px-3 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-semibold flex-1">
-                <span>⚙️</span><span>Config</span>
+            <button onclick="bukaSettings()" class="flex flex-col items-center justify-center gap-1 py-2 px-4 text-gray-700 dark:text-gray-300 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
+                <span class="text-base">⚙️</span><span class="text-[11px] font-bold">Pengaturan</span>
             </button>
         </div>
     </nav>
 
-    <!-- FLOATING ACTION SIMPAN -->
-    <div id="floatingFormActions" class="no-print fixed bottom-16 left-0 right-0 z-[40] flex justify-center px-4 transition-all duration-200">
-        <div class="pro-panel p-2 rounded-xl w-full max-w-2xl flex gap-2 justify-center shadow-lg bg-slate-900/90 backdrop-blur-sm">
-            <button onclick="tambahBaris()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg text-xs flex items-center justify-center gap-2" id="btnTambah">
-                <span>Simpan Record Laporan</span>
+    <!-- FLOATING ACTION BAR SIMPAN LAPORAN -->
+    <div id="floatingFormActions" class="no-print fixed bottom-[85px] left-0 right-0 z-[40] flex justify-center px-4 transition-all duration-300">
+        <div class="kaca-buram p-3 rounded-3xl w-full max-w-3xl flex flex-wrap gap-3 justify-center shadow-2xl border-2 border-blue-500/30">
+            <button onclick="tambahBaris()" class="flex-1 max-w-[400px] bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:opacity-90" id="btnTambah">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Simpan Laporan
             </button>
-            <button onclick="batalEdit()" id="btnBatalEdit" class="hidden px-4 bg-slate-700 text-slate-200 font-semibold py-2 rounded-lg text-xs">Batal</button>
-            <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="hidden px-4 bg-red-950 text-red-400 border border-red-800 font-semibold py-2 rounded-lg text-xs">Hapus</button>
+            <button onclick="batalEdit()" id="btnBatalEdit" class="hidden flex-1 max-w-[150px] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold py-3.5 px-6 rounded-2xl">Batal</button>
+            <button onclick="hapusDataYangDiedit()" id="btnHapusEdit" class="hidden flex-1 max-w-[150px] bg-red-100 dark:bg-red-900/40 text-red-600 font-bold py-3.5 px-6 rounded-2xl">Hapus</button>
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
-    <div class="max-w-4xl mx-auto space-y-4 pt-2">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-3 no-print mb-4 border-b border-slate-800 pb-3">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
-                    <span>PKL Workspace //</span> <span class="text-blue-400 code-font">LUKYY</span>
+    <!-- MAIN KONTEN -->
+    <div class="max-w-5xl mx-auto space-y-6 relative pt-4 md:pt-0">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 no-print mt-8 md:mt-0 mb-6 text-center md:text-left">
+            <div class="animate-item" style="animation-delay: 0.1s;">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
+                    <span>Laporan PKL by</span> 
+                    <span class="gradient-text font-extrabold select-none">LUKYY</span>✨
                 </h1>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="pro-panel px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white flex items-center gap-1.5">
-                    <span>☀️</span><span>Theme</span>
+            <div class="flex flex-wrap gap-2 items-center justify-center animate-item" style="animation-delay: 0.2s;">
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="kaca-buram px-4 py-2.5 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-bold">
+                    🌙 <span>Mode Gelap</span>
                 </button>
             </div>
         </div>
 
-        <div class="relative min-h-[450px]">
-            <!-- TAB INPUT -->
-            <div id="tabInput" class="tab-content active pb-12">
-                <div class="pro-panel rounded-xl p-5 relative z-20 no-print">
-                    <h2 class="text-xs font-bold uppercase tracking-wider mb-4 text-blue-400 flex items-center gap-2">
-                        <span>⚡</span> Form Entri Kegiatan Harian
+        <div class="relative min-h-[500px]">
+            <!-- TAB 1: FORM INPUT -->
+            <div id="tabInput" class="tab-content active pb-10">
+                <div class="glass-panel rounded-[2.5rem] p-6 md:p-8 relative z-20 no-print animate-item" style="animation-delay: 0.3s;">
+                    <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-[#0a84ff]" id="judulForm">
+                        <span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl">✏️</span> Input Kegiatan Baru
                     </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <label class="block font-medium mb-1.5 text-slate-300">Pilih Record (Edit)</label>
-                            <select id="pilihEdit" class="w-full p-2.5" onchange="pilihTanggalEdit()">
-                                <option value="baru">+ Buat Baru</option>
+                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Pilih Tanggal (Edit)</label>
+                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                                <option value="baru">+ Tambah Laporan Baru</option>
                             </select>
                         </div>
                         <div class="lg:col-span-1">
-                            <label class="block font-medium mb-1.5 text-slate-300">Tanggal Pelaksanaan</label>
-                            <input type="date" id="inputTanggal" class="w-full p-2.5">
+                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Tanggal Pelaksanaan</label>
+                            <input type="date" id="inputTanggal" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm">
                         </div>
                         <div class="lg:col-span-2">
-                            <label class="block font-medium mb-1.5 text-slate-300">Uraian Pekerjaan / Tugas</label>
-                            <textarea id="inputUraian" class="w-full p-2.5" rows="3" placeholder="Deskripsikan pekerjaan..."></textarea>
+                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Uraian Kegiatan</label>
+                            <textarea id="inputUraian" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" rows="3" placeholder="Contoh: Mendesain logo..."></textarea>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="block font-medium mb-1.5 text-slate-300">Lampiran Dokumentasi (Opsional)</label>
-                            <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 p-2 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white">
-                            <p class="text-[11px] text-blue-400 mt-1" id="infoFotoEdit" style="display:none;">*Kosongkan jika file gambar tidak ingin diganti.</p>
+                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Upload Foto Bukti</label>
+                            <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/75 rounded-2xl p-3 shadow-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#0a84ff] file:text-white">
+                            <p class="text-sm text-[#0a84ff] mt-2 animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB LAPORAN & STATS -->
+            <!-- TAB 2: LAPORAN -->
             <div id="tabLaporan" class="tab-content">
-                <!-- STATS GRID -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 no-print text-xs">
-                    <div class="pro-panel p-3 rounded-lg flex items-center gap-3">
-                        <div class="p-2 bg-blue-500/10 text-blue-400 rounded">📅</div>
+                
+                <!-- STATISTIK RINGKASAN -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-blue-500/10 text-blue-600 rounded-xl text-xl">📅</div>
                         <div>
-                            <p class="text-[10px] text-slate-400 font-medium">Total Hari</p>
-                            <h3 id="statTotalHari" class="text-base font-bold code-font">0</h3>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 font-bold">Total Hari</p>
+                            <h3 id="statTotalHari" class="text-xl font-extrabold">0</h3>
                         </div>
                     </div>
-                    <div class="pro-panel p-3 rounded-lg flex items-center gap-3">
-                        <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded">📝</div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-indigo-500/10 text-indigo-600 rounded-xl text-xl">📝</div>
                         <div>
-                            <p class="text-[10px] text-slate-400 font-medium">Total Records</p>
-                            <h3 id="statTotalUraian" class="text-base font-bold code-font">0</h3>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 font-bold">Total Uraian</p>
+                            <h3 id="statTotalUraian" class="text-xl font-extrabold">0</h3>
                         </div>
                     </div>
-                    <div class="pro-panel p-3 rounded-lg flex items-center gap-3">
-                        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded">🖼️</div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-emerald-500/10 text-emerald-600 rounded-xl text-xl">🖼️</div>
                         <div>
-                            <p class="text-[10px] text-slate-400 font-medium">Lampiran Foto</p>
-                            <h3 id="statTotalFoto" class="text-base font-bold code-font">0</h3>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 font-bold">Total Foto</p>
+                            <h3 id="statTotalFoto" class="text-xl font-extrabold">0</h3>
                         </div>
                     </div>
-                    <div class="pro-panel p-3 rounded-lg flex items-center gap-3">
-                        <div class="p-2 bg-amber-500/10 text-amber-400 rounded">📊</div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-amber-500/10 text-amber-600 rounded-xl text-xl">📊</div>
                         <div>
-                            <p class="text-[10px] text-slate-400 font-medium">Rata-rata/Bulan</p>
-                            <h3 id="statRataBulan" class="text-base font-bold code-font">0</h3>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 font-bold">Rata-rata/Bulan</p>
+                            <h3 id="statRataBulan" class="text-xl font-extrabold">0</h3>
                         </div>
                     </div>
                 </div>
 
-                <div class="pro-panel rounded-xl p-4 mb-4 space-y-3 no-print">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 border-b border-slate-700/60 pb-3 text-xs">
-                        <button onclick="bukaPreview()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-3 rounded-lg flex justify-center items-center gap-1.5">🔍 Preview Layout</button>
-                        <button onclick="window.print()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 px-3 rounded-lg flex justify-center items-center gap-1.5">🖨️ Direct Print[span_0](start_span)[span_0](end_span)</button>
-                        <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-2 px-3 rounded-lg flex justify-center items-center gap-1.5">📥 Export PDF</button>
+                <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
+                        <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] text-white font-bold py-3 px-6 rounded-2xl shadow-lg flex justify-center items-center gap-2">🔍 Pratinjau Cetak</button>
+                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)</button>
+                        <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs items-center">
-                        <select id="filterBulan" onchange="renderSemuaData()" class="p-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold shadow-sm">
                             <option value="SEMUA">Filter: Semua Bulan</option>
                         </select>
-                        <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="p-2" placeholder="Search keywords...">
+                        <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold shadow-sm" placeholder="Cari laporan...">
                         
-                        <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700">
-                            <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 w-full border-0">
-                            <span class="text-slate-500 text-[10px]">TO</span>
-                            <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 w-full border-0">
-                            <button onclick="resetFilterTanggal()" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[10px]">Reset</button>
+                        <div class="flex items-center gap-2 bg-white/80 dark:bg-gray-800 rounded-xl p-2 shadow-sm">
+                            <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-bold w-full" title="Tanggal Mulai">
+                            <span class="text-xs text-gray-700 dark:text-gray-300">s/d</span>
+                            <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-bold w-full" title="Tanggal Akhir">
+                            <button onclick="resetFilterTanggal()" class="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-red-500 hover:text-white" title="Reset Rentang Tanggal">Reset</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="block md:hidden space-y-2 mb-6 text-xs" id="wadahCardMobile"></div>
+                <div class="block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
-                <div class="area-kertas rounded-lg relative overflow-hidden hidden md:block" id="areaCetak">
+                <div class="area-kertas rounded-xl relative overflow-hidden hidden md:block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
-                    <div class="konten-tabel p-6 md:p-8 bg-white text-black" style="background: white !important; color: black !important;">
+                    <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
                         
                         <!-- KOVER LAPORAN -->
                         <div class="header-print" id="koverPrintSection">
-                            <h2 style="font-size: 18px; letter-spacing: 1px;">LAPORAN</h2>
-                            <h2 style="font-size: 18px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
-                            <p style="margin: 12px 0; font-size: 14px; font-weight: bold;">DI</p>
-                            <h3 style="font-size: 14px; font-weight: normal; text-decoration: underline; margin-bottom: 20px;" id="coverAlamat">Alamat Tempat PKL</h3>
+                            <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
+                            <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                            <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
+                            <h3 style="font-size: 16px; font-weight: normal; text-decoration: underline; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
                             
-                            <img src="https://i.ibb.co.com/spQKNfpB/20250929-290adac27bfcf58.webp" alt="Logo SMK" style="width: 110px; margin: 0 auto 20px auto; display: block;">
+                            <!-- LOGO SEKOLAH -->
+                            <img src="https://i.ibb.co.com/spQKNfpB/20250929-290adac27bfcf58.webp" alt="Logo SMK" style="width: 130px; margin: 0 auto 25px auto; display: block;">
                             
-                            <p style="font-size: 14px; margin-bottom: 8px;">Disusun Oleh:</p>
-                            <table style="border: none !important; margin: 5px auto; width: 280px; font-size: 13px;">
-                                <tr><td style="border: none !important; text-align: left; width: 70px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
+                            <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
+                            <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
+                                <tr><td style="border: none !important; text-align: left; width: 80px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
                                 <tr><td style="border: none !important; text-align: left;">Kelas</td><td style="border: none !important; text-align: left;">: <span id="coverKelas">XII</span></td></tr>
                                 <tr><td style="border: none !important; text-align: left;">NIS/NISN</td><td style="border: none !important; text-align: left;">: <span id="coverNis">/</span></td></tr>
                             </table>
-                            <br>
+                            <br><br>
                             
-                            <h3 style="font-size: 15px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
-                            <table style="border: none !important; margin: 10px auto; width: 380px; font-size: 13px;">
-                                <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 200px;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold;">: <span id="coverProgKeahlian"></span></td></tr>
+                            <h3 style="font-size: 17px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                            <table style="border: none !important; margin: 15px auto; width: 400px; font-size: 15px;">
+                                <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 220px;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold;">: <span id="coverProgKeahlian"></span></td></tr>
                                 <tr><td style="border: none !important; text-align: left; font-weight: bold;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold;">: <span id="coverKonsKeahlian"></span></td></tr>
                             </table>
-                            <h4 style="font-size: 14px; margin-top: 25px;">TAHUN <span id="coverTahun">2026...</span></h4>
+                            <h4 style="font-size: 16px; margin-top: 30px;">TAHUN <span id="coverTahun">2026...</span></h4>
                         </div>
                         
+                        <!-- PEMOTONG HALAMAN -->
                         <div class="html2pdf__page-break pemisah-halaman" id="pemisahHalPrint"></div>
 
+                        <!-- TABEL LAPORAN DIMULAI DI HALAMAN 2 -->
                         <div id="wadahTabelBulan"></div>
                     </div>
                 </div>
@@ -426,7 +446,7 @@
                 if (profil) {
                     dataProfil = { ...dataProfil, ...profil };
                 }
-            } catch (err) { console.error("Error loading profile:", err); }
+            } catch (err) { console.error("Gagal memuat profil:", err); }
             renderProfil();
         }
 
@@ -451,10 +471,13 @@
 
             const modal = document.getElementById('modalSettings');
             modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
         }
 
         function tutupSettings() {
-            document.getElementById('modalSettings').classList.add('hidden');
+            const modal = document.getElementById('modalSettings');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         async function simpanSettings() {
@@ -469,18 +492,18 @@
             await localforage.setItem('profilPKL', dataProfil);
             renderProfil();
             tutupSettings();
-            showToast('Konfigurasi profil tersimpan.');
+            showToast('Profil berhasil diperbarui! ✅');
         }
 
         window.onload = async function() {
-            if (localStorage.getItem('themeMode') === 'light') {
-                document.body.classList.add('light-mode');
-                document.getElementById('btnDarkMode').innerHTML = '🌙 <span>Theme</span>';
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('btnDarkMode').innerHTML = '☀️ <span>Mode Terang</span>';
             }
             try {
                 const dataDariIndexedDB = await localforage.getItem('laporanPKL');
                 if (dataDariIndexedDB !== null) { dataLaporan = dataDariIndexedDB; }
-            } catch (err) { console.error("Error loading logs:", err); }
+            } catch (err) { console.error("Gagal memuat data:", err); }
 
             await muatProfil();
             renderSemuaData();
@@ -489,8 +512,8 @@
         function showToast(message) {
             const container = document.getElementById('toast-container');
             document.getElementById('toast-message').innerText = message;
-            container.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
-            setTimeout(() => { container.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none'); }, 2500);
+            container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => { container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none'); }, 3000);
         }
 
         function switchTab(tabName) {
@@ -502,26 +525,26 @@
 
             if(tabName === 'input') {
                 tabInput.classList.add('active'); tabLaporan.classList.remove('active');
-                btnInput.classList.add('text-blue-400', 'bg-slate-800/80');
-                btnLaporan.classList.remove('text-blue-400', 'bg-slate-800/80');
-                btnLaporan.classList.add('text-slate-400');
+                btnInput.classList.replace('bg-transparent', 'bg-white/60');
+                btnInput.classList.add('text-[#0a84ff]');
+                btnLaporan.classList.remove('text-[#0a84ff]', 'bg-white/60');
+                btnLaporan.classList.add('text-gray-700', 'dark:text-gray-300');
                 floatingActions.style.display = 'flex';
             } else {
                 tabLaporan.classList.add('active'); tabInput.classList.remove('active');
-                btnLaporan.classList.add('text-blue-400', 'bg-slate-800/80');
-                btnLaporan.classList.remove('text-slate-400');
-                btnInput.classList.remove('text-blue-400', 'bg-slate-800/80');
-                btnInput.classList.add('text-slate-400');
+                btnLaporan.classList.replace('text-gray-700', 'text-[#0a84ff]');
+                btnLaporan.classList.replace('dark:text-gray-300', 'text-[#0a84ff]');
+                btnLaporan.classList.add('bg-white/60');
+                btnInput.classList.remove('text-[#0a84ff]', 'bg-white/60');
+                btnInput.classList.add('text-gray-700', 'dark:text-gray-300');
                 floatingActions.style.display = 'none'; 
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function toggleDarkMode() {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('themeMode', isLight ? 'light' : 'dark');
-            document.getElementById('btnDarkMode').innerHTML = isLight ? '🌙 <span>Theme</span>' : '☀️ <span>Theme</span>';
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
 
         function pilihTanggalEdit() {
@@ -534,7 +557,7 @@
             const item = dataLaporan[index];
             document.getElementById('inputTanggal').value = item.tanggal.split('/').reverse().join('-');
             document.getElementById('inputUraian').value = item.uraian;
-            document.getElementById('btnTambah').innerHTML = "<span>Update Record Laporan</span>";
+            document.getElementById('btnTambah').innerHTML = "💾 Update Laporan";
             document.getElementById('btnBatalEdit').classList.remove('hidden');
             document.getElementById('btnHapusEdit').classList.remove('hidden');
             document.getElementById('infoFotoEdit').style.display = 'block';
@@ -545,7 +568,7 @@
             const uraian = document.getElementById('inputUraian').value;
             const fotoInput = document.getElementById('inputFoto');
 
-            if(!tanggalInput || !uraian) { showToast('Warning: Input tanggal dan uraian wajib diisi.'); return; }
+            if(!tanggalInput || !uraian) { showToast('Isi Tanggal dan Uraian!'); return; }
             
             const dateObj = new Date(tanggalInput);
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -573,42 +596,28 @@
             dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
             await localforage.setItem('laporanPKL', dataLaporan);
             
-            updateDropdownEdit();
             renderSemuaData();
             batalEdit();
-            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-            showToast('Record berhasil disimpan.');
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            showToast('Laporan disimpan! 🎉');
             switchTab('laporan');
-        }
-
-        function updateDropdownEdit() {
-            const selectEl = document.getElementById('pilihEdit');
-            selectEl.innerHTML = '<option value="baru">+ Buat Baru</option>';
-            dataLaporan.forEach(item => {
-                selectEl.innerHTML += `<option value="${item.tanggal}">${item.tanggal} - ${item.uraian.substring(0, 25)}...</option>`;
-            });
         }
 
         function batalEdit() {
             indexEditMode = -1;
-            document.getElementById('btnTambah').innerHTML = "<span>Simpan Record Laporan</span>";
+            document.getElementById('btnTambah').innerHTML = "Simpan Laporan";
             document.getElementById('btnBatalEdit').classList.add('hidden');
             document.getElementById('btnHapusEdit').classList.add('hidden');
             document.getElementById('inputTanggal').value = '';
             document.getElementById('inputUraian').value = '';
-            document.getElementById('inputFoto').value = '';
-            document.getElementById('infoFotoEdit').style.display = 'none';
             document.getElementById('pilihEdit').value = 'baru';
         }
 
         async function hapusDataYangDiedit() {
-            if (confirm(`Hapus record tanggal ${dataLaporan[indexEditMode].tanggal}?`)) {
+            if (confirm(`Hapus data tanggal ${dataLaporan[indexEditMode].tanggal}?`)) {
                 dataLaporan.splice(indexEditMode, 1);
                 await localforage.setItem('laporanPKL', dataLaporan);
-                updateDropdownEdit();
-                batalEdit(); 
-                renderSemuaData(); 
-                showToast('Record terhapus.');
+                batalEdit(); renderSemuaData(); showToast('Data dihapus!');
             }
         }
 
@@ -632,24 +641,21 @@
         }
 
         function renderSemuaData() {
-            updateDropdownEdit();
             const wadahTabel = document.getElementById('wadahTabelBulan');
             const wadahCard = document.getElementById('wadahCardMobile');
             wadahTabel.innerHTML = ''; wadahCard.innerHTML = '';
             
             if (dataLaporan.length === 0) {
-                wadahTabel.innerHTML = '<p class="text-center text-slate-400 my-8 text-xs">No records found in storage.</p>';
+                wadahTabel.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 my-10">Belum ada data.</p>';
                 updateStatistik([]);
                 return;
             }
 
             const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
             const filter = document.getElementById('filterBulan');
-            const currentFilterVal = filter.value;
-            filter.innerHTML = '<option value="SEMUA">Filter: Semua Bulan</option>';
-            unikBulan.forEach(b => {
-                filter.innerHTML += `<option value="${b}" ${currentFilterVal === b ? 'selected' : ''}>${b}</option>`;
-            });
+            if(filter.options.length === 1) {
+                unikBulan.forEach(b => filter.innerHTML += `<option value="${b}">${b}</option>`);
+            }
             
             const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
             const bulanDipilih = filter.value === 'SEMUA' ? unikBulan : [filter.value];
@@ -673,7 +679,7 @@
             updateStatistik(dataFiltered);
 
             if (dataFiltered.length === 0) {
-                wadahTabel.innerHTML = '<p class="text-center text-slate-400 my-8 text-xs">No data matches filter parameters.</p>';
+                wadahTabel.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 my-10">Tidak ada data yang sesuai filter.</p>';
                 return;
             }
 
@@ -683,38 +689,38 @@
                 const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if(dataBulanIni.length === 0) return;
 
-                let pemisahBulan = bulanIndex > 0 ? 'margin-top: 30px;' : '';
+                let pemisahBulan = bulanIndex > 0 ? 'margin-top: 40px;' : '';
 
                 let htmlTabel = `
-                    <div class="mb-3 text-sm font-bold text-black pt-2" style="${pemisahBulan}">
+                    <div class="mb-4 text-base font-bold text-black pt-4" style="${pemisahBulan}">
                         <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                     </div>
                     <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
                         <thead>
                             <tr>
-                                <th style="border: 1px solid black; padding: 4px;">No</th>
-                                <th style="border: 1px solid black; padding: 4px;">Hari</th>
-                                <th style="border: 1px solid black; padding: 4px;">Tanggal</th>
-                                <th style="border: 1px solid black; padding: 4px; width: 45%;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 4px;">Foto</th>
+                                <th style="border: 1px solid black; padding: 5px;">No</th>
+                                <th style="border: 1px solid black; padding: 5px;">Hari</th>
+                                <th style="border: 1px solid black; padding: 5px;">Tanggal</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 45%;">Uraian Kegiatan</th>
+                                <th style="border: 1px solid black; padding: 5px;">Foto</th>
                             </tr>
                         </thead><tbody>`;
 
                 dataBulanIni.forEach((item, idx) => {
                     htmlTabel += `
                         <tr>
-                            <td style="border: 1px solid black; padding: 4px; text-align: center;">${idx+1}</td>
-                            <td style="border: 1px solid black; padding: 4px;">${item.hari}</td>
-                            <td style="border: 1px solid black; padding: 4px;">${item.tanggal}</td>
-                            <td style="border: 1px solid black; padding: 4px;">${item.uraian}</td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: center;">
-                                ${item.foto ? `<img src="${item.foto}" style="max-height: 60px;" class="mx-auto border border-slate-300">` : '-'}
+                            <td style="border: 1px solid black; padding: 5px; text-align: center;">${idx+1}</td>
+                            <td style="border: 1px solid black; padding: 5px;">${item.hari}</td>
+                            <td style="border: 1px solid black; padding: 5px;">${item.tanggal}</td>
+                            <td style="border: 1px solid black; padding: 5px;">${item.uraian}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                ${item.foto ? `<img src="${item.foto}" style="max-height: 70px;" class="mx-auto border border-gray-300">` : '-'}
                             </td>
                         </tr>`;
                     
                     wadahCard.innerHTML += `
-                        <div class="pro-panel p-3 rounded-lg mb-2 flex justify-between items-center text-xs">
-                            <div><span class="text-blue-400 font-bold">${item.tanggal}</span><p class="text-slate-300 mt-1">${item.uraian}</p></div>
+                        <div class="kaca-buram p-4 rounded-xl mb-3 flex gap-3">
+                            <div class="flex-1"><b class="text-blue-500">${item.tanggal}</b><p class="text-sm mt-1">${item.uraian}</p></div>
                         </div>`;
                 });
                 wadahTabel.innerHTML += htmlTabel + `</tbody></table>`;
@@ -722,15 +728,18 @@
         }
 
         function eksporDataJSON() {
-            const dataBackup = { profil: dataProfil, laporan: dataLaporan };
+            const dataBackup = {
+                profil: dataProfil,
+                laporan: dataLaporan
+            };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataBackup, null, 2));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `backup_pkl_${dataProfil.nama || 'lukyy'}.json`);
-            document.body.appendChild(dl);
-            dl.click();
-            dl.remove();
-            showToast("Backup JSON berhasil diunduh.");
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Backup_Laporan_PKL_${dataProfil.nama || 'LUKYY'}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Data berhasil diekspor! 📤");
         }
 
         async function imporDataJSON(event) {
@@ -751,9 +760,9 @@
                     }
                     renderSemuaData();
                     tutupSettings();
-                    showToast("Database berhasil dipulihkan.");
+                    showToast("Data berhasil dipulihkan! 🎉");
                 } catch (err) {
-                    alert("Invalid JSON schema.");
+                    alert("Format file JSON tidak valid!");
                 }
             };
             reader.readAsText(file);
@@ -763,12 +772,12 @@
             const btn = document.getElementById('btnHapusSemuaData');
             if (inputEl.value.trim() === 'HAPUS') {
                 btn.disabled = false;
-                btn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-                btn.classList.add('bg-red-600', 'hover:bg-red-500', 'text-white', 'cursor-pointer');
+                btn.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
             } else {
                 btn.disabled = true;
-                btn.classList.add('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-                btn.classList.remove('bg-red-600', 'hover:bg-red-500', 'text-white', 'cursor-pointer');
+                btn.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
             }
         }
 
@@ -779,24 +788,30 @@
             document.getElementById('inputKonfirmasiHapus').value = '';
             cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
             tutupSettings();
-            showToast("Database berhasil dikosongkan.");
+            showToast("Seluruh laporan berhasil dihapus! 🗑️");
         }
 
         function bukaPreview() {
             document.getElementById('wadahPreviewTabel').innerHTML = document.getElementById('areaCetak').innerHTML;
             document.getElementById('modalPreview').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('modalPreview').classList.remove('opacity-0'); }, 10);
         }
 
         function tutupPreview() {
-            document.getElementById('modalPreview').classList.add('hidden');
+            document.getElementById('modalPreview').classList.add('opacity-0');
+            setTimeout(() => { document.getElementById('modalPreview').classList.add('hidden'); }, 300);
         }
 
         function bukaOpsiExport() {
-            document.getElementById('modalExportOpsi').classList.remove('hidden');
+            const modal = document.getElementById('modalExportOpsi');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
         }
 
         function tutupOpsiExport() {
-            document.getElementById('modalExportOpsi').classList.add('hidden');
+            const modal = document.getElementById('modalExportOpsi');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         function prosesEksekusiPDF() {
@@ -832,7 +847,7 @@
                 elemenAsli.style.display = '';
                 koverSection.style.display = '';
                 pemisahHal.style.display = '';
-                showToast("PDF berhasil di-generate.");
+                showToast("PDF berhasil di-download! 📥");
             });
         }
     </script>
