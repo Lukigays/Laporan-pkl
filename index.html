@@ -115,7 +115,7 @@
             .no-print { display: none !important; }
             .watermark { display: none !important; }
             body { background: white !important; color: black !important; padding: 0 !important; animation: none; }
-            .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; display: block !important; }
             .table-wrapper { overflow-x: visible !important; } 
             .header-print { display: block !important; } 
         }
@@ -779,14 +779,20 @@
             dataLaporan = [];
             await localforage.removeItem('laporanPKL');
             renderSemuaData();
-            document.getElementById('inputKonfirmasiHapus').value = '';
+            document.getElementById('inputKonfirmasiHapus').value, '';
             cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
             tutupSettings();
             showToast("Seluruh laporan berhasil dihapus! 🗑️");
         }
 
         function cetakLangsungTanpaPreview() {
-            // Langsung memanggil window.print() untuk eksekusi cetak
+            const areaCetak = document.getElementById('areaCetak');
+            
+            // Paksa area cetak agar muncul sepenuhnya (mengatasi masalah tersembunyi di perangkat mobile/hidden classes)
+            areaCetak.classList.remove('hidden');
+            areaCetak.classList.add('block');
+            
+            // Eksekusi fungsi print browser
             window.print();
         }
 
