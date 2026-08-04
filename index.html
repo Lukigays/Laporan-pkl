@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <script>(function(s){s.dataset.zone='11500942',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a">
@@ -157,14 +156,14 @@
                     <input type="radio" name="opsiCover" value="dengan" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <div>
                         <p class="font-bold text-sm">Dengan Judul & Kover Laporan</p>
-                        <p class="text-xs text-gray-500">Mencetak halaman kover lengkap beserta tabel.</p>
+                        <p class="text-xs text-gray-500">Mencetak halaman kover lengkap beserta tabel[span_0](start_span)[span_0](end_span).</p>
                     </div>
                 </label>
                 <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
                     <input type="radio" name="opsiCover" value="tanpa" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <div>
                         <p class="font-bold text-sm">Hanya Tabel Saja</p>
-                        <p class="text-xs text-gray-500">Langsung mencetak halaman data tabel kegiatan harian.</p>
+                        <p class="text-xs text-gray-500">Langsung mencetak halaman data tabel kegiatan harian[span_1](start_span)[span_1](end_span).</p>
                     </div>
                 </label>
             </div>
@@ -176,48 +175,81 @@
         </div>
     </div>
 
-    <!-- MODAL PENGATURAN PROFIL -->
+    <!-- MODAL PENGATURAN PROFIL & DATA -->
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400" id="modalSettingsBox">
             <div class="p-5 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
-                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan Profil</h3></div>
+                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan & Data</h3></div>
                 <button onclick="tutupSettings()" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
-            <div class="p-5 md:p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                <div>
-                    <label class="block text-sm font-bold mb-2">Nama Lengkap</label>
-                    <input type="text" id="setNama" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: LUKYY">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+            <div class="p-5 md:p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                <div class="space-y-4">
+                    <h4 class="font-bold text-sm text-[#0a84ff]">Profil Pengguna</h4>
                     <div>
-                        <label class="block text-sm font-bold mb-2">Kelas</label>
-                        <input type="text" id="setKelas" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: XII">
+                        <label class="block text-xs font-bold mb-1">Nama Lengkap</label>
+                        <input type="text" id="setNama" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: LUKYY">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Kelas</label>
+                            <input type="text" id="setKelas" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: XII">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">NIS / NISN</label>
+                            <input type="text" id="setNis" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: 1234567890">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold mb-2">NIS / NISN</label>
-                        <input type="text" id="setNis" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: 1234567890">
+                        <label class="block text-xs font-bold mb-1">Alamat Tempat PKL</label>
+                        <input type="text" id="setAlamat" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: PT. Teknologi Indonesia">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Program Keahlian</label>
+                            <input type="text" id="setProgKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Teknik Komputer">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Konsentrasi Keahlian</label>
+                            <input type="text" id="setKonsKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Teknik Jaringan">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Tahun Pelajaran</label>
+                        <input type="text" id="setTahun" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: 2026/2027">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold mb-2">Alamat Tempat PKL</label>
-                    <input type="text" id="setAlamat" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: PT. Teknologi Indonesia">
+
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <!-- 1. EKSPOR & IMPOR DATA -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm text-[#0a84ff]">Backup & Restore (JSON)[span_2](start_span)[span_2](end_span)</h4>
+                    <div class="flex gap-3">
+                        <button onclick="eksporDataJSON()" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                            📤 Ekspor Data
+                        </button>
+                        <label class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                            📥 Impor Data
+                            <input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden">
+                        </label>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold mb-2">Program Keahlian</label>
-                    <input type="text" id="setProgKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: Teknik Komputer dan Jaringan">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold mb-2">Konsentrasi Keahlian</label>
-                    <input type="text" id="setKonsKeahlian" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: Teknik Jaringan Komputer">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold mb-2">Tahun Pelajaran</label>
-                    <input type="text" id="setTahun" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3.5 shadow-sm text-sm" placeholder="Contoh: 2026/2027">
+
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <!-- 5. KONFIRMASI HAPUS SEMUA DATA -->
+                <div class="space-y-2 bg-red-500/10 p-4 rounded-2xl border border-red-500/20">
+                    <h4 class="font-bold text-sm text-red-600 dark:text-red-400">Zona Bahaya: Hapus Semua Data[span_3](start_span)[span_3](end_span)</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Tindakan ini akan menghapus seluruh laporan harian secara permanen. Ketik kata <strong class="text-red-600">HAPUS</strong> di bawah ini untuk mengaktifkan tombol konfirmasi[span_4](start_span)[span_4](end_span):</p>
+                    <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="w-full bg-white/80 dark:bg-gray-800 rounded-xl p-2.5 text-xs border border-red-300" placeholder="Ketik HAPUS di sini...">
+                    <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="w-full py-2.5 bg-gray-300 dark:bg-gray-700 text-gray-500 font-bold rounded-xl text-xs cursor-not-allowed transition-all">
+                        🗑️ Hapus Seluruh Laporan
+                    </button>
                 </div>
             </div>
-            <div class="p-5 md:p-6 flex justify-end gap-3 bg-white/40 dark:bg-gray-900/40 border-t border-gray-200/50 dark:border-gray-800/50">
+            <div class="p-4 md:p-6 flex justify-end gap-3 bg-white/40 dark:bg-gray-900/40 border-t border-gray-200/50 dark:border-gray-800/50">
                 <button onclick="tutupSettings()" class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-sm">Batal</button>
-                <button onclick="simpanSettings()" class="px-6 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-500/30">💾 Simpan Perubahan</button>
+                <button onclick="simpanSettings()" class="px-6 py-2.5 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-500/30">💾 Simpan Profil</button>
             </div>
         </div>
     </div>
@@ -298,17 +330,60 @@
 
             <!-- TAB 2: LAPORAN -->
             <div id="tabLaporan" class="tab-content">
+                
+                <!-- 2. STATISTIK RINGKASAN -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-blue-500/10 text-blue-600 rounded-xl text-xl">📅</div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">Total Hari</p>
+                            <h3 id="statTotalHari" class="text-xl font-extrabold">0</h3>
+                        </div>
+                    </div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-indigo-500/10 text-indigo-600 rounded-xl text-xl">📝</div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">Total Uraian</p>
+                            <h3 id="statTotalUraian" class="text-xl font-extrabold">0</h3>
+                        </div>
+                    </div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-emerald-500/10 text-emerald-600 rounded-xl text-xl">🖼️</div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">Total Foto</p>
+                            <h3 id="statTotalFoto" class="text-xl font-extrabold">0</h3>
+                        </div>
+                    </div>
+                    <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
+                        <div class="p-3 bg-amber-500/10 text-amber-600 rounded-xl text-xl">📊</div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold">Rata-rata/Bulan</p>
+                            <h3 id="statRataBulan" class="text-xl font-extrabold">0</h3>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
+                    <!-- 4. TOMBOL CETAK (PRINT) LANGSUNG & EKSPOR -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
                         <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] text-white font-bold py-3 px-6 rounded-2xl shadow-lg flex justify-center items-center gap-2">🔍 Pratinjau Cetak</button>
+                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)[span_5](start_span)[span_5](end_span)</button>
                         <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-5">
-                        <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold w-full md:w-56 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <select id="filterBulan" onchange="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold shadow-sm">
                             <option value="SEMUA">Filter: Semua Bulan</option>
                         </select>
-                        <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold w-full max-w-md shadow-sm" placeholder="Cari laporan...">
+                        <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="bg-white/80 dark:bg-gray-800 rounded-xl p-3 text-sm font-bold shadow-sm" placeholder="Cari laporan...">
+                        
+                        <!-- 3. FILTER BERDASARKAN RENTANG TANGGAL -->
+                        <div class="flex items-center gap-2 bg-white/80 dark:bg-gray-800 rounded-xl p-2 shadow-sm">
+                            <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-bold w-full" title="Tanggal Mulai">
+                            <span class="text-xs text-gray-400">s/d</span>
+                            <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-bold w-full" title="Tanggal Akhir">
+                            <button onclick="resetFilterTanggal()" class="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-red-500 hover:text-white" title="Reset Rentang Tanggal">Reset</button>
+                        </div>
                     </div>
                 </div>
 
@@ -548,6 +623,25 @@
             }
         }
 
+        function resetFilterTanggal() {
+            document.getElementById('filterTglMulai').value = '';
+            document.getElementById('filterTglAkhir').value = '';
+            renderSemuaData();
+        }
+
+        function updateStatistik(dataAktif) {
+            const totalHari = dataAktif.length;
+            const totalUraian = dataAktif.length;
+            const totalFoto = dataAktif.filter(i => i.foto && i.foto.trim() !== '').length;
+            const unikBulan = [...new Set(dataAktif.map(i => i.bulanLabel))].length;
+            const rataBulan = unikBulan > 0 ? (totalHari / unikBulan).toFixed(1) : 0;
+
+            document.getElementById('statTotalHari').innerText = totalHari;
+            document.getElementById('statTotalUraian').innerText = totalUraian;
+            document.getElementById('statTotalFoto').innerText = totalFoto;
+            document.getElementById('statRataBulan').innerText = rataBulan;
+        }
+
         function renderSemuaData() {
             const wadahTabel = document.getElementById('wadahTabelBulan');
             const wadahCard = document.getElementById('wadahCardMobile');
@@ -555,6 +649,7 @@
             
             if (dataLaporan.length === 0) {
                 wadahTabel.innerHTML = '<p class="text-center text-gray-500 my-10">Belum ada data.</p>';
+                updateStatistik([]);
                 return;
             }
 
@@ -566,9 +661,34 @@
             
             const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
             const bulanDipilih = filter.value === 'SEMUA' ? unikBulan : [filter.value];
+            
+            const tglMulaiVal = document.getElementById('filterTglMulai').value;
+            const tglAkhirVal = document.getElementById('filterTglAkhir').value;
+            const angkaMulai = tglMulaiVal ? parseInt(tglMulaiVal.replace(/-/g, '')) : 0;
+            const angkaAkhir = tglAkhirVal ? parseInt(tglAkhirVal.replace(/-/g, '')) : 99999999;
 
-            bulanDipilih.forEach((bulan, bulanIndex) => {
-                const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan && (i.uraian.toLowerCase().includes(kataKunci) || i.tanggal.includes(kataKunci)));
+            let dataFiltered = dataLaporan.filter(i => {
+                const matchBulan = bulanDipilih.includes(i.bulanLabel);
+                const matchCari = i.uraian.toLowerCase().includes(kataKunci) || i.tanggal.includes(kataKunci);
+                
+                const parts = i.tanggal.split('/');
+                const angkaTgl = parseInt(parts[2] + parts[1] + parts[0]);
+                const matchRentang = angkaTgl >= angkaMulai && angkaTgl <= angkaAkhir;
+
+                return matchBulan && matchCari && matchRentang;
+            });
+
+            updateStatistik(dataFiltered);
+
+            if (dataFiltered.length === 0) {
+                wadahTabel.innerHTML = '<p class="text-center text-gray-500 my-10">Tidak ada data yang sesuai filter.</p>';
+                return;
+            }
+
+            const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
+
+            unikBulanFiltered.forEach((bulan, bulanIndex) => {
+                const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if(dataBulanIni.length === 0) return;
 
                 let pemisahBulan = bulanIndex > 0 ? 'margin-top: 40px;' : '';
@@ -607,6 +727,72 @@
                 });
                 wadahTabel.innerHTML += htmlTabel + `</tbody></table>`;
             });
+        }
+
+        // 1. EKSPOR & IMPOR DATA (JSON)
+        function eksporDataJSON() {
+            const dataBackup = {
+                profil: dataProfil,
+                laporan: dataLaporan
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataBackup, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Backup_Laporan_PKL_${dataProfil.nama || 'LUKYY'}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Data berhasil diekspor! 📤");
+        }
+
+        async function imporDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.laporan && Array.isArray(parsed.laporan)) {
+                        dataLaporan = parsed.laporan;
+                        await localforage.setItem('laporanPKL', dataLaporan);
+                    }
+                    if (parsed.profil) {
+                        dataProfil = { ...dataProfil, ...parsed.profil };
+                        await localforage.setItem('profilPKL', dataProfil);
+                        renderProfil();
+                    }
+                    renderSemuaData();
+                    tutupSettings();
+                    showToast("Data berhasil dipulihkan! 🎉");
+                } catch (err) {
+                    alert("Format file JSON tidak valid!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 5. KONFIRMASI HAPUS SEMUA DATA
+        function cekKonfirmasiHapus(inputEl) {
+            const btn = document.getElementById('btnHapusSemuaData');
+            if (inputEl.value.trim() === 'HAPUS') {
+                btn.disabled = false;
+                btn.classList.remove('bg-gray-300', 'dark:bg-gray-700', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-gray-300', 'dark:bg-gray-700', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
+            }
+        }
+
+        async function hapusSemuaDataLaporan() {
+            dataLaporan = [];
+            await localforage.removeItem('laporanPKL');
+            renderSemuaData();
+            document.getElementById('inputKonfirmasiHapus').value = '';
+            cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
+            tutupSettings();
+            showToast("Seluruh laporan berhasil dihapus! 🗑️");
         }
 
         function bukaPreview() {
@@ -663,7 +849,6 @@
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
-                // Kembalikan tampilan kover default
                 koverSection.style.display = '';
                 pemisahHal.style.display = '';
                 showToast("PDF berhasil di-download! 📥");
