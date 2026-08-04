@@ -378,7 +378,8 @@
                     </div>
                 </div>
 
-                <div class="block md:hidden space-y-4 mb-8 no-print" id="wadahCardMobile"></div>
+                <!-- DITAMBAHKAN KELAS no-print AGAR TIDAK IKUT TERCETAK DI HALAMAN ATAS -->
+                <div class="no-print block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
                 <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
@@ -809,7 +810,7 @@
         }
 
         function prosesEksekusiPDF() {
-            const opsi = document.querySelector('input[name="opsiCover"]:checked`') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
+            const opsi = document.querySelector('input[name="opsiCover"]:checked') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
             tutupOpsiExport();
             downloadPDF(opsi);
         }
@@ -817,7 +818,7 @@
         function downloadPDF(opsiCover) {
             const elemenAsli = document.getElementById('areaCetak');
             const koverSection = document.getElementById('koverPrintSection');
-            const pemisahHal = document.getElementById('pemisahHalPanel') || document.getElementById('pemisahHalPrint');
+            const pemisahHal = document.getElementById('pemisahHalPrint');
 
             if (opsiCover === 'tanpa') {
                 if (koverSection) koverSection.style.display = 'none';
