@@ -162,6 +162,29 @@
         </div>
     </div>
 
+    <!-- MODAL PANDUAN WEB2APK -->
+    <div id="modalWeb2APK" class="fixed inset-0 z-[115] hidden bg-black/80 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl p-6 text-left relative overflow-hidden border border-white/30 transform scale-95 transition-transform duration-400">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2"><span class="text-2xl">📱</span><h3 class="font-extrabold text-lg text-indigo-600">Panduan Web2APK</h3></div>
+                <button onclick="tutupPanduanWeb2APK()" title="Tutup" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
+            </div>
+            
+            <div class="space-y-3 text-xs text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+                <p>Langkah-langkah mengubah website Laporan PKL ini menjadi aplikasi Android (APK):</p>
+                <ol class="list-decimal list-inside space-y-2 font-medium">
+                    <li>Pastikan aplikasi web ini sudah di-deploy/online (misal lewat Vercel, Netlify, atau GitHub Pages).</li>
+                    <li>Klik tombol <strong class="text-indigo-600">"Buat APK via PWABuilder"</strong> di menu pengaturan.</li>
+                    <li>Masukkan tautan (URL) website laporan PKL Anda ke kolom yang tersedia di situs PWABuilder, lalu klik <strong>Start</strong>.</li>
+                    <li>Setelah analisis selesai, klik tombol <strong>Generate</strong> pada bagian opsi Android/APK.</li>
+                    <li>Unduh file APK yang dihasilkan dan instal langsung di perangkat Android Anda!</li>
+                </ol>
+            </div>
+
+            <button onclick="tutupPanduanWeb2APK()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-sm shadow-lg shadow-indigo-500/30">Mengerti & Tutup</button>
+        </div>
+    </div>
+
     <!-- MODAL LOGIN / REGISTER CLOUD SYNC -->
     <div id="modalAuth" class="fixed inset-0 z-[105] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/25 transform scale-95 transition-transform duration-400 p-6">
@@ -292,6 +315,24 @@
                             📥 Impor Data
                             <input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden">
                         </label>
+                    </div>
+                </div>
+
+                <!-- FITUR WEB2APK -->
+                <hr class="border-gray-200 dark:border-gray-700">
+
+                <div class="space-y-3 bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20">
+                    <h4 class="font-bold text-sm text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">📱 Ubah ke Aplikasi Android (Web2APK)</h4>
+                    <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+                        Ingin mengubah web laporan PKL ini menjadi aplikasi Android (APK) di HP Anda? Gunakan layanan generator PWA resmi secara gratis.
+                    </p>
+                    <div class="flex gap-2">
+                        <a href="https://www.pwabuilder.com/" target="_blank" title="Buka PWABuilder untuk generate APK" class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm text-center">
+                            🚀 Buat APK via PWABuilder
+                        </a>
+                        <button onclick="bukaPanduanWeb2APK()" title="Lihat panduan cara membuat APK" class="py-2.5 px-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs">
+                            📖 Panduan
+                        </button>
                     </div>
                 </div>
 
@@ -705,6 +746,18 @@
         function tutupTour() {
             localStorage.setItem('sudahTourPKL', 'true');
             const modal = document.getElementById('modalTour');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function bukaPanduanWeb2APK() {
+            const modal = document.getElementById('modalWeb2APK');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
+        }
+
+        function tutupPanduanWeb2APK() {
+            const modal = document.getElementById('modalWeb2APK');
             modal.classList.add('opacity-0');
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
