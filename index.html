@@ -140,11 +140,6 @@
         </div>
     </div>
 
-    <!-- LIGHTBOX & PREVIEW MODAL -->
-    <div id="lightbox" class="fixed inset-0 z-[99] hidden bg-black/90 backdrop-blur-xl flex justify-center items-center p-4 transition-opacity duration-300" onclick="tutupLightbox()">
-        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
-    </div>
-
     <!-- MODAL PILIHAN OPSI EXPORT PDF -->
     <div id="modalExportOpsi" class="fixed inset-0 z-[97] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400 p-6 text-center">
@@ -363,9 +358,8 @@
                 </div>
 
                 <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
-                        <button onclick="bukaPreview()" class="w-full bg-[#0a84ff] text-white font-bold py-3 px-6 rounded-2xl shadow-lg flex justify-center items-center gap-2">🔍 Pratinjau Cetak</button>
-                        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
+                        <button onclick="cetakLangsungTanpaPreview()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)</button>
                         <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
@@ -791,15 +785,9 @@
             showToast("Seluruh laporan berhasil dihapus! 🗑️");
         }
 
-        function bukaPreview() {
-            document.getElementById('wadahPreviewTabel').innerHTML = document.getElementById('areaCetak').innerHTML;
-            document.getElementById('modalPreview').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('modalPreview').classList.remove('opacity-0'); }, 10);
-        }
-
-        function tutupPreview() {
-            document.getElementById('modalPreview').classList.add('opacity-0');
-            setTimeout(() => { document.getElementById('modalPreview').classList.add('hidden'); }, 300);
+        function cetakLangsungTanpaPreview() {
+            // Langsung memanggil window.print() untuk eksekusi cetak
+            window.print();
         }
 
         function bukaOpsiExport() {
