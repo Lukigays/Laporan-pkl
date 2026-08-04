@@ -378,9 +378,9 @@
                     </div>
                 </div>
 
-                <div class="block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
+                <div class="block md:hidden space-y-4 mb-8 no-print" id="wadahCardMobile"></div>
 
-                <div class="area-kertas rounded-xl relative overflow-hidden hidden md:block" id="areaCetak">
+                <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
                         
@@ -779,7 +779,7 @@
             dataLaporan = [];
             await localforage.removeItem('laporanPKL');
             renderSemuaData();
-            document.getElementById('inputKonfirmasiHapus').value, '';
+            document.getElementById('inputKonfirmasiHapus').value = '';
             cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
             tutupSettings();
             showToast("Seluruh laporan berhasil dihapus! 🗑️");
@@ -788,11 +788,11 @@
         function cetakLangsungTanpaPreview() {
             const areaCetak = document.getElementById('areaCetak');
             
-            // Paksa area cetak agar muncul sepenuhnya (mengatasi masalah tersembunyi di perangkat mobile/hidden classes)
+            // Pastikan area cetak terlihat secara penuh
             areaCetak.classList.remove('hidden');
             areaCetak.classList.add('block');
             
-            // Eksekusi fungsi print browser
+            // Eksekusi print browser
             window.print();
         }
 
@@ -809,7 +809,7 @@
         }
 
         function prosesEksekusiPDF() {
-            const opsi = document.querySelector('input[name="opsiCover"]:checked').value;
+            const opsi = document.querySelector('input[name="opsiCover"]:checked`') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
             tutupOpsiExport();
             downloadPDF(opsi);
         }
@@ -817,14 +817,14 @@
         function downloadPDF(opsiCover) {
             const elemenAsli = document.getElementById('areaCetak');
             const koverSection = document.getElementById('koverPrintSection');
-            const pemisahHal = document.getElementById('pemisahHalPrint');
+            const pemisahHal = document.getElementById('pemisahHalPanel') || document.getElementById('pemisahHalPrint');
 
             if (opsiCover === 'tanpa') {
-                koverSection.style.display = 'none';
-                pemisahHal.style.display = 'none';
+                if (koverSection) koverSection.style.display = 'none';
+                if (pemisahHal) pemisahHal.style.display = 'none';
             } else {
-                koverSection.style.display = 'block';
-                pemisahHal.style.display = 'block';
+                if (koverSection) koverSection.style.display = 'block';
+                if (pemisahHal) pemisahHal.style.display = 'block';
             }
 
             elemenAsli.classList.add('pdf-export-mode'); 
@@ -839,8 +839,8 @@
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
-                koverSection.style.display = '';
-                pemisahHal.style.display = '';
+                if (koverSection) koverSection.style.display = '';
+                if (pemisahHal) pemisahHal.style.display = '';
                 showToast("PDF berhasil di-download! 📥");
             });
         }
