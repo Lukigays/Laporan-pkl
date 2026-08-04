@@ -175,12 +175,12 @@
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400" id="modalSettingsBox">
             <div class="p-5 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
-                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan & Data</h3></div>
+                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan & Edit Profil</h3></div>
                 <button onclick="tutupSettings()" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
             <div class="p-5 md:p-6 space-y-5 overflow-y-auto max-h-[70vh]">
                 <div class="space-y-4">
-                    <h4 class="font-bold text-sm text-[#0a84ff]">Profil Pengguna</h4>
+                    <h4 class="font-bold text-sm text-[#0a84ff]">Edit Profil Pengguna</h4>
                     <div>
                         <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Nama Lengkap</label>
                         <input type="text" id="setNama" class="w-full bg-white/75 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Contoh: LUKYY">
@@ -263,10 +263,10 @@
         </div>
     </nav>
 
-    <!-- FLOATING ACTION BAR SIMPAN LAPORAN -->
+    <!-- FLOATING ACTION BAR SIMPAN / EDIT LAPORAN -->
     <div id="floatingFormActions" class="no-print fixed bottom-[85px] left-0 right-0 z-[40] flex justify-center px-4 transition-all duration-300">
         <div class="kaca-buram p-3 rounded-3xl w-full max-w-3xl flex flex-wrap gap-3 justify-center shadow-2xl border-2 border-blue-500/30">
-            <button onclick="tambahBaris()" class="flex-1 max-w-[400px] bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:opacity-90" id="btnTambah">
+            <button onclick="tambahBaris()" class="flex-1 max-w-[300px] bg-gradient-to-r from-[#0a84ff] to-[#5e5ce6] text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:opacity-95" id="btnTambah">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                 Simpan Laporan
             </button>
@@ -292,16 +292,16 @@
         </div>
 
         <div class="relative min-h-[500px]">
-            <!-- TAB 1: FORM INPUT -->
+            <!-- TAB 1: FORM INPUT & EDIT LAPORAN -->
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="glass-panel rounded-[2.5rem] p-6 md:p-8 relative z-20 no-print animate-item" style="animation-delay: 0.3s;">
                     <h2 class="text-xl font-extrabold mb-6 flex items-center gap-3 text-[#0a84ff]" id="judulForm">
-                        <span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl">✏️</span> Input Kegiatan Baru
+                        <span class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl">✏️</span> Form Input & Edit Laporan
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Pilih Tanggal (Edit)</label>
-                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm" onchange="pilihTanggalEdit()">
+                            <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Mode / Pilih Edit Tanggal</label>
+                            <select id="pilihEdit" class="w-full bg-white/75 rounded-2xl p-3.5 shadow-sm text-sm font-bold" onchange="pilihTanggalEdit()">
                                 <option value="baru">+ Tambah Laporan Baru</option>
                             </select>
                         </div>
@@ -316,7 +316,7 @@
                         <div class="lg:col-span-4">
                             <label class="block text-sm font-bold mb-2 text-gray-800 dark:text-gray-200">Upload Foto Bukti</label>
                             <input type="file" id="inputFoto" accept="image/*" class="w-full md:w-1/2 bg-white/75 rounded-2xl p-3 shadow-sm file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#0a84ff] file:text-white">
-                            <p class="text-sm text-[#0a84ff] mt-2 animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak diubah</p>
+                            <p class="text-sm text-[#0a84ff] mt-2 animate-pulse" id="infoFotoEdit" style="display:none;">*Kosongkan jika foto tidak ingin diubah</p>
                         </div>
                     </div>
                 </div>
@@ -378,7 +378,7 @@
                     </div>
                 </div>
 
-                <!-- DITAMBAHKAN KELAS no-print AGAR TIDAK IKUT TERCETAK DI HALAMAN ATAS -->
+                <!-- KARTU MOBILE (Hanya tampil di HP) -->
                 <div class="no-print block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
                 <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak">
@@ -501,6 +501,7 @@
             } catch (err) { console.error("Gagal memuat data:", err); }
 
             await muatProfil();
+            perbaruiDropdownEdit();
             renderSemuaData();
         };
 
@@ -542,11 +543,20 @@
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
 
+        function perbaruiDropdownEdit() {
+            const selectEdit = document.getElementById('pilihEdit');
+            selectEdit.innerHTML = '<option value="baru">+ Tambah Laporan Baru</option>';
+            dataLaporan.forEach((item, index) => {
+                selectEdit.innerHTML += `<option value="${index}">Edit: ${item.tanggal} - ${item.uraian.substring(0, 25)}...</option>`;
+            });
+        }
+
         function pilihTanggalEdit() {
             const val = document.getElementById('pilihEdit').value;
             if (val === 'baru') { batalEdit(); return; }
-            const index = dataLaporan.findIndex(item => item.tanggal === val);
-            if (index === -1) return;
+            
+            const index = parseInt(val);
+            if (isNaN(index) || !dataLaporan[index]) return;
 
             indexEditMode = index;
             const item = dataLaporan[index];
@@ -556,6 +566,12 @@
             document.getElementById('btnBatalEdit').classList.remove('hidden');
             document.getElementById('btnHapusEdit').classList.remove('hidden');
             document.getElementById('infoFotoEdit').style.display = 'block';
+        }
+
+        function triggerEditDariLaporan(indexGlobal) {
+            switchTab('input');
+            document.getElementById('pilihEdit').value = indexGlobal;
+            pilihTanggalEdit();
         }
 
         async function tambahBaris() {
@@ -591,10 +607,11 @@
             dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
             await localforage.setItem('laporanPKL', dataLaporan);
             
+            perbaruiDropdownEdit();
             renderSemuaData();
             batalEdit();
             confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-            showToast('Laporan disimpan! 🎉');
+            showToast('Laporan berhasil disimpan! 🎉');
             switchTab('laporan');
         }
 
@@ -605,14 +622,19 @@
             document.getElementById('btnHapusEdit').classList.add('hidden');
             document.getElementById('inputTanggal').value = '';
             document.getElementById('inputUraian').value = '';
+            document.getElementById('inputFoto').value = '';
             document.getElementById('pilihEdit').value = 'baru';
+            document.getElementById('infoFotoEdit').style.display = 'none';
         }
 
         async function hapusDataYangDiedit() {
-            if (confirm(`Hapus data tanggal ${dataLaporan[indexEditMode].tanggal}?`)) {
+            if (indexEditMode > -1 && confirm(`Hapus data laporan tanggal ${dataLaporan[indexEditMode].tanggal}?`)) {
                 dataLaporan.splice(indexEditMode, 1);
                 await localforage.setItem('laporanPKL', dataLaporan);
-                batalEdit(); renderSemuaData(); showToast('Data dihapus!');
+                perbaruiDropdownEdit();
+                batalEdit(); 
+                renderSemuaData(); 
+                showToast('Laporan berhasil dihapus! 🗑️');
             }
         }
 
@@ -641,15 +663,20 @@
             wadahTabel.innerHTML = ''; wadahCard.innerHTML = '';
             
             if (dataLaporan.length === 0) {
-                wadahTabel.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 my-10">Belum ada data.</p>';
+                wadahTabel.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 my-10">Belum ada data laporan.</p>';
                 updateStatistik([]);
                 return;
             }
 
             const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
             const filter = document.getElementById('filterBulan');
-            if(filter.options.length === 1) {
-                unikBulan.forEach(b => filter.innerHTML += `<option value="${b}">${b}</option>`);
+            const nilaiFilterSblm = filter.value;
+            filter.innerHTML = '<option value="SEMUA">Filter: Semua Bulan</option>';
+            unikBulan.forEach(b => {
+                filter.innerHTML += `<option value="${b}">${b}</option>`;
+            });
+            if([...filter.options].some(o => o.value === nilaiFilterSblm)) {
+                filter.value = nilaiFilterSblm;
             }
             
             const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
@@ -693,29 +720,40 @@
                     <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
                         <thead>
                             <tr>
-                                <th style="border: 1px solid black; padding: 5px;">No</th>
-                                <th style="border: 1px solid black; padding: 5px;">Hari</th>
-                                <th style="border: 1px solid black; padding: 5px;">Tanggal</th>
-                                <th style="border: 1px solid black; padding: 5px; width: 45%;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 5px;">Foto</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
+                                <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
+                                <th class="no-print" style="border: 1px solid black; padding: 5px; width: 70px;">Aksi</th>
                             </tr>
                         </thead><tbody>`;
 
-                dataBulanIni.forEach((item, idx) => {
+                dataBulanIni.forEach((item) => {
+                    const indexGlobal = dataLaporan.findIndex(x => x === item);
+                    const idxTampil = dataBulanIni.indexOf(item) + 1;
+
                     htmlTabel += `
                         <tr>
-                            <td style="border: 1px solid black; padding: 5px; text-align: center;">${idx+1}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: center;">${idxTampil}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.hari}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.tanggal}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.uraian}</td>
                             <td style="border: 1px solid black; padding: 5px; text-align: center;">
                                 ${item.foto ? `<img src="${item.foto}" style="max-height: 70px;" class="mx-auto border border-gray-300">` : '-'}
                             </td>
+                            <td class="no-print" style="border: 1px solid black; padding: 5px; text-align: center;">
+                                <button onclick="triggerEditDariLaporan(${indexGlobal})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs">Edit</button>
+                            </td>
                         </tr>`;
                     
                     wadahCard.innerHTML += `
-                        <div class="kaca-buram p-4 rounded-xl mb-3 flex gap-3">
-                            <div class="flex-1"><b class="text-blue-500">${item.tanggal}</b><p class="text-sm mt-1">${item.uraian}</p></div>
+                        <div class="kaca-buram p-4 rounded-xl mb-3 flex flex-col gap-2">
+                            <div class="flex justify-between items-center">
+                                <b class="text-blue-500">${item.tanggal} (${item.hari})</b>
+                                <button onclick="triggerEditDariLaporan(${indexGlobal})" class="px-3 py-1 bg-blue-600 text-white font-bold rounded-lg text-xs">✏️ Edit</button>
+                            </div>
+                            <p class="text-sm mt-1">${item.uraian}</p>
                         </div>`;
                 });
                 wadahTabel.innerHTML += htmlTabel + `</tbody></table>`;
@@ -753,6 +791,7 @@
                         await localforage.setItem('profilPKL', dataProfil);
                         renderProfil();
                     }
+                    perbaruiDropdownEdit();
                     renderSemuaData();
                     tutupSettings();
                     showToast("Data berhasil dipulihkan! 🎉");
@@ -779,6 +818,7 @@
         async function hapusSemuaDataLaporan() {
             dataLaporan = [];
             await localforage.removeItem('laporanPKL');
+            perbaruiDropdownEdit();
             renderSemuaData();
             document.getElementById('inputKonfirmasiHapus').value = '';
             cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
@@ -788,12 +828,8 @@
 
         function cetakLangsungTanpaPreview() {
             const areaCetak = document.getElementById('areaCetak');
-            
-            // Pastikan area cetak terlihat secara penuh
             areaCetak.classList.remove('hidden');
             areaCetak.classList.add('block');
-            
-            // Eksekusi print browser
             window.print();
         }
 
