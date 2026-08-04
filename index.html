@@ -11,6 +11,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
+    <!-- Firebase SDK (Modular v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        window.firebaseAppModules = { initializeApp, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, getFirestore, doc, setDoc, getDoc };
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -44,7 +53,6 @@
 
         @keyframes bgShift { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
         
-        /* GAYA KACA BURAM */
         .kaca-buram {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(20px) saturate(200%);
@@ -74,12 +82,11 @@
         body.dark-mode .text-gray-500 { color: #d1d1d6 !important; }
         body.dark-mode .bg-white { background: #1c1c1e !important; color: #f5f5f7; }
 
-        input[type="date"], input[type="text"], input[type="file"], textarea, select { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; }
+        input[type="date"], input[type="text"], input[type="file"], input[type="email"], input[type="password"], textarea, select { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; }
         input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary); background: rgba(255, 255, 255, 0.95); transform: translateY(-1px); }
         button { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         button:active { transform: scale(0.95); }
 
-        /* AREA PRINT MUTLAK */
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .area-kertas table { border: 1px solid black !important; border-collapse: collapse !important; font-size: 11px !important; width: 100%; min-width: 650px; table-layout: fixed; margin-top: 10px; }
@@ -92,7 +99,6 @@
         .pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
         .pdf-export-mode .watermark { display: none !important; }
         
-        /* HEADER KOVER (Hanya untuk Print/PDF) */
         .header-print {
             display: none;
             font-family: "Times New Roman", Times, serif;
@@ -105,7 +111,6 @@
         }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
 
-        /* KELAS PEMOTONG HALAMAN TUNGGAL */
         .pemisah-halaman {
             page-break-after: always;
             break-after: page;
@@ -140,6 +145,51 @@
         </div>
     </div>
 
+    <!-- MODAL TOUR / PANDUAN PENGGUNA -->
+    <div id="modalTour" class="fixed inset-0 z-[120] hidden bg-black/80 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl p-6 text-center relative overflow-hidden border border-white/30 transform scale-95 transition-transform duration-400">
+            <div id="tourIcon" class="text-5xl mb-3">👋</div>
+            <h3 id="tourTitle" class="font-extrabold text-xl mb-2 text-[#0a84ff]">Selamat Datang di Laporan PKL</h3>
+            <p id="tourDesc" class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">Aplikasi praktis untuk mencatat kegiatan PKL harian Anda, mengekspor PDF, dan menyinkronkan data ke Cloud.</p>
+            
+            <div class="flex items-center justify-between">
+                <button onclick="lewatiTour()" class="text-xs text-gray-500 hover:text-red-500 font-bold px-3 py-2">Lewati Panduan</button>
+                <div class="flex gap-2 items-center">
+                    <span id="tourStepIndicator" class="text-xs font-bold text-gray-400 mr-2">1 / 4</span>
+                    <button onclick="lanjutTour()" class="py-2.5 px-6 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">Lanjut ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN / REGISTER CLOUD SYNC -->
+    <div id="modalAuth" class="fixed inset-0 z-[105] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
+        <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/25 transform scale-95 transition-transform duration-400 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2"><span class="text-2xl">☁️</span><h3 class="font-extrabold text-lg" id="authModalTitle">Sinkronisasi Cloud</h3></div>
+                <button onclick="tutupModalAuth()" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
+            </div>
+            
+            <p class="text-xs text-gray-600 dark:text-gray-300 mb-4" id="authModalDesc">Masuk atau Daftar akun untuk menyimpan dan mengambil laporan Anda secara aman di server cloud.</p>
+            
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Email</label>
+                    <input type="email" id="authEmail" class="w-full bg-white/80 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="nama@email.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Password</label>
+                    <input type="password" id="authPassword" class="w-full bg-white/80 dark:bg-gray-800 rounded-2xl p-3 shadow-sm text-sm" placeholder="Minimal 6 karakter">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2.5">
+                <button onclick="prosesLoginAuth()" id="btnLoginAuth" class="w-full py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">🔑 Masuk (Login)</button>
+                <button onclick="prosesRegisterAuth()" id="btnRegisterAuth" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm shadow-sm">✨ Daftar Akun Baru (Register)</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PILIHAN OPSI EXPORT PDF -->
     <div id="modalExportOpsi" class="fixed inset-0 z-[97] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-md rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400 p-6 text-center">
@@ -171,14 +221,29 @@
         </div>
     </div>
 
-    <!-- MODAL PENGATURAN PROFIL & DATA -->
+    <!-- MODAL PENGATURAN PROFIL & CLOUD SYNC -->
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-400 opacity-0">
         <div class="glass-panel w-full max-w-lg rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20 transform scale-95 transition-transform duration-400" id="modalSettingsBox">
             <div class="p-5 md:p-6 border-b border-gray-200/50 dark:border-gray-800/50 flex justify-between items-center bg-white/40 dark:bg-gray-900/40">
-                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan & Edit Profil</h3></div>
+                <div class="flex items-center gap-2"><span class="text-2xl">⚙️</span><h3 class="font-extrabold text-lg">Pengaturan, Profil & Cloud</h3></div>
                 <button onclick="tutupSettings()" class="text-gray-500 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
             <div class="p-5 md:p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                
+                <!-- STATUS AKUN CLOUD -->
+                <div class="space-y-3 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
+                    <h4 class="font-bold text-sm text-[#0a84ff] flex items-center gap-1.5">☁️ Sinkronisasi Cloud (Firebase)</h4>
+                    <p id="labelStatusAuth" class="text-xs text-gray-700 dark:text-gray-300">Status: Belum masuk akun cloud.</p>
+                    <div id="wrapperTombolAuth" class="flex gap-2">
+                        <button onclick="bukaModalAuth()" class="flex-1 py-2 bg-[#0a84ff] text-white font-bold rounded-xl text-xs shadow-sm">Masuk / Daftar</button>
+                    </div>
+                    <div id="wrapperTombolSync" class="hidden flex gap-2">
+                        <button onclick="simpanKeCloud()" class="flex-1 py-2 bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm">⬆️ Simpan ke Cloud</button>
+                        <button onclick="tarikDariCloud()" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-xl text-xs shadow-sm">⬇️ Ambil dari Cloud</button>
+                        <button onclick="logoutAuth()" class="py-2 px-3 bg-red-600 text-white font-bold rounded-xl text-xs shadow-sm">Keluar</button>
+                    </div>
+                </div>
+
                 <div class="space-y-4">
                     <h4 class="font-bold text-sm text-[#0a84ff]">Edit Profil Pengguna</h4>
                     <div>
@@ -285,6 +350,9 @@
                 </h1>
             </div>
             <div class="flex flex-wrap gap-2 items-center justify-center animate-item" style="animation-delay: 0.2s;">
+                <button onclick="bukaTourManual()" class="kaca-buram px-3.5 py-2.5 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-1.5 text-xs font-bold text-[#0a84ff]">
+                    💡 <span>Panduan</span>
+                </button>
                 <button onclick="toggleDarkMode()" id="btnDarkMode" class="kaca-buram px-4 py-2.5 rounded-2xl shadow-sm hover:scale-105 flex items-center gap-2 text-sm font-bold">
                     🌙 <span>Mode Gelap</span>
                 </button>
@@ -435,6 +503,191 @@
             tahun: '2026...'
         };
 
+        // KONFIGURASI FIREBASE (Ganti dengan kredensial project Firebase Anda jika diperlukan)
+        const firebaseConfig = {
+  apiKey: "AIzaSyA9u3AXLrDJRyeRkocGZ7lYuhHJFgQHSLE",
+  authDomain: "laporan-pkl-65b82.firebaseapp.com",
+  projectId: "laporan-pkl-65b82",
+  storageBucket: "laporan-pkl-65b82.firebasestorage.app",
+  messagingSenderId: "862572978351",
+  appId: "1:862572978351:web:dd620346433a498175f45a"
+};
+
+        let fApp, fAuth, fDb, currentUser = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (window.firebaseAppModules) {
+                    const { initializeApp, getAuth, getFirestore, onAuthStateChanged } = window.firebaseAppModules;
+                    try {
+                        fApp = initializeApp(firebaseConfig);
+                        fAuth = getAuth(fApp);
+                        fDb = getFirestore(fApp);
+
+                        onAuthStateChanged(fAuth, (user) => {
+                            currentUser = user;
+                            updateAuthUI();
+                        });
+                    } catch(e) { console.log("Firebase initialized offline/default mode"); }
+                }
+            }, 500);
+        });
+
+        function updateAuthUI() {
+            const label = document.getElementById('labelStatusAuth');
+            const btnIn = document.getElementById('wrapperTombolAuth');
+            const btnSync = document.getElementById('wrapperTombolSync');
+            if (currentUser) {
+                label.innerText = `Status: Masuk sebagai (${currentUser.email})`;
+                btnIn.classList.add('hidden');
+                btnSync.classList.remove('hidden');
+            } else {
+                label.innerText = "Status: Belum masuk akun cloud.";
+                btnIn.classList.remove('hidden');
+                btnSync.classList.add('hidden');
+            }
+        }
+
+        function bukaModalAuth() {
+            const modal = document.getElementById('modalAuth');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
+        }
+
+        function tutupModalAuth() {
+            const modal = document.getElementById('modalAuth');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        async function prosesLoginAuth() {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value;
+            if(!email || !pass) { showToast('Isi email dan password!'); return; }
+            try {
+                const { signInWithEmailAndPassword } = window.firebaseAppModules;
+                await signInWithEmailAndPassword(fAuth, email, pass);
+                tutupModalAuth();
+                showToast("Berhasil Masuk! 🔓");
+                tarikDariCloud();
+            } catch(err) {
+                alert("Gagal masuk: " + err.message);
+            }
+        }
+
+        async function prosesRegisterAuth() {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value;
+            if(!email || !pass) { showToast('Isi email dan password!'); return; }
+            try {
+                const { createUserWithEmailAndPassword } = window.firebaseAppModules;
+                await createUserWithEmailAndPassword(fAuth, email, pass);
+                tutupModalAuth();
+                showToast("Akun berhasil dibuat! 🎉");
+            } catch(err) {
+                alert("Gagal daftar: " + err.message);
+            }
+        }
+
+        async function logoutAuth() {
+            try {
+                const { signOut } = window.firebaseAppModules;
+                await signOut(fAuth);
+                showToast("Keluar akun berhasil.");
+            } catch(e) { console.error(e); }
+        }
+
+        async function simpanKeCloud() {
+            if(!currentUser) { showToast('Belum login akun!'); return; }
+            try {
+                const { doc, setDoc } = window.firebaseAppModules;
+                const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
+                await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
+                showToast("Data berhasil disimpan ke Cloud! ☁️⬆️");
+            } catch(err) {
+                alert("Gagal sync ke cloud: " + err.message);
+            }
+        }
+
+        async function tarikDariCloud() {
+            if(!currentUser) { showToast('Belum login akun!'); return; }
+            try {
+                const { doc, getDoc } = window.firebaseAppModules;
+                const snap = await getDoc(doc(fDb, "usersData", currentUser.uid));
+                if(snap.exists()) {
+                    const cloudData = snap.data();
+                    if(cloudData.laporan) {
+                        dataLaporan = cloudData.laporan;
+                        await localforage.setItem('laporanPKL', dataLaporan);
+                    }
+                    if(cloudData.profil) {
+                        dataProfil = { ...dataProfil, ...cloudData.profil };
+                        await localforage.setItem('profilPKL', dataProfil);
+                        renderProfil();
+                    }
+                    perbaruiDropdownEdit();
+                    renderSemuaData();
+                    showToast("Data berhasil ditarik dari Cloud! ☁️⬇️");
+                } else {
+                    showToast("Belum ada data di cloud untuk akun ini.");
+                }
+            } catch(err) {
+                alert("Gagal tarik dari cloud: " + err.message);
+            }
+        }
+
+        // PANDUAN PENGGUNA (TOUR) SYSTEM
+        const langkahTour = [
+            { icon: '👋', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda dengan mudah.' },
+            { icon: '📝', title: 'Tab Input & Edit Data', desc: 'Gunakan tab ini untuk mencatat kegiatan baru harian atau memilih tanggal untuk mengedit/menghapus catatan sebelumnya.' },
+            { icon: '📋', title: 'Tab Laporan & Cetak PDF', desc: 'Lihat ringkasan statistik, saring data per bulan, lalu cetak langsung atau unduh dokumen ke format PDF.' },
+            { icon: '☁️', title: 'Sinkronisasi Cloud & Profil', desc: 'Atur identitas profil Anda dan simpan data ke server Cloud melalui menu Pengaturan agar aman diakses dari perangkat mana pun.' }
+        ];
+        let indexTourAktif = 0;
+
+        function cekDanJalankanTour() {
+            const sudahPernah = localStorage.getItem('sudahTourPKL');
+            if (!sudahPernah) {
+                bukaTourManual();
+            }
+        }
+
+        function bukaTourManual() {
+            indexTourAktif = 0;
+            renderTourStep();
+            const modal = document.getElementById('modalTour');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
+        }
+
+        function renderTourStep() {
+            const step = langkahTour[indexTourAktif];
+            document.getElementById('tourIcon').innerText = step.icon;
+            document.getElementById('tourTitle').innerText = step.title;
+            document.getElementById('tourDesc').innerText = step.desc;
+            document.getElementById('tourStepIndicator').innerText = `${indexTourAktif + 1} / ${langkahTour.length}`;
+        }
+
+        function lanjutTour() {
+            indexTourAktif++;
+            if (indexTourAktif < langkahTour.length) {
+                renderTourStep();
+            } else {
+                tutupTour();
+            }
+        }
+
+        function lewatiTour() {
+            tutupTour();
+        }
+
+        function tutupTour() {
+            localStorage.setItem('sudahTourPKL', 'true');
+            const modal = document.getElementById('modalTour');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
         async function muatProfil() {
             try {
                 const profil = await localforage.getItem('profilPKL');
@@ -503,6 +756,7 @@
             await muatProfil();
             perbaruiDropdownEdit();
             renderSemuaData();
+            cekDanJalankanTour();
         };
 
         function showToast(message) {
