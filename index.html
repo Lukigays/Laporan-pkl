@@ -137,9 +137,9 @@
 </head>
 <body class="p-4 md:p-8 text-gray-800 dark:text-gray-100 antialiased min-h-screen pb-40 md:pb-32">
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST NOTIFICATION (MODERN UI) -->
     <div id="toast-container" class="fixed bottom-32 right-4 md:bottom-28 md:right-6 z-[110] transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
-        <div id="toast-box" class="kaca-buram px-5 py-3.5 rounded-2xl flex items-center gap-3">
+        <div id="toast-box" class="kaca-buram px-5 py-3.5 rounded-2xl flex items-center gap-3 shadow-2xl border border-white/20">
             <span id="toast-icon" class="text-xl">✅</span>
             <p id="toast-message" class="text-sm font-bold text-gray-800 dark:text-gray-100">Pesan...</p>
         </div>
@@ -503,7 +503,6 @@
             tahun: '2026...'
         };
 
-        // KONFIGURASI FIREBASE (Ganti dengan kredensial project Firebase Anda jika diperlukan)
         const firebaseConfig = {
   apiKey: "AIzaSyA9u3AXLrDJRyeRkocGZ7lYuhHJFgQHSLE",
   authDomain: "laporan-pkl-65b82.firebaseapp.com",
@@ -560,10 +559,32 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
+        // FORMAT PESAN ERROR FIREBASE KE BAHASA INDONESIA YANG LEBIH RAMAH
+        function terjemahkanErrorFirebase(errorCode) {
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return 'Format email tidak valid. Periksa kembali penulisan email Anda.';
+                case 'auth/user-not-found':
+                    return 'Akun dengan email tersebut tidak ditemukan.';
+                case 'auth/wrong-password':
+                    return 'Kata sandi (password) salah.';
+                case 'auth/email-already-in-use':
+                    return 'Email ini sudah terdaftar. Silakan gunakan email lain atau langsung masuk.';
+                case 'auth/weak-password':
+                    return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
+                case 'auth/missing-password':
+                    return 'Kata sandi wajib diisi.';
+                case 'auth/invalid-credential':
+                    return 'Email atau kata sandi salah.';
+                default:
+                    return 'Terjadi kesalahan sistem: ' + errorCode;
+            }
+        }
+
         async function prosesLoginAuth() {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPassword').value;
-            if(!email || !pass) { showToast('Isi email dan password!'); return; }
+            if(!email || !pass) { showToast('⚠️ Isi email dan password terlebih dahulu!'); return; }
             try {
                 const { signInWithEmailAndPassword } = window.firebaseAppModules;
                 await signInWithEmailAndPassword(fAuth, email, pass);
@@ -571,21 +592,23 @@
                 showToast("Berhasil Masuk! 🔓");
                 tarikDariCloud();
             } catch(err) {
-                alert("Gagal masuk: " + err.message);
+                const pesanRamah = terjemahkanErrorFirebase(err.code);
+                showToast("❌ " + pesanRamah);
             }
         }
 
         async function prosesRegisterAuth() {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPassword').value;
-            if(!email || !pass) { showToast('Isi email dan password!'); return; }
+            if(!email || !pass) { showToast('⚠️ Isi email dan password terlebih dahulu!'); return; }
             try {
                 const { createUserWithEmailAndPassword } = window.firebaseAppModules;
                 await createUserWithEmailAndPassword(fAuth, email, pass);
                 tutupModalAuth();
                 showToast("Akun berhasil dibuat! 🎉");
             } catch(err) {
-                alert("Gagal daftar: " + err.message);
+                const pesanRamah = terjemahkanErrorFirebase(err.code);
+                showToast("❌ " + pesanRamah);
             }
         }
 
@@ -598,19 +621,19 @@
         }
 
         async function simpanKeCloud() {
-            if(!currentUser) { showToast('Belum login akun!'); return; }
+            if(!currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
             try {
                 const { doc, setDoc } = window.firebaseAppModules;
                 const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
                 await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
                 showToast("Data berhasil disimpan ke Cloud! ☁️⬆️");
             } catch(err) {
-                alert("Gagal sync ke cloud: " + err.message);
+                showToast("❌ Gagal sinkronisasi ke cloud.");
             }
         }
 
         async function tarikDariCloud() {
-            if(!currentUser) { showToast('Belum login akun!'); return; }
+            if(!currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
             try {
                 const { doc, getDoc } = window.firebaseAppModules;
                 const snap = await getDoc(doc(fDb, "usersData", currentUser.uid));
@@ -629,14 +652,13 @@
                     renderSemuaData();
                     showToast("Data berhasil ditarik dari Cloud! ☁️⬇️");
                 } else {
-                    showToast("Belum ada data di cloud untuk akun ini.");
+                    showToast("⚠️ Belum ada data di cloud untuk akun ini.");
                 }
             } catch(err) {
-                alert("Gagal tarik dari cloud: " + err.message);
+                showToast("❌ Gagal mengambil data dari cloud.");
             }
         }
 
-        // PANDUAN PENGGUNA (TOUR) SYSTEM
         const langkahTour = [
             { icon: '👋', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda dengan mudah.' },
             { icon: '📝', title: 'Tab Input & Edit Data', desc: 'Gunakan tab ini untuk mencatat kegiatan baru harian atau memilih tanggal untuk mengedit/menghapus catatan sebelumnya.' },
@@ -763,7 +785,7 @@
             const container = document.getElementById('toast-container');
             document.getElementById('toast-message').innerText = message;
             container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
-            setTimeout(() => { container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none'); }, 3000);
+            setTimeout(() => { container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none'); }, 3500);
         }
 
         function switchTab(tabName) {
@@ -833,7 +855,7 @@
             const uraian = document.getElementById('inputUraian').value;
             const fotoInput = document.getElementById('inputFoto');
 
-            if(!tanggalInput || !uraian) { showToast('Isi Tanggal dan Uraian!'); return; }
+            if(!tanggalInput || !uraian) { showToast('⚠️ Isi Tanggal dan Uraian terlebih dahulu!'); return; }
             
             const dateObj = new Date(tanggalInput);
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
