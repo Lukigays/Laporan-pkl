@@ -12,11 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Library Ekspor Excel (SheetJS / xlsx) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Library Ekspor Word (html-docx-js) -->
-    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-    
     <!-- Firebase SDK (Modular v10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -474,11 +469,9 @@
                 </div>
 
                 <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
-                        <button onclick="cetakLangsungTanpaPreview()" title="Cetak langsung ke printer fisik" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-2xl shadow-sm flex justify-center items-center gap-2 text-xs md:text-sm">🖨️ Cetak Print</button>
-                        <button onclick="bukaOpsiExport()" id="btnDownload" title="Unduh laporan dalam format dokumen PDF" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-4 rounded-2xl shadow-sm flex justify-center items-center gap-2 text-xs md:text-sm">📥 Export PDF</button>
-                        <button onclick="eksporKeExcel()" title="Unduh data tabel ke file Excel (.xlsx)" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded-2xl shadow-sm flex justify-center items-center gap-2 text-xs md:text-sm">📊 Export Excel</button>
-                        <button onclick="eksporKeWord()" title="Unduh laporan ke file Word (.docx)" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-2xl shadow-sm flex justify-center items-center gap-2 text-xs md:text-sm">📄 Export Word</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-gray-200/50 dark:border-white/10 pb-5">
+                        <button onclick="cetakLangsungTanpaPreview()" title="Klik di sini untuk langsung mencetak laporan ke printer fisik" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)</button>
+                        <button onclick="bukaOpsiExport()" id="btnDownload" title="Klik di sini untuk mengunduh laporan dalam format dokumen PDF" class="w-full bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -543,7 +536,7 @@
     <script>
         let dataLaporan = [];
         let indexEditMode = -1; 
-        let dataTelahBerubah = false;
+        let dataTelahBerubah = false; // Flag untuk pencadangan otomatis
         
         let dataProfil = {
             nama: 'LUKYY',
@@ -682,8 +675,9 @@
                     const { doc, setDoc } = window.firebaseAppModules;
                     const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
                     await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
-                    dataTelahBerubah = false;
+                    dataTelahBerubah = false; // Reset flag
                     showToast("☁️🔄 Pencadangan otomatis berhasil!");
+                    console.log("Auto-backup cloud sukses.");
                 } catch (err) {
                     console.error("Gagal pencadangan otomatis", err);
                 }
@@ -836,8 +830,10 @@
             showToast('Profil berhasil diperbarui! ✅');
         }
 
+        // --- FITUR PENGINGAT HARIAN ---
         function tampilkanNotifikasiBrowser(title, body) {
             if (!("Notification" in window)) return;
+            
             if (Notification.permission === "granted") {
                 new Notification(title, { body: body });
             } else if (Notification.permission !== "denied") {
@@ -877,8 +873,8 @@
             renderSemuaData();
             cekDanJalankanTour();
             
-            checkDailyReminder();
-            setInterval(autoSyncKeCloud, 300000);
+            checkDailyReminder(); // Panggil pengingat harian
+            setInterval(autoSyncKeCloud, 300000); // 300.000 ms = 5 menit untuk Auto-Backup
         };
 
         function showToast(message) {
@@ -985,7 +981,7 @@
             dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
             await localforage.setItem('laporanPKL', dataLaporan);
             
-            dataTelahBerubah = true;
+            dataTelahBerubah = true; // Tandai data berubah untuk Auto-backup
             
             perbaruiDropdownEdit();
             renderSemuaData();
@@ -1135,55 +1131,6 @@
                 });
                 wadahTabel.innerHTML += htmlTabel + `</tbody></table>`;
             });
-        }
-
-        // --- FITUR EKSPOR EXCEL & WORD ---
-        function eksporKeExcel() {
-            if (dataLaporan.length === 0) {
-                showToast("⚠️ Tidak ada data untuk diekspor!");
-                return;
-            }
-
-            const formattedData = dataLaporan.map((item, idx) => ({
-                "No": idx + 1,
-                "Hari": item.hari,
-                "Tanggal": item.tanggal,
-                "Uraian Kegiatan": item.uraian,
-                "Bulan": item.bulanLabel
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(formattedData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan PKL");
-            
-            XLSX.writeFile(workbook, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.xlsx`);
-            showToast("Berhasil export ke Excel! 📊");
-        }
-
-        function eksporKeWord() {
-            const elemenCetak = document.getElementById('areaCetak');
-            if (!elemenCetak || dataLaporan.length === 0) {
-                showToast("⚠️ Tidak ada data laporan untuk diekspor!");
-                return;
-            }
-
-            // Clone elemen agar bisa dimodifikasi untuk dokumen Word
-            const clone = elemenCetak.cloneNode(true);
-            const watermark = clone.querySelector('.watermark');
-            if (watermark) watermark.remove();
-
-            const htmlHeader = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan PKL</title><style>body{font-family: "Times New Roman", Times, serif; color: black;} table{width: 100%; border-collapse: collapse; margin-top: 10px;} th, td{border: 1px solid black; padding: 6px 8px; vertical-align: top; word-break: break-word;} th{background-color: #f8f9fa; font-weight: bold; text-align: center;}</style></head><body>`;
-            const htmlFooter = `</body></html>`;
-            const htmlContent = htmlHeader + clone.innerHTML + htmlFooter;
-
-            const converted = htmlDocx.asBlob(htmlContent);
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(converted);
-            link.download = `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.docx`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            showToast("Berhasil export ke Word (DOCX)! 📄");
         }
 
         function eksporDataJSON() {
