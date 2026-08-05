@@ -262,10 +262,11 @@
                         <button onclick="bukaModalAuth()" title="Klik di sini untuk masuk atau mendaftarkan akun" class="flex-1 py-2 bg-[#0a84ff] text-white font-bold rounded-xl text-xs shadow-sm">Masuk / Daftar</button>
                     </div>
                     <div id="wrapperTombolSync" class="hidden flex gap-2">
-                        <button onclick="simpanKeCloud()" title="Klik di sini untuk menyimpan data ke server cloud" class="flex-1 py-2 bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm">⬆️ Simpan ke Cloud</button>
+                        <button onclick="simpanKeCloud()" title="Klik di sini untuk menyimpan data ke server cloud secara manual" class="flex-1 py-2 bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm">⬆️ Simpan ke Cloud</button>
                         <button onclick="tarikDariCloud()" title="Klik di sini untuk mengunduh data dari server cloud" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-xl text-xs shadow-sm">⬇️ Ambil dari Cloud</button>
                         <button onclick="logoutAuth()" title="Keluar dari akun cloud" class="py-2 px-3 bg-red-600 text-white font-bold rounded-xl text-xs shadow-sm">Keluar</button>
                     </div>
+                    <p class="text-[10px] text-gray-500 mt-1">*Jika sudah login, aplikasi otomatis menyimpan ke Cloud setiap 5 menit jika ada perubahan data.</p>
                 </div>
 
                 <div class="space-y-4">
@@ -535,6 +536,8 @@
     <script>
         let dataLaporan = [];
         let indexEditMode = -1; 
+        let dataTelahBerubah = false; // Flag untuk pencadangan otomatis
+        
         let dataProfil = {
             nama: 'LUKYY',
             kelas: 'XII',
@@ -603,22 +606,14 @@
 
         function terjemahkanErrorFirebase(errorCode) {
             switch (errorCode) {
-                case 'auth/invalid-email':
-                    return 'Format email tidak valid. Periksa kembali penulisan email Anda.';
-                case 'auth/user-not-found':
-                    return 'Akun dengan email tersebut tidak ditemukan.';
-                case 'auth/wrong-password':
-                    return 'Kata sandi (password) salah.';
-                case 'auth/email-already-in-use':
-                    return 'Email ini sudah terdaftar. Silakan gunakan email lain atau langsung masuk.';
-                case 'auth/weak-password':
-                    return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
-                case 'auth/missing-password':
-                    return 'Kata sandi wajib diisi.';
-                case 'auth/invalid-credential':
-                    return 'Email atau kata sandi salah.';
-                default:
-                    return 'Terjadi kesalahan sistem: ' + errorCode;
+                case 'auth/invalid-email': return 'Format email tidak valid. Periksa kembali penulisan email Anda.';
+                case 'auth/user-not-found': return 'Akun dengan email tersebut tidak ditemukan.';
+                case 'auth/wrong-password': return 'Kata sandi (password) salah.';
+                case 'auth/email-already-in-use': return 'Email ini sudah terdaftar. Silakan gunakan email lain atau langsung masuk.';
+                case 'auth/weak-password': return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
+                case 'auth/missing-password': return 'Kata sandi wajib diisi.';
+                case 'auth/invalid-credential': return 'Email atau kata sandi salah.';
+                default: return 'Terjadi kesalahan sistem: ' + errorCode;
             }
         }
 
@@ -667,9 +662,25 @@
                 const { doc, setDoc } = window.firebaseAppModules;
                 const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
                 await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
+                dataTelahBerubah = false;
                 showToast("Data berhasil disimpan ke Cloud! ☁️⬆️");
             } catch(err) {
                 showToast("❌ Gagal sinkronisasi ke cloud.");
+            }
+        }
+        
+        async function autoSyncKeCloud() {
+            if (currentUser && dataTelahBerubah) {
+                try {
+                    const { doc, setDoc } = window.firebaseAppModules;
+                    const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
+                    await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
+                    dataTelahBerubah = false; // Reset flag
+                    showToast("☁️🔄 Pencadangan otomatis berhasil!");
+                    console.log("Auto-backup cloud sukses.");
+                } catch (err) {
+                    console.error("Gagal pencadangan otomatis", err);
+                }
             }
         }
 
@@ -813,9 +824,38 @@
             dataProfil.tahun = document.getElementById('setTahun').value.trim() || '2026...';
 
             await localforage.setItem('profilPKL', dataProfil);
+            dataTelahBerubah = true;
             renderProfil();
             tutupSettings();
             showToast('Profil berhasil diperbarui! ✅');
+        }
+
+        // --- FITUR PENGINGAT HARIAN ---
+        function tampilkanNotifikasiBrowser(title, body) {
+            if (!("Notification" in window)) return;
+            
+            if (Notification.permission === "granted") {
+                new Notification(title, { body: body });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === "granted") {
+                        new Notification(title, { body: body });
+                    }
+                });
+            }
+        }
+
+        function checkDailyReminder() {
+            const today = new Date().toLocaleDateString();
+            const lastReminder = localStorage.getItem('lastReminderDate');
+
+            if (lastReminder !== today) {
+                setTimeout(() => {
+                    tampilkanNotifikasiBrowser("📝 Pengingat Laporan PKL", "Halo! Jangan lupa catat kegiatan PKL kamu hari ini ya.");
+                    showToast("🔔 Jangan lupa isi laporan PKL hari ini ya!");
+                    localStorage.setItem('lastReminderDate', today);
+                }, 3000);
+            }
         }
 
         window.onload = async function() {
@@ -832,6 +872,9 @@
             perbaruiDropdownEdit();
             renderSemuaData();
             cekDanJalankanTour();
+            
+            checkDailyReminder(); // Panggil pengingat harian
+            setInterval(autoSyncKeCloud, 300000); // 300.000 ms = 5 menit untuk Auto-Backup
         };
 
         function showToast(message) {
@@ -938,6 +981,8 @@
             dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
             await localforage.setItem('laporanPKL', dataLaporan);
             
+            dataTelahBerubah = true; // Tandai data berubah untuk Auto-backup
+            
             perbaruiDropdownEdit();
             renderSemuaData();
             batalEdit();
@@ -962,6 +1007,7 @@
             if (indexEditMode > -1 && confirm(`Hapus data laporan tanggal ${dataLaporan[indexEditMode].tanggal}?`)) {
                 dataLaporan.splice(indexEditMode, 1);
                 await localforage.setItem('laporanPKL', dataLaporan);
+                dataTelahBerubah = true;
                 perbaruiDropdownEdit();
                 batalEdit(); 
                 renderSemuaData(); 
@@ -1088,10 +1134,7 @@
         }
 
         function eksporDataJSON() {
-            const dataBackup = {
-                profil: dataProfil,
-                laporan: dataLaporan
-            };
+            const dataBackup = { profil: dataProfil, laporan: dataLaporan };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataBackup, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -1118,6 +1161,7 @@
                         await localforage.setItem('profilPKL', dataProfil);
                         renderProfil();
                     }
+                    dataTelahBerubah = true;
                     perbaruiDropdownEdit();
                     renderSemuaData();
                     tutupSettings();
@@ -1145,6 +1189,7 @@
         async function hapusSemuaDataLaporan() {
             dataLaporan = [];
             await localforage.removeItem('laporanPKL');
+            dataTelahBerubah = true;
             perbaruiDropdownEdit();
             renderSemuaData();
             document.getElementById('inputKonfirmasiHapus').value = '';
