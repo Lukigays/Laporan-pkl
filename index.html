@@ -948,6 +948,9 @@
             pilihTanggalEdit();
         }
 
+        /* ----------------------------------------------------
+           FUNGSI TAMBAH BARIS YANG SUDAH DITINGKATKAN (AUTO-COMPRESS)
+           ---------------------------------------------------- */
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -962,10 +965,33 @@
 
             let fotoBase64 = indexEditMode > -1 ? dataLaporan[indexEditMode].foto : '';
             if(fotoInput.files && fotoInput.files[0]) {
+                showToast('⏳ Memproses dan mengompresi foto...'); // UI indikator sedang bekerja
                 const reader = new FileReader();
-                reader.onload = async function(e) {
-                    fotoBase64 = e.target.result; 
-                    await simpanData(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = async function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // Resolusi maksimal
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Kalkulasi ulang dimensi gambar agar proporsional
+                        if (width > MAX_WIDTH) {
+                            height = Math.round(height * (MAX_WIDTH / width));
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Kompresi kualitas JPEG menjadi 60%
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+                        await simpanData(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
+                    }
+                    img.src = e.target.result;
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
@@ -987,7 +1013,7 @@
             renderSemuaData();
             batalEdit();
             confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-            showToast('Laporan berhasil disimpan! 🎉');
+            showToast('Laporan & Foto berhasil disimpan! 🎉');
             switchTab('laporan');
         }
 
