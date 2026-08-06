@@ -16,9 +16,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
-        window.firebaseAppModules = { initializeApp, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, getFirestore, doc, setDoc, getDoc };
+        window.firebaseAppModules = { initializeApp, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, getFirestore, doc, setDoc, getDoc, collection, getDocs, writeBatch };
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -94,7 +94,6 @@
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
-        /* Mencegah baris tabel terpotong saat pindah halaman */
         .area-kertas tr {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
@@ -542,7 +541,7 @@
     <script>
         let dataLaporan = [];
         let indexEditMode = -1; 
-        let dataTelahBerubah = false; // Flag untuk pencadangan otomatis
+        let dataTelahBerubah = false; 
         
         let dataProfil = {
             nama: 'LUKYY',
@@ -614,7 +613,7 @@
             switch (errorCode) {
                 case 'auth/invalid-email': return 'Format email tidak valid. Periksa kembali penulisan email Anda.';
                 case 'auth/user-not-found': return 'Akun dengan email tersebut tidak ditemukan.';
-                case 'auth/wrong-password': return 'Kata sandi (password) salah.';
+                case 'auth/wrong-password': return 'Kata sandi salah.';
                 case 'auth/email-already-in-use': return 'Email ini sudah terdaftar. Silakan gunakan email lain atau langsung masuk.';
                 case 'auth/weak-password': return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
                 case 'auth/missing-password': return 'Kata sandi wajib diisi.';
@@ -633,10 +632,7 @@
                 tutupModalAuth();
                 showToast("Berhasil Masuk! 🔓");
                 tarikDariCloud();
-            } catch(err) {
-                const pesanRamah = terjemahkanErrorFirebase(err.code);
-                showToast("❌ " + pesanRamah);
-            }
+            } catch(err) { showToast("❌ " + terjemahkanErrorFirebase(err.code)); }
         }
 
         async function prosesRegisterAuth() {
@@ -648,10 +644,7 @@
                 await createUserWithEmailAndPassword(fAuth, email, pass);
                 tutupModalAuth();
                 showToast("Akun berhasil dibuat! 🎉");
-            } catch(err) {
-                const pesanRamah = terjemahkanErrorFirebase(err.code);
-                showToast("❌ " + pesanRamah);
-            }
+            } catch(err) { showToast("❌ " + terjemahkanErrorFirebase(err.code)); }
         }
 
         async function logoutAuth() {
@@ -662,57 +655,99 @@
             } catch(e) { console.error(e); }
         }
 
+        /* ----------------------------------------------------
+           CLOUD SYNC FIX: PECAH DATA MENJADI BANYAK DOKUMEN KECIL
+           ---------------------------------------------------- */
         async function simpanKeCloud() {
             if(!currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
+            showToast("⏳ Sedang menyimpan data ke Cloud...");
             try {
-                const { doc, setDoc } = window.firebaseAppModules;
-                const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
-                await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
+                const { writeBatch, doc, collection } = window.firebaseAppModules;
+                let batch = writeBatch(fDb);
+                let count = 0;
+
+                // Simpan profil & metadata di dokumen utama
+                const userRef = doc(fDb, "usersData", currentUser.uid);
+                batch.set(userRef, { profil: dataProfil, totalData: dataLaporan.length, updatedAt: new Date().toISOString() });
+                count++;
+
+                // Simpan laporan ke sub-koleksi untuk melewati limit ukuran 1MB
+                for(let i = 0; i < dataLaporan.length; i++) {
+                    const docRef = doc(collection(fDb, "usersData", currentUser.uid, "laporan"), `baris_${i}`);
+                    batch.set(docRef, dataLaporan[i]);
+                    count++;
+                    
+                    // Batas commit batch Firebase adalah 500, jadi kita potong per 490
+                    if(count >= 490) { 
+                        await batch.commit();
+                        batch = writeBatch(fDb);
+                        count = 0;
+                    }
+                }
+                
+                if(count > 0) await batch.commit(); // Selesaikan sisa antrean batch
+                
                 dataTelahBerubah = false;
-                showToast("Data berhasil disimpan ke Cloud! ☁️⬆️");
+                showToast("✅ Data berhasil disimpan ke Cloud!");
             } catch(err) {
+                console.error(err);
                 showToast("❌ Gagal sinkronisasi ke cloud.");
             }
         }
         
         async function autoSyncKeCloud() {
             if (currentUser && dataTelahBerubah) {
-                try {
-                    const { doc, setDoc } = window.firebaseAppModules;
-                    const dataCloud = { profil: dataProfil, laporan: dataLaporan, updatedAt: new Date().toISOString() };
-                    await setDoc(doc(fDb, "usersData", currentUser.uid), dataCloud);
-                    dataTelahBerubah = false; // Reset flag
-                    showToast("☁️🔄 Pencadangan otomatis berhasil!");
-                    console.log("Auto-backup cloud sukses.");
-                } catch (err) {
-                    console.error("Gagal pencadangan otomatis", err);
-                }
+                simpanKeCloud(); 
             }
         }
 
         async function tarikDariCloud() {
             if(!currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
+            showToast("⏳ Mengambil data dari Cloud...");
             try {
-                const { doc, getDoc } = window.firebaseAppModules;
-                const snap = await getDoc(doc(fDb, "usersData", currentUser.uid));
+                const { getDoc, doc } = window.firebaseAppModules;
+                const userRef = doc(fDb, "usersData", currentUser.uid);
+                const snap = await getDoc(userRef);
+                
                 if(snap.exists()) {
                     const cloudData = snap.data();
-                    if(cloudData.laporan) {
-                        dataLaporan = cloudData.laporan;
-                        await localforage.setItem('laporanPKL', dataLaporan);
-                    }
+                    
                     if(cloudData.profil) {
                         dataProfil = { ...dataProfil, ...cloudData.profil };
                         await localforage.setItem('profilPKL', dataProfil);
                         renderProfil();
                     }
+
+                    // Logika transisi: Jika user punya format lama (array dalam satu file)
+                    if(cloudData.laporan && Array.isArray(cloudData.laporan)) {
+                        dataLaporan = cloudData.laporan;
+                    } else {
+                        // Ambil format baru (dari sub-koleksi)
+                        const totalData = cloudData.totalData || 0;
+                        let pulledLaporan = [];
+                        let promises = [];
+                        
+                        for(let i = 0; i < totalData; i++) {
+                            promises.push(getDoc(doc(fDb, "usersData", currentUser.uid, "laporan", `baris_${i}`)));
+                        }
+                        
+                        const snaps = await Promise.all(promises);
+                        snaps.forEach(s => {
+                            if(s.exists()) pulledLaporan.push(s.data());
+                        });
+                        
+                        dataLaporan = pulledLaporan;
+                    }
+
+                    await localforage.setItem('laporanPKL', dataLaporan);
                     perbaruiDropdownEdit();
                     renderSemuaData();
-                    showToast("Data berhasil ditarik dari Cloud! ☁️⬇️");
+                    showToast("✅ Data berhasil ditarik dari Cloud!");
                 } else {
                     showToast("⚠️ Belum ada data di cloud untuk akun ini.");
                 }
             } catch(err) {
+                console.error(err);
                 showToast("❌ Gagal mengambil data dari cloud.");
             }
         }
@@ -727,9 +762,7 @@
 
         function cekDanJalankanTour() {
             const sudahPernah = localStorage.getItem('sudahTourPKL');
-            if (!sudahPernah) {
-                bukaTourManual();
-            }
+            if (!sudahPernah) { bukaTourManual(); }
         }
 
         function bukaTourManual() {
@@ -750,16 +783,10 @@
 
         function lanjutTour() {
             indexTourAktif++;
-            if (indexTourAktif < langkahTour.length) {
-                renderTourStep();
-            } else {
-                tutupTour();
-            }
+            if (indexTourAktif < langkahTour.length) { renderTourStep(); } else { tutupTour(); }
         }
 
-        function lewatiTour() {
-            tutupTour();
-        }
+        function lewatiTour() { tutupTour(); }
 
         function tutupTour() {
             localStorage.setItem('sudahTourPKL', 'true');
@@ -783,9 +810,7 @@
         async function muatProfil() {
             try {
                 const profil = await localforage.getItem('profilPKL');
-                if (profil) {
-                    dataProfil = { ...dataProfil, ...profil };
-                }
+                if (profil) { dataProfil = { ...dataProfil, ...profil }; }
             } catch (err) { console.error("Gagal memuat profil:", err); }
             renderProfil();
         }
@@ -836,17 +861,13 @@
             showToast('Profil berhasil diperbarui! ✅');
         }
 
-        // --- FITUR PENGINGAT HARIAN ---
         function tampilkanNotifikasiBrowser(title, body) {
             if (!("Notification" in window)) return;
-            
             if (Notification.permission === "granted") {
                 new Notification(title, { body: body });
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function (permission) {
-                    if (permission === "granted") {
-                        new Notification(title, { body: body });
-                    }
+                    if (permission === "granted") { new Notification(title, { body: body }); }
                 });
             }
         }
@@ -878,9 +899,8 @@
             perbaruiDropdownEdit();
             renderSemuaData();
             cekDanJalankanTour();
-            
-            checkDailyReminder(); // Panggil pengingat harian
-            setInterval(autoSyncKeCloud, 300000); // 300.000 ms = 5 menit untuk Auto-Backup
+            checkDailyReminder(); 
+            setInterval(autoSyncKeCloud, 300000); // Auto backup 5 menit
         };
 
         function showToast(message) {
@@ -954,9 +974,7 @@
             pilihTanggalEdit();
         }
 
-        /* ----------------------------------------------------
-           FUNGSI TAMBAH BARIS YANG SUDAH DITINGKATKAN (AUTO-COMPRESS)
-           ---------------------------------------------------- */
+        /* EKSTRA KOMPRESI CANVAS AGAR LEBIH KECIL */
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -971,17 +989,16 @@
 
             let fotoBase64 = indexEditMode > -1 ? dataLaporan[indexEditMode].foto : '';
             if(fotoInput.files && fotoInput.files[0]) {
-                showToast('⏳ Memproses dan mengompresi foto...'); // UI indikator sedang bekerja
+                showToast('⏳ Memproses kompresi foto...'); 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; // Resolusi maksimal
+                        const MAX_WIDTH = 600; // DI KECILKAN LAGI DEMI PERFORMA 
                         let width = img.width;
                         let height = img.height;
 
-                        // Kalkulasi ulang dimensi gambar agar proporsional
                         if (width > MAX_WIDTH) {
                             height = Math.round(height * (MAX_WIDTH / width));
                             width = MAX_WIDTH;
@@ -993,8 +1010,8 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // Kompresi kualitas JPEG menjadi 60%
-                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+                        // KOMPRESI EXTREME KE 50% QUALITY
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5); 
                         await simpanData(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                     }
                     img.src = e.target.result;
@@ -1013,7 +1030,7 @@
             dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
             await localforage.setItem('laporanPKL', dataLaporan);
             
-            dataTelahBerubah = true; // Tandai data berubah untuk Auto-backup
+            dataTelahBerubah = true; 
             
             perbaruiDropdownEdit();
             renderSemuaData();
@@ -1084,9 +1101,7 @@
             unikBulan.forEach(b => {
                 filter.innerHTML += `<option value="${b}">${b}</option>`;
             });
-            if([...filter.options].some(o => o.value === nilaiFilterSblm)) {
-                filter.value = nilaiFilterSblm;
-            }
+            if([...filter.options].some(o => o.value === nilaiFilterSblm)) { filter.value = nilaiFilterSblm; }
             
             const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
             const bulanDipilih = filter.value === 'SEMUA' ? unikBulan : [filter.value];
@@ -1165,15 +1180,24 @@
             });
         }
 
+        /* SOLUSI BLOB UNTUK MENGHINDARI CRASH SAAT EXPORT JSON UKURAN BESAR */
         function eksporDataJSON() {
+            showToast("⏳ Memproses file Backup...");
             const dataBackup = { profil: dataProfil, laporan: dataLaporan };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataBackup, null, 2));
+            const jsonString = JSON.stringify(dataBackup, null, 2);
+            
+            // Gunakan Object URL (Blob) dibanding text encoding yang gampang crash
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("href", url);
             downloadAnchor.setAttribute("download", `Backup_Laporan_PKL_${dataProfil.nama || 'LUKYY'}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
+            
+            setTimeout(() => URL.revokeObjectURL(url), 5000); 
             showToast("Data berhasil diekspor! 📤");
         }
 
