@@ -94,6 +94,12 @@
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
+        /* Mencegah baris tabel terpotong saat pindah halaman */
+        .area-kertas tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
         
         .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
