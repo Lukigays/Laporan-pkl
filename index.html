@@ -82,15 +82,41 @@
 
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .area-kertas table { border: 1px solid black !important; border-collapse: collapse !important; font-size: 11px !important; width: 100%; min-width: 650px; table-layout: fixed; margin-top: 10px; }
-        .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
-        .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-
-        /* PENGATURAN CETAK PDF AGAR BARIS TABEL TIDAK TERPOTONG SAMA SEKALIK */
+        
+        /* SOLUSI UTAMA AGAR BARIS & GARIS BORDER PEMBATAS TDK TERPOTONG */
+        .area-kertas table { 
+            border: 1px solid black !important; 
+            border-collapse: collapse !important; 
+            font-size: 11px !important; 
+            width: 100%; 
+            min-width: 650px; 
+            table-layout: fixed; 
+            margin-top: 10px;
+            page-break-inside: auto;
+        }
+        
         .area-kertas tr {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
         }
+
+        .area-kertas th, .area-kertas td { 
+            border: 1px solid black !important; 
+            padding: 6px 8px !important; 
+            vertical-align: top; 
+            color: black !important; 
+            word-break: break-word;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .area-kertas td img {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            display: block;
+        }
+
+        .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
         .block-bulan {
             page-break-before: always !important;
@@ -1224,12 +1250,12 @@
             elemenAsli.style.display = 'block';
             
             html2pdf().set({
-                margin: 10, 
+                margin: [12, 10, 12, 10], 
                 filename: 'Laporan_PKL_LUKYY.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.block-bulan'] }
+                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'td', 'img'] }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
