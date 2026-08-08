@@ -6,17 +6,16 @@
     <meta name="theme-color" content="#0f172a">
     
     <title>LAPORAN PKL BY LUKYY</title>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --accent-primary: #0a84ff;
@@ -77,13 +76,14 @@
 
         input[type="date"], input[type="text"], input[type="file"], input[type="email"], input[type="password"], textarea, select { transition: all 0.2s ease; }
         input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary) !important; }
-
+        
         button { transition: all 0.2s ease; }
         button:active { transform: scale(0.96); }
 
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
+        
+        /* PENGATURAN STRUKTUR TABEL PRESISI DENGAN BORDER MANDIRI */
         .area-kertas table { 
             border-collapse: collapse !important; 
             font-size: 11px !important; 
@@ -92,7 +92,7 @@
             table-layout: fixed; 
             margin-top: 0px;
         }
-
+        
         .area-kertas tr {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
@@ -122,23 +122,23 @@
         }
 
         .block-bulan:first-child {
-            page-break-before: avoid !important;
-            break-before: avoid !important;
+            page-break-before: auto !important;
+            break-before: auto !important;
         }
 
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
-
+        
         .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
         .pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
         .pdf-export-mode .watermark { display: none !important; }
-
+        
         .header-print {
             display: none;
             font-family: "Times New Roman", Times, serif;
             text-align: center;
             color: black;
             width: 100%;
-            padding-top: 10px; 
+            padding-top: 40px; 
             padding-bottom: 20px;
             box-sizing: border-box;
         }
@@ -162,25 +162,6 @@
         .tab-content.active { opacity: 1; transform: translateY(0) scale(1); position: relative; pointer-events: auto; visibility: visible; }
         @keyframes fluidFadeIn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
         .animate-item { opacity: 0; animation: fluidFadeIn 0.4s ease forwards; }
-
-        /* FIX BOT-NAV COLLAPSE ISSUE */
-        nav.nav-bottom-fix {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            right: 1rem;
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-        }
-        nav.nav-bottom-fix .nav-container {
-            width: 100%;
-            max-width: 32rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.375rem;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8 antialiased min-h-screen pb-40 md:pb-32">
@@ -199,7 +180,9 @@
             <div class="text-4xl mb-2">🔑</div>
             <h3 class="font-extrabold text-xl mb-2 text-[#0a84ff]">Buat Password Baru</h3>
             <p class="text-xs mb-4">Masukkan password baru untuk akun laporan PKL Anda.</p>
+            
             <input type="password" id="newPasswordInput" class="w-full rounded-2xl p-3 text-sm mb-4" placeholder="Password baru (min. 6 karakter)">
+            
             <button onclick="simpanPasswordBaru()" class="w-full py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">Simpan Password Baru</button>
         </div>
     </div>
@@ -228,7 +211,9 @@
                 <div class="flex items-center gap-2"><span class="text-2xl">☁️</span><h3 class="font-extrabold text-lg">Sinkronisasi Cloud</h3></div>
                 <button onclick="tutupModalAuth()" class="hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
+            
             <p class="text-xs mb-4">Masuk atau Daftar akun untuk menyimpan dan mengambil laporan Anda secara aman di server cloud.</p>
+            
             <div class="space-y-3 mb-4">
                 <div>
                     <label class="block text-xs font-bold mb-1">Email</label>
@@ -239,10 +224,42 @@
                     <input type="password" id="authPassword" class="w-full rounded-2xl p-3 text-sm" placeholder="Minimal 6 karakter">
                 </div>
             </div>
+
             <div class="flex flex-col gap-2">
                 <button onclick="prosesLoginAuth()" class="w-full py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">🔑 Masuk (Login)</button>
                 <button onclick="prosesRegisterAuth()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm shadow-sm">✨ Daftar Akun Baru (Register)</button>
                 <button onclick="prosesLupaPassword()" class="w-full py-2 bg-transparent text-[#0a84ff] font-bold rounded-xl text-xs hover:underline mt-1">Lupa Password?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EXPORT PDF -->
+    <div id="modalExportOpsi" class="fixed inset-0 z-[97] hidden bg-black/70 backdrop-blur-xl flex justify-center items-center p-4 transition-all duration-300 opacity-0">
+        <div class="glass-panel w-full max-w-md rounded-[2.5rem] flex flex-col overflow-hidden p-6 text-center">
+            <div class="text-3xl mb-2">📑</div>
+            <h3 class="font-extrabold text-xl mb-2">Opsi Ekspor PDF</h3>
+            <p class="text-sm mb-6">Pilih format dokumen PDF yang ingin Anda unduh:</p>
+            
+            <div class="space-y-3 mb-6 text-left">
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
+                    <input type="radio" name="opsiCover" value="dengan" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <div>
+                        <p class="font-bold text-sm">Dengan Judul & Kover Laporan</p>
+                        <p class="text-xs text-slate-500 dark:text-gray-400">Mencetak halaman kover lengkap beserta tabel.</p>
+                    </div>
+                </label>
+                <label class="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
+                    <input type="radio" name="opsiCover" value="tanpa" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <div>
+                        <p class="font-bold text-sm">Hanya Tabel Saja</p>
+                        <p class="text-xs text-slate-500 dark:text-gray-400">Langsung mencetak halaman data tabel kegiatan harian.</p>
+                    </div>
+                </label>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="tutupOpsiExport()" class="flex-1 py-3 bg-slate-200 dark:bg-gray-700 font-bold rounded-2xl text-sm">Batal</button>
+                <button onclick="prosesEksekusiPDF()" class="flex-1 py-3 bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-500/30">Unduh PDF</button>
             </div>
         </div>
     </div>
@@ -255,6 +272,7 @@
                 <button onclick="tutupSettings()" class="hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
             <div class="p-5 md:p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                
                 <div class="space-y-3 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
                     <h4 class="font-bold text-sm text-[#0a84ff] flex items-center gap-1.5">☁️ Sinkronisasi Cloud (Supabase)</h4>
                     <p id="labelStatusAuth" class="text-xs">Status: Belum masuk akun cloud.</p>
@@ -333,20 +351,20 @@
         </div>
     </div>
 
-    <!-- TAB NAVIGASI UTAMA (FIXED DESIGN) -->
-    <nav class="nav-bottom-fix no-print">
-        <div class="kaca-buram p-2 rounded-3xl nav-container shadow-2xl border border-slate-300 dark:border-white/20">
-            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-2 text-[#0a84ff] bg-slate-100 dark:bg-white/10 rounded-2xl transition-all shadow-sm flex-1">
-                <span class="text-base">📝</span><span class="text-[10px] md:text-[11px] font-extrabold whitespace-nowrap">Input Data</span>
+    <!-- TAB NAVIGASI UTAMA -->
+    <nav class="no-print fixed bottom-4 left-4 right-4 z-50 flex justify-center">
+        <div class="kaca-buram p-2 rounded-3xl flex gap-1.5 max-w-lg w-full justify-around items-center shadow-2xl border border-slate-300 dark:border-white/20">
+            <button onclick="switchTab('input')" id="btnTabInput" class="flex flex-col items-center justify-center gap-1 py-2 px-3 text-[#0a84ff] bg-slate-100 dark:bg-white/10 rounded-2xl transition-all shadow-sm flex-1">
+                <span class="text-base">📝</span><span class="text-[10px] md:text-[11px] font-extrabold">Input Data</span>
             </button>
-            <button onclick="switchTab('edit')" id="btnTabEdit" class="flex flex-col items-center justify-center gap-1 py-2 px-2 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
-                <span class="text-base">✏️</span><span class="text-[10px] md:text-[11px] font-extrabold whitespace-nowrap">Pengeditan</span>
+            <button onclick="switchTab('edit')" id="btnTabEdit" class="flex flex-col items-center justify-center gap-1 py-2 px-3 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
+                <span class="text-base">✏️</span><span class="text-[10px] md:text-[11px] font-extrabold">Pengeditan Laporan</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-2 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
-                <span class="text-base">📋</span><span class="text-[10px] md:text-[11px] font-extrabold whitespace-nowrap">Laporan</span>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="flex flex-col items-center justify-center gap-1 py-2 px-3 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
+                <span class="text-base">📋</span><span class="text-[10px] md:text-[11px] font-extrabold">Laporan</span>
             </button>
-            <button onclick="bukaSettings()" class="flex flex-col items-center justify-center gap-1 py-2 px-2 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
-                <span class="text-base">⚙️</span><span class="text-[10px] md:text-[11px] font-extrabold whitespace-nowrap">Pengaturan</span>
+            <button onclick="bukaSettings()" class="flex flex-col items-center justify-center gap-1 py-2 px-3 hover:text-[#0a84ff] transition-all rounded-2xl flex-1">
+                <span class="text-base">⚙️</span><span class="text-[10px] md:text-[11px] font-extrabold">Pengaturan</span>
             </button>
         </div>
     </nav>
@@ -439,6 +457,7 @@
 
             <!-- TAB 3: LAPORAN -->
             <div id="tabLaporan" class="tab-content">
+                
                 <!-- STATISTIK RINGKASAN -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
                     <div class="kaca-buram p-4 rounded-2xl flex items-center gap-3">
@@ -473,7 +492,7 @@
 
                 <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
                     <div class="border-b border-slate-200 dark:border-white/10 pb-5">
-                        <button onclick="downloadPDF()" id="btnDownload" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">📥 Export PDF</button>
+                        <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -528,11 +547,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT TUNGGAL -->
     <script>
         let dataLaporan = [];
         let dataTelahBerubah = false; 
-
+        
         let dataProfil = {
             nama: 'LUKYY',
             kelas: 'XII',
@@ -545,14 +563,14 @@
 
         const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
-
+        
         let supabaseClient = null;
         try {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
             console.warn("URL Supabase belum valid.");
         }
-
+        
         let currentUser = null;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -695,7 +713,7 @@
                 showToast("❌ Gagal sinkronisasi ke cloud: " + err.message);
             }
         }
-
+        
         async function autoSyncKeCloud() {
             if (currentUser && dataTelahBerubah && supabaseClient) { simpanKeCloud(); }
         }
@@ -886,6 +904,7 @@
             document.getElementById('btnDarkMode').innerHTML = isDark ? '☀️ <span>Mode Terang</span>' : '🌙 <span>Mode Gelap</span>';
         }
 
+        // ================= SIMPAN DATA BARU =================
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -940,6 +959,7 @@
             switchTab('laporan');
         }
 
+        // ================= TAB PENGEDITAN LAPORAN =================
         function updateDropdownEditTab() {
             const dropdown = document.getElementById('pilihEditDropdown');
             dropdown.innerHTML = '<option value="">-- Pilih Catatan Laporan --</option>';
@@ -1042,6 +1062,7 @@
             document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
         }
 
+        /* RENDERING DENGAN SOLUSI BARU: MEMECAH TIAP BARIS AGAR TIDAK BISA TERPOTONG KARENA RENDER CANVAS */
         function renderSemuaData() {
             const wadahTabel = document.getElementById('wadahTabelBulan');
             wadahTabel.innerHTML = '';
@@ -1085,14 +1106,12 @@
 
             const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
 
-            unikBulanFiltered.forEach((bulan, index) => {
+            unikBulanFiltered.forEach((bulan) => {
                 const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if(dataBulanIni.length === 0) return;
 
-                const styleBreak = index === 0 ? "page-break-before: avoid !important; break-before: avoid !important;" : "page-break-before: always !important; break-before: page !important;";
-
                 let htmlTabel = `
-                    <div class="block-bulan" style="${styleBreak}">
+                    <div class="block-bulan" style="page-break-before: always; break-before: page;">
                         <div class="mb-4 text-base font-bold text-black pt-4">
                             <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
@@ -1201,22 +1220,43 @@
             showToast("Seluruh laporan berhasil dihapus! 🗑️");
         }
 
-        function downloadPDF() {
+        function bukaOpsiExport() {
+            const modal = document.getElementById('modalExportOpsi');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
+        }
+
+        function tutupOpsiExport() {
+            const modal = document.getElementById('modalExportOpsi');
+            modal.classList.add('opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function prosesEksekusiPDF() {
+            const opsi = document.querySelector('input[name="opsiCover"]:checked') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
+            tutupOpsiExport();
+            downloadPDF(opsi);
+        }
+
+        function downloadPDF(opsiCover) {
             const elemenAsli = document.getElementById('areaCetak');
             const koverSection = document.getElementById('koverPrintSection');
             const pemisahHal = document.getElementById('pemisahHalPrint');
 
-            if (koverSection) koverSection.style.display = 'block';
-            if (pemisahHal) pemisahHal.style.display = 'block';
+            if (opsiCover === 'tanpa') {
+                if (koverSection) koverSection.style.display = 'none';
+                if (pemisahHal) pemisahHal.style.display = 'none';
+            } else {
+                if (koverSection) koverSection.style.display = 'block';
+                if (pemisahHal) pemisahHal.style.display = 'block';
+            }
 
             elemenAsli.classList.add('pdf-export-mode'); 
             elemenAsli.style.display = 'block';
             
-            showToast("⏳ Sedang memproses PDF...");
-
             html2pdf().set({
-                margin: [10, 10, 10, 10], 
-                filename: `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`,
+                margin: [12, 10, 12, 10], 
+                filename: 'Laporan_PKL_LUKYY.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
