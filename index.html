@@ -85,7 +85,8 @@
         
         /* PENGATURAN STRUKTUR TABEL PRESISI DENGAN BORDER MANDIRI */
         .area-kertas table { 
-            border-collapse: collapse !important; 
+            border-collapse: separate !important; 
+            border-spacing: 0 !important;
             font-size: 11px !important; 
             width: 100%; 
             min-width: 650px; 
@@ -112,21 +113,55 @@
             page-break-inside: avoid !important;
             break-inside: avoid !important;
         }
+        .area-kertas tbody {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
 
         .area-kertas td img {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             display: block;
         }
-        .row-wrapper {
+        /* DIV-BASED TABLE FOR PDF */
+        .pdf-table {
+            width: 100%;
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            font-size: 11px;
+            color: black !important;
+        }
+        .pdf-row {
+            display: flex;
+            width: 100%;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            break-inside: avoid-page !important;
         }
-        .row-wrapper table {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+        .pdf-header {
+            font-weight: bold;
+            background-color: #f8f9fa !important;
+            text-align: center;
         }
+        .pdf-cell {
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            word-break: break-word;
+            color: black !important;
+        }
+        .pdf-no { width: 40px; text-align: center; flex-shrink: 0; }
+        .pdf-hari { width: 80px; flex-shrink: 0; }
+        .pdf-tanggal { width: 90px; flex-shrink: 0; }
+        .pdf-uraian { flex: 1; min-width: 0; }
+        .pdf-foto { width: 100px; text-align: center; flex-shrink: 0; }
+        .pdf-foto img {
+            max-height: 70px;
+            display: block;
+            margin: 0 auto;
+        }
+
+
 
 
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
@@ -1275,7 +1310,7 @@
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css'], avoid: ['.row-wrapper', 'tr', 'img'] }
+                pagebreak: { mode: ['avoid-all', 'css'], avoid: ['.pdf-row', 'img'] }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
