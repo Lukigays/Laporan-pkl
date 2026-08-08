@@ -83,16 +83,14 @@
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         
-        /* SOLUSI UTAMA AGAR BARIS & GARIS BORDER PEMBATAS TDK TERPOTONG */
+        /* PENGATURAN STRUKTUR TABEL PRESISI DENGAN BORDER MANDIRI */
         .area-kertas table { 
-            border: 1px solid black !important; 
             border-collapse: collapse !important; 
             font-size: 11px !important; 
             width: 100%; 
             min-width: 650px; 
             table-layout: fixed; 
-            margin-top: 10px;
-            page-break-inside: auto;
+            margin-top: 0px;
         }
         
         .area-kertas tr {
@@ -1009,7 +1007,7 @@
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = async function() {
-                        const canvas = document.createElement('canvas');
+                        const canvas = document.getElementById('canvasTemp') || document.createElement('canvas');
                         const MAX_WIDTH = 600;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
@@ -1064,6 +1062,7 @@
             document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
         }
 
+        /* RENDERING DENGAN SOLUSI BARU: MEMECAH TIAP BARIS AGAR TIDAK BISA TERPOTONG KARENA RENDER CANVAS */
         function renderSemuaData() {
             const wadahTabel = document.getElementById('wadahTabelBulan');
             wadahTabel.innerHTML = '';
@@ -1112,14 +1111,14 @@
                 if(dataBulanIni.length === 0) return;
 
                 let htmlTabel = `
-                    <div class="block-bulan">
+                    <div class="block-bulan" style="page-break-before: always; break-before: page;">
                         <div class="mb-4 text-base font-bold text-black pt-4">
                             <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
                         <div class="table-wrapper">
-                            <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
+                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; border-top: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;">
                                 <thead>
-                                    <tr>
+                                    <tr style="page-break-inside: avoid; break-inside: avoid;">
                                         <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
                                         <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
                                         <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
@@ -1127,23 +1126,29 @@
                                         <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
                                     </tr>
                                 </thead>
-                                <tbody>`;
+                            </table>`;
 
                 dataBulanIni.forEach((item) => {
                     const idxTampil = dataBulanIni.indexOf(item) + 1;
 
                     htmlTabel += `
-                        <tr style="page-break-inside: avoid !important; break-inside: avoid !important;">
-                            <td style="border: 1px solid black; padding: 5px; text-align: center;">${idxTampil}</td>
-                            <td style="border: 1px solid black; padding: 5px;">${item.hari}</td>
-                            <td style="border: 1px solid black; padding: 5px;">${item.tanggal}</td>
-                            <td style="border: 1px solid black; padding: 5px;">${item.uraian}</td>
-                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
-                                ${item.foto ? `<img src="${item.foto}" style="max-height: 70px;" class="mx-auto border border-gray-300">` : '-'}
-                            </td>
-                        </tr>`;
+                        <div class="row-block" style="page-break-inside: avoid !important; break-inside: avoid !important; margin-top: -1px;">
+                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
+                                <tbody>
+                                    <tr style="page-break-inside: avoid !important; break-inside: avoid !important;">
+                                        <td style="border: 1px solid black !important; padding: 5px; text-align: center; width: 40px;">${idxTampil}</td>
+                                        <td style="border: 1px solid black !important; padding: 5px; width: 80px;">${item.hari}</td>
+                                        <td style="border: 1px solid black !important; padding: 5px; width: 90px;">${item.tanggal}</td>
+                                        <td style="border: 1px solid black !important; padding: 5px; width: 40%;">${item.uraian}</td>
+                                        <td style="border: 1px solid black !important; padding: 5px; text-align: center; width: 100px;">
+                                            ${item.foto ? `<img src="${item.foto}" style="max-height: 70px; page-break-inside: avoid;" class="mx-auto border border-gray-300">` : '-'}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>`;
                 });
-                wadahTabel.innerHTML += htmlTabel + `</tbody></table></div></div>`;
+                wadahTabel.innerHTML += htmlTabel + `</div></div>`;
             });
         }
 
@@ -1253,9 +1258,9 @@
                 margin: [12, 10, 12, 10], 
                 filename: 'Laporan_PKL_LUKYY.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'td', 'img'] }
+                pagebreak: { mode: ['css'], avoid: ['.row-block', 'tr', 'td', 'img'] }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
