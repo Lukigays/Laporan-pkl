@@ -86,6 +86,22 @@
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
+        /* PENGATURAN CETAK PDF AGAR BARIS TABEL TIDAK TERPOTONG SAMA SEKALIK */
+        .area-kertas tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .block-bulan {
+            page-break-before: always !important;
+            break-before: page !important;
+        }
+
+        .block-bulan:first-child {
+            page-break-before: auto !important;
+            break-before: auto !important;
+        }
+
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
         
         .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
@@ -104,7 +120,7 @@
         }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
 
-        .pemisah-halaman { page-break-after: always; break-after: page; }
+        .pemisah-halaman { page-break-after: always !important; break-after: page !important; }
 
         @media print {
             .no-print { display: none !important; }
@@ -1065,34 +1081,33 @@
 
             const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
 
-            unikBulanFiltered.forEach((bulan, bulanIndex) => {
+            unikBulanFiltered.forEach((bulan) => {
                 const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if(dataBulanIni.length === 0) return;
 
-                let pemisahBulan = bulanIndex > 0 ? 'margin-top: 40px;' : '';
-
                 let htmlTabel = `
-                    <div class="mb-4 text-base font-bold text-black pt-4" style="${pemisahBulan}">
-                        <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
-                            <thead>
-                                <tr>
-                                    <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
-                                    <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
-                                    <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
-                                    <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
-                                    <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+                    <div class="block-bulan">
+                        <div class="mb-4 text-base font-bold text-black pt-4">
+                            <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
+                                        <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
+                                        <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
+                                        <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
+                                        <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
 
                 dataBulanIni.forEach((item) => {
                     const idxTampil = dataBulanIni.indexOf(item) + 1;
 
                     htmlTabel += `
-                        <tr>
+                        <tr style="page-break-inside: avoid !important; break-inside: avoid !important;">
                             <td style="border: 1px solid black; padding: 5px; text-align: center;">${idxTampil}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.hari}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.tanggal}</td>
@@ -1102,7 +1117,7 @@
                             </td>
                         </tr>`;
                 });
-                wadahTabel.innerHTML += htmlTabel + `</tbody></table></div>`;
+                wadahTabel.innerHTML += htmlTabel + `</tbody></table></div></div>`;
             });
         }
 
@@ -1209,11 +1224,12 @@
             elemenAsli.style.display = 'block';
             
             html2pdf().set({
-                margin: 10, filename: 'Laporan_PKL_LUKYY.pdf',
+                margin: 10, 
+                filename: 'Laporan_PKL_LUKYY.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'] }
+                pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.block-bulan'] }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
