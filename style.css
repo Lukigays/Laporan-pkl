@@ -1,0 +1,145 @@
+:root {
+    --accent-primary: #0a84ff;
+    --accent-secondary: #5e5ce6;
+    --ring-color: rgba(10, 132, 255, 0.25);
+}
+
+/* DEFAULT MODE TERANG */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #e2e8f0; 
+    color: #0f172a !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* MODE GELAP */
+body.dark-mode {
+    background-color: #000000;
+    color: #f8fafc !important;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.22) 0px, transparent 55%),
+        radial-gradient(at 100% 0%, rgba(94, 92, 230, 0.22) 0px, transparent 55%);
+}
+
+/* PANEL MODE TERANG */
+.kaca-buram, .glass-panel {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important;
+}
+
+/* PANEL MODE GELAP */
+body.dark-mode .kaca-buram, 
+body.dark-mode .glass-panel {
+    background: rgba(30, 41, 59, 0.8) !important;
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    color: #f8fafc !important;
+}
+
+/* ELEMEN INPUT & TEXTAREA */
+input, textarea, select {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border: 1px solid #94a3b8 !important;
+}
+body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+input::placeholder, textarea::placeholder { color: #64748b !important; }
+body.dark-mode input::placeholder, body.dark-mode textarea::placeholder { color: #94a3b8 !important; }
+
+input[type="date"], input[type="text"], input[type="file"], input[type="email"], input[type="password"], textarea, select { transition: all 0.2s ease; }
+input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 4px var(--ring-color); border-color: var(--accent-primary) !important; }
+
+button { transition: all 0.2s ease; }
+button:active { transform: scale(0.96); }
+
+.area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* PENGATURAN STRUKTUR TABEL PRESISI DENGAN BORDER MANDIRI */
+.area-kertas table { 
+    border-collapse: collapse !important; 
+    font-size: 11px !important; 
+    width: 100%; 
+    min-width: 650px; 
+    table-layout: fixed; 
+    margin-top: 0px;
+}
+
+.area-kertas tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.area-kertas th, .area-kertas td { 
+    border: 1px solid black !important; 
+    padding: 6px 8px !important; 
+    vertical-align: top; 
+    color: black !important; 
+    word-break: break-word;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.area-kertas td img {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: block;
+}
+
+.area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
+
+.block-bulan {
+    page-break-before: always !important;
+    break-before: page !important;
+}
+
+.block-bulan:first-child {
+    page-break-before: auto !important;
+    break-before: auto !important;
+}
+
+.watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0, 0, 0, 0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.1em; }
+
+.pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
+.pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
+.pdf-export-mode .watermark { display: none !important; }
+
+.header-print {
+    display: none;
+    font-family: "Times New Roman", Times, serif;
+    text-align: center;
+    color: black;
+    width: 100%;
+    padding-top: 40px; 
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+.header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
+
+.pemisah-halaman { page-break-after: always !important; break-after: page !important; }
+
+@media print {
+    .no-print { display: none !important; }
+    .watermark { display: none !important; }
+    body { background: white !important; color: black !important; padding: 0 !important; }
+    .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; display: block !important; }
+    .table-wrapper { overflow-x: visible !important; } 
+    .header-print { display: block !important; } 
+}
+.pdf-export-mode .header-print { display: block !important; } 
+
+.gradient-text { background: linear-gradient(135deg, #0284c7, #4f46e5, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.tab-content { opacity: 0; transform: translateY(15px) scale(0.99); transition: opacity 0.3s ease, transform 0.3s ease; position: absolute; width: 100%; pointer-events: none; visibility: hidden; }
+.tab-content.active { opacity: 1; transform: translateY(0) scale(1); position: relative; pointer-events: auto; visibility: visible; }
+@keyframes fluidFadeIn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+.animate-item { opacity: 0; animation: fluidFadeIn 0.4s ease forwards; }
