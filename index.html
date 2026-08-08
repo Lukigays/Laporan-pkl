@@ -97,6 +97,11 @@
             page-break-inside: avoid !important;
             break-inside: avoid !important;
         }
+        .area-kertas tbody {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
 
         .area-kertas th, .area-kertas td { 
             border: 1px solid black !important; 
@@ -1260,7 +1265,7 @@
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css'], avoid: ['.row-block', 'tr', 'td', 'img'] }
+                pagebreak: { mode: ['css'], avoid: ['tbody', 'tr', 'img'] }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
