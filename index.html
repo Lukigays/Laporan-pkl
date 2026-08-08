@@ -451,9 +451,8 @@
                 </div>
 
                 <div class="kaca-buram rounded-[2.5rem] p-5 md:p-6 mb-6 space-y-5 no-print relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-slate-200 dark:border-white/10 pb-5">
-                        <button onclick="cetakLangsungTanpaPreview()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">🖨️ Cetak Langsung (Print)</button>
-                        <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-slate-900 text-white dark:bg-gray-800 font-bold py-3 px-6 rounded-2xl shadow-sm flex justify-center items-center gap-2">📥 Export PDF</button>
+                    <div class="border-b border-slate-200 dark:border-white/10 pb-5">
+                        <button onclick="bukaOpsiExport()" id="btnDownload" class="w-full bg-[#0a84ff] hover:bg-[#0071e3] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">📥 Export PDF</button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -470,9 +469,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- KARTU MOBILE DAFTAR LAPORAN (TANPA TOMBOL EDIT) -->
-                <div class="no-print block md:hidden space-y-4 mb-8" id="wadahCardMobile"></div>
 
                 <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak">
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
@@ -718,7 +714,7 @@
             { icon: '👋', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda dengan mudah.' },
             { icon: '📝', title: 'Tab Input Data', desc: 'Gunakan tab ini untuk mencatat kegiatan baru harian Anda.' },
             { icon: '✏️', title: 'Tab Pengeditan Laporan', desc: 'Pilih dan edit catatan laporan sebelumnya secara cepat tanpa memakan banyak ruang.' },
-            { icon: '📋', title: 'Tab Laporan & PDF', desc: 'Lihat ringkasan statistik, saring data, lalu cetak langsung atau unduh dokumen ke format PDF.' }
+            { icon: '📋', title: 'Tab Laporan & PDF', desc: 'Lihat ringkasan statistik, saring data, lalu unduh dokumen ke format PDF.' }
         ];
         let indexTourAktif = 0;
 
@@ -1028,8 +1024,7 @@
 
         function renderSemuaData() {
             const wadahTabel = document.getElementById('wadahTabelBulan');
-            const wadahCard = document.getElementById('wadahCardMobile');
-            wadahTabel.innerHTML = ''; wadahCard.innerHTML = '';
+            wadahTabel.innerHTML = '';
             
             if (dataLaporan.length === 0) {
                 wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
@@ -1080,16 +1075,18 @@
                     <div class="mb-4 text-base font-bold text-black pt-4" style="${pemisahBulan}">
                         <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                     </div>
-                    <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
-                        <thead>
-                            <tr>
-                                <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
-                                <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
-                                <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
-                                <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
-                            </tr>
-                        </thead><tbody>`;
+                    <div class="table-wrapper">
+                        <table class="w-full border-collapse text-black" style="color: black !important; border: 1px solid black;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
+                                    <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
+                                    <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
+                                    <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
+                                    <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
                 dataBulanIni.forEach((item) => {
                     const idxTampil = dataBulanIni.indexOf(item) + 1;
@@ -1104,15 +1101,8 @@
                                 ${item.foto ? `<img src="${item.foto}" style="max-height: 70px;" class="mx-auto border border-gray-300">` : '-'}
                             </td>
                         </tr>`;
-                    
-                    /* TAMPILAN KARTU MOBILE MURNI TANPA TOMBOL EDIT */
-                    wadahCard.innerHTML += `
-                        <div class="kaca-buram p-4 rounded-2xl mb-3 flex flex-col gap-1.5 relative">
-                            <b class="text-blue-600 dark:text-blue-400 font-extrabold text-sm border-b border-slate-200 dark:border-gray-700 pb-2">${item.tanggal} (${item.hari})</b>
-                            <p class="text-sm font-semibold mt-1 leading-relaxed">${item.uraian}</p>
-                        </div>`;
                 });
-                wadahTabel.innerHTML += htmlTabel + `</tbody></table>`;
+                wadahTabel.innerHTML += htmlTabel + `</tbody></table></div>`;
             });
         }
 
@@ -1182,13 +1172,6 @@
             cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
             tutupSettings();
             showToast("Seluruh laporan berhasil dihapus! 🗑️");
-        }
-
-        function cetakLangsungTanpaPreview() {
-            const areaCetak = document.getElementById('areaCetak');
-            areaCetak.classList.remove('hidden');
-            areaCetak.classList.add('block');
-            window.print();
         }
 
         function bukaOpsiExport() {
