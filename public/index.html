@@ -1121,36 +1121,32 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF INSTAN KLIEN
+        // GENERATOR PDF DENGAN LAYOUT KOVER PRESISI (SAMA PERSIS DENGAN GAMBAR 2)
         function downloadPDF(opsiCover) {
             showToast("⏳ Membuat PDF...");
 
             try {
                 const docContent = [];
 
-                // 1. DENGAN KOVER
+                // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
                     let logoImageObj = null;
                     if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                        logoImageObj = { image: dataProfil.logoSekolah, width: 100, alignment: 'center', margin: [0, 0, 0, 20] };
+                        logoImageObj = { image: dataProfil.logoSekolah, width: 110, alignment: 'center', margin: [0, 15, 0, 20] };
+                    } else {
+                        logoImageObj = { image: DEFAULT_SVG_LOGO, width: 110, alignment: 'center', margin: [0, 15, 0, 20] };
                     }
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
-                        { text: 'DI', style: 'headerSub', margin: [0, 8, 0, 8] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] }
-                    );
-
-                    if (logoImageObj) {
-                        docContent.push(logoImageObj);
-                    }
-
-                    docContent.push(
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 8] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 6] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 15] },
+                        logoImageObj,
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 12] },
                         {
                             table: {
-                                widths: [80, 150],
+                                widths: [75, 180],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ': ' + (dataProfil.nama || 'LUKYY'), border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ': ' + (dataProfil.kelas || 'XII'), border: [] }],
@@ -1159,12 +1155,12 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 0, 0, 25]
+                            margin: [0, 0, 0, 35]
                         },
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
                         {
                             table: {
-                                widths: [140, 180],
+                                widths: [150, 190],
                                 body: [
                                     [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.progKeahlian || ''), bold: true, border: [] }],
                                     [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.konsKeahlian || ''), bold: true, border: [] }]
@@ -1172,7 +1168,7 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 10, 0, 25]
+                            margin: [0, 8, 0, 35]
                         },
                         { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', pageBreak: 'after' }
                     );
@@ -1239,18 +1235,17 @@
 
                 const docDefinition = {
                     pageSize: 'A4',
-                    pageMargins: [30, 30, 30, 30],
+                    pageMargins: [40, 40, 40, 40],
                     content: docContent,
                     styles: {
-                        headerTitle: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 2, 0, 2] },
-                        headerSub: { fontSize: 14, bold: true, alignment: 'center' },
-                        headerAddress: { fontSize: 13, alignment: 'center', decoration: 'underline' },
-                        headerSchool: { fontSize: 14, bold: true, alignment: 'center', margin: [0, 10, 0, 5] },
+                        headerTitle: { fontSize: 15, bold: true, alignment: 'center', margin: [0, 1, 0, 1] },
+                        headerSub: { fontSize: 13, bold: true, alignment: 'center' },
+                        headerAddress: { fontSize: 12, alignment: 'center', decoration: 'underline' },
+                        headerSchool: { fontSize: 13, bold: true, alignment: 'center', margin: [0, 5, 0, 5] },
                         tableHeader: { bold: true, fontSize: 10, color: 'black' }
                     }
                 };
 
-                // PEMICU UTAMA HP
                 pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
                 showToast("PDF berhasil diunduh! 📥");
 
