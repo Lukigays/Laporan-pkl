@@ -76,7 +76,7 @@
         .badge-cosmic { background: rgba(192,38,211,0.1); border: 1px solid rgba(192,38,211,0.2); color: #d946ef; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; }
         .danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
         
-        /* FIX KERTAS & TABEL EKSPOR PDF */
+        /* FIX TOTAL AREA KERTAS & TABEL PDF */
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .area-kertas table { border-collapse: collapse !important; font-size: 11px !important; width: 100% !important; min-width: 0 !important; table-layout: fixed; }
         .area-kertas tr { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -84,16 +84,20 @@
         .area-kertas td img { page-break-inside: avoid !important; break-inside: avoid !important; display: block; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
         
-        /* PERBAIKAN: Menghilangkan spasi berlebih di awal halaman */
-        .block-bulan { page-break-before: auto !important; break-before: auto !important; padding-top: 0 !important; margin-top: 0 !important; }
+        /* MEMAKSA SETIAP BULAN PINDAH HALAMAN SECARA MULTI-PAGE */
+        .block-bulan { page-break-before: always !important; break-before: page !important; padding-top: 0 !important; margin-top: 0 !important; }
+        .block-bulan:first-child { page-break-before: auto !important; break-before: auto !important; }
         
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
-        .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
+        
+        /* MODE EKSPOR PDF KHUSUS (MENGHILANGKAN MARGIN DAN PADDING PENYEBAB SPASI KOSONG) */
+        .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; padding: 0 !important; margin: 0 !important; }
+        .pdf-export-mode .konten-tabel { padding: 0 !important; margin: 0 !important; }
         .pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
         .pdf-export-mode .watermark { display: none !important; }
         
         /* FIX COVER HEADER PRINT */
-        .header-print { display: none; font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; padding-top: 10px; padding-bottom: 10px; box-sizing: border-box; page-break-after: always !important; break-after: page !important; }
+        .header-print { display: none; font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; padding-top: 0 !important; margin-top: 0 !important; padding-bottom: 10px; box-sizing: border-box; page-break-after: always !important; break-after: page !important; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
         
         @media print { .no-print { display: none !important; } .watermark { display: none !important; } body { background: white !important; color: black !important; padding: 0 !important; } .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; display: block !important; } .table-wrapper { overflow-x: visible !important; } .header-print { display: block !important; } }
@@ -102,8 +106,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(192,38,211,0.5); }
-        input[type="file"]::-webkit-file-upload-button { background: linear-gradient(135deg, #7c3aed, #c026d3); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 12px; transition: all 0.3s ease; }
-        input[type="file"]::-webkit-file-upload-button:hover { box-shadow: 0 0 20px rgba(192,38,211,0.4); }
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         select.glass-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
         .hero-section { position: relative; padding: 3rem 0 2rem; }
@@ -1130,7 +1132,7 @@
             downloadPDF(opsi);
         }
 
-        // PERBAIKAN: Fungsi Ekspor PDF dengan Margin Pas
+        // FUNGSI EKSPOR PDF PRESISI TANPA SPASI ATAS & SETIAP BULAN HALAMAN BARU
         function downloadPDF(opsiCover) {
             const elemenAsli = document.getElementById('areaCetak');
             const koverSection = document.getElementById('koverPrintSection');
@@ -1148,13 +1150,14 @@
             elemenAsli.style.display = 'block';
 
             html2pdf().set({
-                margin: [10, 10, 10, 10], // Margin A4 Presisi
+                margin: [12, 10, 12, 10], // Margin A4 rata kanan-kiri-atas-bawah
                 filename: `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { 
                     mode: ['css', 'legacy'], 
+                    before: ['.block-bulan'],
                     avoid: ['tr', 'img'] 
                 }
             }).from(elemenAsli).save().then(() => {
