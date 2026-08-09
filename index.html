@@ -89,7 +89,6 @@
         .pdf-export-mode .watermark { display: none !important; }
         .header-print { display: none; font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; padding-top: 40px; padding-bottom: 20px; box-sizing: border-box; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
-        .pemisah-halaman { page-break-after: always !important; break-after: page !important; }
         @media print { .no-print { display: none !important; } .watermark { display: none !important; } body { background: white !important; color: black !important; padding: 0 !important; } .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; display: block !important; } .table-wrapper { overflow-x: visible !important; } .header-print { display: block !important; } }
         .pdf-export-mode .header-print { display: block !important; }
         ::-webkit-scrollbar { width: 6px; }
@@ -275,6 +274,7 @@
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-sm" onchange="previewLogoUpload(this)">
                             <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default.</p>
                         </div>
+                        <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
                 </div>
                 <div class="h-px bg-white/5"></div>
@@ -444,7 +444,6 @@
                             </table>
                             <h4 style="font-size: 16px; margin-top: 30px;">TAHUN <span id="coverTahun">2026...</span></h4>
                         </div>
-                        <div class="html2pdf__page-break pemisah-halaman" id="pemisahHalPrint"></div>
                         <div id="wadahTabelBulan"></div>
                     </div>
                 </div>
@@ -748,14 +747,25 @@
         function renderLogoPreview() {
             const img = document.getElementById('previewLogoSekolah');
             const placeholder = document.getElementById('placeholderLogo');
+            const btnHapus = document.getElementById('btnHapusLogo');
             if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
                 img.src = dataProfil.logoSekolah;
                 img.classList.remove('hidden');
                 placeholder.classList.add('hidden');
+                if (btnHapus) btnHapus.classList.remove('hidden');
             } else {
                 img.classList.add('hidden');
                 placeholder.classList.remove('hidden');
+                if (btnHapus) btnHapus.classList.add('hidden');
             }
+        }
+
+        async function hapusLogoSekolah() {
+            dataProfil.logoSekolah = '';
+            await localforage.setItem('profilPKL', dataProfil);
+            renderLogoPreview();
+            renderProfil();
+            showToast('Logo berhasil dihapus! 🗑️');
         }
 
         async function previewLogoUpload(input) {
@@ -992,46 +1002,46 @@
                 return;
             }
             const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
-            unikBulanFiltered.forEach((bulan) => {
+            unikBulanFiltered.forEach((bulan, idxBulan) => {
                 const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if (dataBulanIni.length === 0) return;
+                const isFirst = idxBulan === 0;
                 let htmlTabel = `
-                    <div class="block-bulan" style="page-break-before: always; break-before: page;">
+                    <div class="block-bulan ${isFirst ? '' : 'pdf-page'}" style="${isFirst ? '' : 'page-break-before: always; break-before: page;'}">
                         <div class="mb-4 text-base font-bold text-black pt-4">
                             <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
                         <div class="table-wrapper">
-                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; border-top: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;">
+                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
                                 <thead>
-                                    <tr style="page-break-inside: avoid; break-inside: avoid;">
-                                        <th style="border: 1px solid black; padding: 5px; width: 40px;">No</th>
-                                        <th style="border: 1px solid black; padding: 5px; width: 80px;">Hari</th>
-                                        <th style="border: 1px solid black; padding: 5px; width: 90px;">Tanggal</th>
-                                        <th style="border: 1px solid black; padding: 5px; width: 40%;">Uraian Kegiatan</th>
-                                        <th style="border: 1px solid black; padding: 5px; width: 100px;">Foto</th>
+                                    <tr>
+                                        <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
+                                        <th style="border: 1px solid black; padding: 6px; width: 80px;">Hari</th>
+                                        <th style="border: 1px solid black; padding: 6px; width: 90px;">Tanggal</th>
+                                        <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
+                                        <th style="border: 1px solid black; padding: 6px; width: 90px; text-align: center;">Foto</th>
                                     </tr>
                                 </thead>
-                            </table>`;
-                dataBulanIni.forEach((item) => {
-                    const idxTampil = dataBulanIni.indexOf(item) + 1;
+                                <tbody>`;
+                dataBulanIni.forEach((item, idx) => {
+                    const idxTampil = idx + 1;
                     htmlTabel += `
-                        <div class="row-block" style="page-break-inside: avoid !important; break-inside: avoid !important; margin-top: -1px;">
-                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
-                                <tbody>
-                                    <tr style="page-break-inside: avoid !important; break-inside: avoid !important;">
-                                        <td style="border: 1px solid black !important; padding: 5px; text-align: center; width: 40px;">${idxTampil}</td>
-                                        <td style="border: 1px solid black !important; padding: 5px; width: 80px;">${item.hari}</td>
-                                        <td style="border: 1px solid black !important; padding: 5px; width: 90px;">${item.tanggal}</td>
-                                        <td style="border: 1px solid black !important; padding: 5px; width: 40%;">${item.uraian}</td>
-                                        <td style="border: 1px solid black !important; padding: 5px; text-align: center; width: 100px;">
-                                            ${item.foto ? `<img src="${item.foto}" style="max-height: 70px; page-break-inside: avoid;" class="mx-auto border border-gray-300">` : '-'}
+                                    <tr>
+                                        <td style="border: 1px solid black; padding: 6px; text-align: center; width: 40px;">${idxTampil}</td>
+                                        <td style="border: 1px solid black; padding: 6px; width: 80px;">${item.hari}</td>
+                                        <td style="border: 1px solid black; padding: 6px; width: 90px;">${item.tanggal}</td>
+                                        <td style="border: 1px solid black; padding: 6px; width: auto;">${item.uraian}</td>
+                                        <td style="border: 1px solid black; padding: 6px; text-align: center; width: 90px;">
+                                            ${item.foto ? `<img src="${item.foto}" style="width: 80px; height: 80px; object-fit: cover; display: block; margin: 0 auto;" class="border border-gray-300">` : '-'}
                                         </td>
-                                    </tr>
+                                    </tr>`;
+                });
+                htmlTabel += `
                                 </tbody>
                             </table>
-                        </div>`;
-                });
-                wadahTabel.innerHTML += htmlTabel + `</div></div>`;
+                        </div>
+                    </div>`;
+                wadahTabel.innerHTML += htmlTabel;
             });
         }
 
@@ -1130,12 +1140,12 @@
             elemenAsli.classList.add('pdf-export-mode');
             elemenAsli.style.display = 'block';
             html2pdf().set({
-                margin: [12, 10, 12, 10],
+                margin: [10, 10, 10, 10],
                 filename: 'Laporan_PKL_LUKYY.pdf',
-                image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css'], avoid: ['.pdf-row', 'img'] }
+                pagebreak: { mode: ['css', 'legacy'], before: ['.block-bulan'], avoid: 'img' }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
                 elemenAsli.style.display = '';
