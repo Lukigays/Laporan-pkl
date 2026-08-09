@@ -424,7 +424,7 @@
                             <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
                             <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                             <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
-                            <h3 style="font-size: 16px; font-weight: normal; text-decoration: underline; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
+                            <h3 style="font-size: 16px; font-weight: normal; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
                             <img id="coverLogoSekolah" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 90,25 90,75 50,95 10,75 10,25' fill='%231d4ed8' stroke='%23f59e0b' stroke-width='4'/><circle cx='50' cy='50' r='25' fill='%23ffffff'/><text x='50' y='55' font-size='12' text-anchor='middle' font-weight='bold' fill='%231e3a8a'>SMKN</text></svg>" alt="Logo Sekolah" style="width: 130px; margin: 0 auto 25px auto; display: block;">
                             <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
                             <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
@@ -1121,7 +1121,7 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF INSTAN KLIEN
+        // GENERATOR PDF DENGAN LAYOUT KOVER SAMA PERSIS DENGAN CONTOH GAMBAR ACUAN
         function downloadPDF(opsiCover) {
             showToast("⏳ Membuat PDF...");
 
@@ -1132,25 +1132,21 @@
                 if (opsiCover === 'dengan') {
                     let logoImageObj = null;
                     if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                        logoImageObj = { image: dataProfil.logoSekolah, width: 100, alignment: 'center', margin: [0, 0, 0, 20] };
+                        logoImageObj = { image: dataProfil.logoSekolah, width: 110, alignment: 'center', margin: [0, 10, 0, 15] };
+                    } else {
+                        logoImageObj = { image: DEFAULT_SVG_LOGO, width: 110, alignment: 'center', margin: [0, 10, 0, 15] };
                     }
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
-                        { text: 'DI', style: 'headerSub', margin: [0, 8, 0, 8] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] }
-                    );
-
-                    if (logoImageObj) {
-                        docContent.push(logoImageObj);
-                    }
-
-                    docContent.push(
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 8] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 6] },
+                        { text: dataProfil.alamat || 'Alamat', style: 'headerAddress', margin: [0, 0, 0, 15] },
+                        logoImageObj,
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
-                                widths: [80, 150],
+                                widths: [75, 180],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ': ' + (dataProfil.nama || 'LUKYY'), border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ': ' + (dataProfil.kelas || 'XII'), border: [] }],
@@ -1159,12 +1155,12 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 0, 0, 25]
+                            margin: [0, 0, 0, 30]
                         },
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
                         {
                             table: {
-                                widths: [140, 180],
+                                widths: [150, 190],
                                 body: [
                                     [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.progKeahlian || ''), bold: true, border: [] }],
                                     [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.konsKeahlian || ''), bold: true, border: [] }]
@@ -1172,7 +1168,7 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 10, 0, 25]
+                            margin: [0, 6, 0, 30]
                         },
                         { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', pageBreak: 'after' }
                     );
@@ -1239,13 +1235,13 @@
 
                 const docDefinition = {
                     pageSize: 'A4',
-                    pageMargins: [30, 30, 30, 30],
+                    pageMargins: [40, 40, 40, 40],
                     content: docContent,
                     styles: {
-                        headerTitle: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 2, 0, 2] },
-                        headerSub: { fontSize: 14, bold: true, alignment: 'center' },
-                        headerAddress: { fontSize: 13, alignment: 'center', decoration: 'underline' },
-                        headerSchool: { fontSize: 14, bold: true, alignment: 'center', margin: [0, 10, 0, 5] },
+                        headerTitle: { fontSize: 15, bold: true, alignment: 'center', margin: [0, 1, 0, 1] },
+                        headerSub: { fontSize: 13, bold: true, alignment: 'center' },
+                        headerAddress: { fontSize: 12, alignment: 'center' },
+                        headerSchool: { fontSize: 13, bold: true, alignment: 'center', margin: [0, 5, 0, 5] },
                         tableHeader: { bold: true, fontSize: 10, color: 'black' }
                     }
                 };
