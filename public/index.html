@@ -9,6 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- LIBRARY PDFMAKE (SUPER CEPAT & HAPUS MASALAH HALAMAN KOSONG) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -765,7 +770,7 @@
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 250; // Kompresi maksimal logo
+                        const MAX_WIDTH = 250;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
@@ -816,7 +821,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= SIMPAN DATA BARU (DENGAN KOMPRESI SUPER KECIL) =================
+        // ================= SIMPAN DATA BARU =================
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -834,13 +839,13 @@
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 300; // Kompres ke 300px agar payload Vercel ringan
+                        const MAX_WIDTH = 300;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.4); // Kualitas 40%
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
                         await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                     }
                     img.src = e.target.result;
@@ -910,7 +915,7 @@
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
                         finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                     }
                     img.src = e.target.result;
@@ -1114,130 +1119,131 @@
             downloadPDF(opsi);
         }
 
-        // FUNGSI EXPORT DENGAN DUKUNGAN TIMEOUT & ABORT CONTROLLER
+        // FUNGSI PDFMAKE: INSTAN, A4 PRESISI, TIDAK ADA HALAMAN KOSONG/BARIS TERPOTONG
         async function downloadPDF(opsiCover) {
-            showToast("⏳ Memproses PDF via Serverless Vercel...");
-
-            const coverElement = document.getElementById('koverPrintSection');
-            const tabelElement = document.getElementById('wadahTabelBulan');
-
-            const coverHTML = opsiCover === 'dengan' ? coverElement.outerHTML : '';
-            const tabelHTML = tabelElement.outerHTML;
-
-            const fullHtmlContent = `
-                <!DOCTYPE html>
-                <html lang="id">
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        @page {
-                            size: A4 portrait;
-                            margin: 10mm;
-                        }
-                        body {
-                            font-family: "Times New Roman", Times, serif;
-                            color: black;
-                            background: white;
-                            margin: 0;
-                            padding: 0;
-                            -webkit-print-color-adjust: exact;
-                        }
-                        .header-print {
-                            text-align: center;
-                            width: 100%;
-                            box-sizing: border-box;
-                            page-break-after: always;
-                        }
-                        .header-print h2, .header-print h3, .header-print h4 {
-                            margin: 5px 0;
-                            font-weight: bold;
-                        }
-                        .block-bulan {
-                            width: 100%;
-                        }
-                        table {
-                            border-collapse: collapse !important;
-                            width: 100% !important;
-                            font-size: 11px !important;
-                            margin-top: 8px;
-                            table-layout: fixed;
-                        }
-                        th, td {
-                            border: 1px solid black !important;
-                            padding: 6px 8px !important;
-                            vertical-align: top;
-                            word-wrap: break-word;
-                        }
-                        th {
-                            background-color: #f0f0f0 !important;
-                            font-weight: bold;
-                            text-align: center;
-                        }
-                        tr {
-                            page-break-inside: avoid !important;
-                            break-inside: avoid !important;
-                        }
-                        img {
-                            display: block;
-                            margin: 0 auto;
-                            max-height: 75px;
-                            max-width: 80px;
-                            object-fit: cover;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${coverHTML}
-                    <div style="padding-top: 5px;">
-                        ${tabelHTML}
-                    </div>
-                </body>
-                </html>
-            `;
-
-            // Memberikan limit waktu 14 detik untuk pemicu timeout lokal
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 14000);
+            showToast("⏳ Menggenerasi PDF...");
 
             try {
-                const response = await fetch('/generate-pdf', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ htmlContent: fullHtmlContent }),
-                    signal: controller.signal
+                const docContent = [];
+
+                // 1. TAMBAH KOVER JIKA DIPILIH
+                if (opsiCover === 'dengan') {
+                    docContent.push(
+                        { text: 'LAPORAN', style: 'headerTitle' },
+                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
+                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 10] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress' },
+                        { text: '\n\n' }
+                    );
+
+                    if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                        docContent.push({ image: dataProfil.logoSekolah, width: 100, alignment: 'center', margin: [0, 0, 0, 15] });
+                    }
+
+                    docContent.push(
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 5] },
+                        {
+                            table: {
+                                widths: [80, 150],
+                                body: [
+                                    [{ text: 'Nama', border: [] }, { text: ': ' + (dataProfil.nama || 'LUKYY'), border: [] }],
+                                    [{ text: 'Kelas', border: [] }, { text: ': ' + (dataProfil.kelas || 'XII'), border: [] }],
+                                    [{ text: 'NIS/NISN', border: [] }, { text: ': ' + (dataProfil.nis || '/'), border: [] }]
+                                ]
+                            },
+                            layout: 'noBorders',
+                            alignment: 'center',
+                            margin: [0, 0, 0, 20]
+                        },
+                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
+                        {
+                            table: {
+                                widths: [140, 180],
+                                body: [
+                                    [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.progKeahlian || ''), bold: true, border: [] }],
+                                    [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.konsKeahlian || ''), bold: true, border: [] }]
+                                ]
+                            },
+                            layout: 'noBorders',
+                            alignment: 'center',
+                            margin: [0, 10, 0, 20]
+                        },
+                        { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', pageBreak: 'after' }
+                    );
+                }
+
+                // 2. KELOMPOKKAN LAPORAN PER BULAN
+                const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
+
+                unikBulan.forEach((bulan, bIdx) => {
+                    const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
+                    if (dataBulanIni.length === 0) return;
+
+                    docContent.push(
+                        { text: '1. Laporan Kegiatan Harian', fontSize: 11, bold: true, margin: [0, bIdx > 0 ? 15 : 0, 0, 2] },
+                        { text: 'b. Bulan ' + bulan.toUpperCase(), fontSize: 11, bold: true, margin: [0, 0, 0, 8] }
+                    );
+
+                    const tableBody = [
+                        [
+                            { text: 'No', style: 'tableHeader', alignment: 'center' },
+                            { text: 'Hari', style: 'tableHeader' },
+                            { text: 'Tanggal', style: 'tableHeader' },
+                            { text: 'Uraian Kegiatan', style: 'tableHeader' },
+                            { text: 'Foto', style: 'tableHeader', alignment: 'center' }
+                        ]
+                    ];
+
+                    dataBulanIni.forEach((item, idx) => {
+                        let fotoCell = { text: '-', alignment: 'center' };
+                        if (item.foto && item.foto.trim() !== '') {
+                            fotoCell = { image: item.foto, width: 65, height: 65, alignment: 'center' };
+                        }
+
+                        tableBody.push([
+                            { text: idx + 1, alignment: 'center', fontSize: 10 },
+                            { text: item.hari, fontSize: 10 },
+                            { text: item.tanggal, fontSize: 10 },
+                            { text: item.uraian, fontSize: 10 },
+                            fotoCell
+                        ]);
+                    });
+
+                    docContent.push({
+                        table: {
+                            headerRows: 1,
+                            widths: [25, 55, 65, '*', 75],
+                            dontBreakRows: true, // MENJAGA BARIS KATA MAUPUN GAMBAR TERPOTONG SETENGAH
+                            body: tableBody
+                        },
+                        layout: {
+                            fillColor: function (rowIndex) { return (rowIndex === 0) ? '#f0f0f0' : null; }
+                        },
+                        margin: [0, 0, 0, 15]
+                    });
                 });
 
-                clearTimeout(timeoutId);
+                // DEFINISI DOKUMEN PDF
+                const docDefinition = {
+                    pageSize: 'A4',
+                    pageMargins: [30, 30, 30, 30],
+                    content: docContent,
+                    styles: {
+                        headerTitle: { fontSize: 16, bold: true, alignment: 'center', margin: [0, 2, 0, 2] },
+                        headerSub: { fontSize: 14, bold: true, alignment: 'center' },
+                        headerAddress: { fontSize: 13, alignment: 'center', decoration: 'underline' },
+                        headerSchool: { fontSize: 14, bold: true, alignment: 'center', margin: [0, 10, 0, 5] },
+                        tableHeader: { bold: true, fontSize: 10, color: 'black' }
+                    }
+                };
 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`Server status ${response.status}: ${errText}`);
-                }
-
-                const blob = await response.blob();
-                if (blob.size === 0) throw new Error("Output file PDF kosong.");
-
-                const downloadUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = downloadUrl;
-                a.download = `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-
-                setTimeout(() => {
-                    a.remove();
-                    window.URL.revokeObjectURL(downloadUrl);
-                }, 500);
-
+                // UNDUH PDF SECARA DUKUNGAN NATIVE BROWSER
+                pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
                 showToast("PDF berhasil di-download! 📥");
+
             } catch (err) {
                 console.error(err);
-                if (err.name === 'AbortError') {
-                    showToast("❌ Timeout: Ukuran laporan/foto terlalu besar untuk server!");
-                } else {
-                    showToast("❌ Gagal: " + err.message);
-                }
+                showToast("❌ Gagal membuat PDF: " + err.message);
             }
         }
     </script>
