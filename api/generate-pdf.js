@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     let browser = null;
     try {
         browser = await puppeteer.launch({
-            args: chromium.args,
+            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
             headless: chromium.headless,
@@ -24,18 +24,19 @@ export default async function handler(req, res) {
 
         const page = await browser.newPage();
 
+        // Menggunakan domcontentloaded agar loading Vercel sangat cepat
         await page.setContent(htmlContent, {
-            waitUntil: ['load', 'networkidle0'],
-            timeout: 20000
+            waitUntil: 'domcontentloaded',
+            timeout: 10000
         });
 
         const pdfBuffer = await page.pdf({
             format: 'A4',
             printBackground: true,
             margin: {
-                top: '12mm',
+                top: '10mm',
                 right: '10mm',
-                bottom: '12mm',
+                bottom: '10mm',
                 left: '10mm'
             },
             preferCSSPageSize: true
