@@ -76,22 +76,24 @@
         .badge-cosmic { background: rgba(192,38,211,0.1); border: 1px solid rgba(192,38,211,0.2); color: #d946ef; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; }
         .danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
         
-        /* FIX KERTAS DAN TABEL EKSPOR PDF */
+        /* FIX KERTAS & TABEL EKSPOR PDF */
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .area-kertas table { border-collapse: collapse !important; font-size: 11px !important; width: 100% !important; min-width: 0 !important; table-layout: fixed; }
         .area-kertas tr { page-break-inside: avoid !important; break-inside: avoid !important; }
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; page-break-inside: avoid !important; break-inside: avoid !important; }
         .area-kertas td img { page-break-inside: avoid !important; break-inside: avoid !important; display: block; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-        .block-bulan { page-break-before: always !important; break-before: page !important; }
-        .block-bulan:first-child { page-break-before: auto !important; break-before: auto !important; }
+        
+        /* PERBAIKAN: Menghilangkan spasi berlebih di awal halaman */
+        .block-bulan { page-break-before: auto !important; break-before: auto !important; padding-top: 0 !important; margin-top: 0 !important; }
+        
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
         .pdf-export-mode { box-shadow: none !important; border-radius: 0 !important; background: white !important; }
         .pdf-export-mode .table-wrapper { overflow-x: visible !important; border: none !important; box-shadow: none !important; }
         .pdf-export-mode .watermark { display: none !important; }
         
         /* FIX COVER HEADER PRINT */
-        .header-print { display: none; font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; padding-top: 20px; padding-bottom: 20px; box-sizing: border-box; page-break-after: always !important; break-after: page !important; }
+        .header-print { display: none; font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; padding-top: 10px; padding-bottom: 10px; box-sizing: border-box; page-break-after: always !important; break-after: page !important; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
         
         @media print { .no-print { display: none !important; } .watermark { display: none !important; } body { background: white !important; color: black !important; padding: 0 !important; } .area-kertas { box-shadow: none !important; padding: 0 !important; margin: 0 !important; display: block !important; } .table-wrapper { overflow-x: visible !important; } .header-print { display: block !important; } }
@@ -1005,13 +1007,12 @@
                 return;
             }
             const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
-            unikBulanFiltered.forEach((bulan, idxBulan) => {
+            unikBulanFiltered.forEach((bulan) => {
                 const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
                 if (dataBulanIni.length === 0) return;
-                const isFirst = idxBulan === 0;
                 let htmlTabel = `
-                    <div class="block-bulan ${isFirst ? '' : 'pdf-page'}" style="${isFirst ? '' : 'page-break-before: always; break-before: page;'}">
-                        <div class="mb-4 text-base font-bold text-black pt-4">
+                    <div class="block-bulan">
+                        <div class="mb-4 text-base font-bold text-black pt-2">
                             <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                         </div>
                         <div class="table-wrapper">
@@ -1129,7 +1130,7 @@
             downloadPDF(opsi);
         }
 
-        // FIX EKSPOR PDF RAPI PER HALAMAN
+        // PERBAIKAN: Fungsi Ekspor PDF dengan Margin Pas
         function downloadPDF(opsiCover) {
             const elemenAsli = document.getElementById('areaCetak');
             const koverSection = document.getElementById('koverPrintSection');
@@ -1147,14 +1148,14 @@
             elemenAsli.style.display = 'block';
 
             html2pdf().set({
-                margin: [8, 8, 8, 8],
+                margin: [10, 10, 10, 10], // Margin A4 Presisi
                 filename: `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { 
-                    mode: ['avoid-all', 'css', 'legacy'], 
-                    avoid: ['tr', 'img', '.block-bulan'] 
+                    mode: ['css', 'legacy'], 
+                    avoid: ['tr', 'img'] 
                 }
             }).from(elemenAsli).save().then(() => {
                 elemenAsli.classList.remove('pdf-export-mode');
