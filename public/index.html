@@ -425,7 +425,7 @@
                             <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                             <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
                             <h3 style="font-size: 16px; font-weight: normal; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
-                            <img id="coverLogoSekolah" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 90,25 90,75 50,95 10,75 10,25' fill='%231d4ed8' stroke='%23f59e0b' stroke-width='4'/><circle cx='50' cy='50' r='25' fill='%23ffffff'/><text x='50' y='55' font-size='12' text-anchor='middle' font-weight='bold' fill='%231e3a8a'>SMKN</text></svg>" alt="Logo Sekolah" style="width: 130px; margin: 0 auto 25px auto; display: block;">
+                            <img id="coverLogoSekolah" src="" alt="Logo Sekolah" style="width: 130px; margin: 0 auto 25px auto; display: block;">
                             <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
                             <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
                                 <tr><td style="border: none !important; text-align: left; width: 80px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
@@ -509,7 +509,9 @@
         let dataLaporan = [];
         let dataTelahBerubah = false;
         let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '' };
-        const DEFAULT_SVG_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 90,25 90,75 50,95 10,75 10,25' fill='%231d4ed8' stroke='%23f59e0b' stroke-width='4'/><circle cx='50' cy='50' r='25' fill='%23ffffff'/><text x='50' y='55' font-size='12' text-anchor='middle' font-weight='bold' fill='%231e3a8a'>SMKN</text></svg>";
+        
+        // LOGO SMKN KUDU DEFAULT BASE64 JPEG MURNI
+        const DEFAULT_LOGO_BASE64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARERER4RHGQaG2RnURNRZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2P/wAARCAA8AEADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi42Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAM0BAAAe3pKKKACmSSJFG0kjBUQFmY9AB3p9MmiSeF4pVDxupVlI4IPUUAO/zn2/Co3d1kjURlgxILAgBeCcn64/Wpdv+feopoIptgljWTawdQfXp/WgCWl/z24oooAKKKKACiiigCtf3aWVq0zjdzhVHUsc4H54qS1m+02kU4Ur5iB9ueRkdKl3LnG4Z+tIskbdJEP0IoAZNPFAoMzqilgoLHqSa/9k=";
 
         const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
@@ -702,7 +704,7 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : DEFAULT_SVG_LOGO;
+                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : DEFAULT_LOGO_BASE64;
             }
         }
 
@@ -1121,36 +1123,31 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN LAYOUT KOVER SAMA PERSIS DENGAN CONTOH GAMBAR ACUAN
+        // GENERATOR PDF DENGAN BASE64 JPEG LOKAL LENGKAP & PRESISI
         function downloadPDF(opsiCover) {
             showToast("⏳ Membuat PDF...");
 
             try {
                 const docContent = [];
 
-                // 1. DENGAN KOVER
+                // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
-                    let logoImageObj = null;
-                    if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                        logoImageObj = { image: dataProfil.logoSekolah, width: 110, alignment: 'center', margin: [0, 10, 0, 15] };
-                    } else {
-                        logoImageObj = { image: DEFAULT_SVG_LOGO, width: 110, alignment: 'center', margin: [0, 10, 0, 15] };
-                    }
+                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : DEFAULT_LOGO_BASE64;
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
-                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 6] },
-                        { text: dataProfil.alamat || 'Alamat', style: 'headerAddress', margin: [0, 0, 0, 15] },
-                        logoImageObj,
+                        { text: 'DI', style: 'headerSub', margin: [0, 8, 0, 4] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
+                        { image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 20] },
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
-                                widths: [75, 180],
+                                widths: [75, 10, 170],
                                 body: [
-                                    [{ text: 'Nama', border: [] }, { text: ': ' + (dataProfil.nama || 'LUKYY'), border: [] }],
-                                    [{ text: 'Kelas', border: [] }, { text: ': ' + (dataProfil.kelas || 'XII'), border: [] }],
-                                    [{ text: 'NIS/NISN', border: [] }, { text: ': ' + (dataProfil.nis || '/'), border: [] }]
+                                    [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
+                                    [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
+                                    [{ text: 'NIS/NISN', border: [] }, { text: ':', border: [] }, { text: dataProfil.nis || '/', border: [] }]
                                 ]
                             },
                             layout: 'noBorders',
@@ -1160,10 +1157,10 @@
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
                         {
                             table: {
-                                widths: [150, 190],
+                                widths: [150, 10, 180],
                                 body: [
-                                    [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.progKeahlian || ''), bold: true, border: [] }],
-                                    [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ': ' + (dataProfil.konsKeahlian || ''), bold: true, border: [] }]
+                                    [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.progKeahlian || '', bold: true, border: [] }],
+                                    [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.konsKeahlian || '', bold: true, border: [] }]
                                 ]
                             },
                             layout: 'noBorders',
