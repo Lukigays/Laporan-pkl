@@ -263,6 +263,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
+                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah</h4>
+                    <p class="text-xs text-slate-400 mb-3">Upload logo sekolah Anda untuk ditampilkan di cover laporan.</p>
+                    <div class="flex items-center gap-4">
+                        <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                            <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
+                            <span id="placeholderLogo" class="text-2xl">🏫</span>
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-sm" onchange="previewLogoUpload(this)">
+                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default.</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="h-px bg-white/5"></div>
                 <div class="space-y-3">
                     <h4 class="font-display font-bold text-sm text-accent-light">Backup & Restore (JSON)</h4>
@@ -415,7 +429,7 @@
                             <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                             <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
                             <h3 style="font-size: 16px; font-weight: normal; text-decoration: underline; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
-                            <img src="https://i.ibb.co.com/spQKNfpB/20250929-290adac27bfcf58.webp" alt="Logo SMK" style="width: 130px; margin: 0 auto 25px auto; display: block;">
+                            <img id="coverLogoSekolah" src="https://i.ibb.co.com/spQKNfpB/20250929-290adac27bfcf58.webp" alt="Logo Sekolah" style="width: 130px; margin: 0 auto 25px auto; display: block;">
                             <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
                             <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
                                 <tr><td style="border: none !important; text-align: left; width: 80px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
@@ -501,7 +515,7 @@
         // ================= DATA & STATE =================
         let dataLaporan = [];
         let dataTelahBerubah = false;
-        let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...' };
+        let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '' };
         const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
         let supabaseClient = null;
@@ -680,6 +694,7 @@
                 if (profil) dataProfil = { ...dataProfil, ...profil };
             } catch (err) { console.error(err); }
             renderProfil();
+            renderLogoPreview();
         }
 
         function renderProfil() {
@@ -690,6 +705,10 @@
             document.getElementById('coverProgKeahlian').textContent = dataProfil.progKeahlian || '';
             document.getElementById('coverKonsKeahlian').textContent = dataProfil.konsKeahlian || '';
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
+            const logoEl = document.getElementById('coverLogoSekolah');
+            if (logoEl && dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                logoEl.src = dataProfil.logoSekolah;
+            }
         }
 
         function bukaSettings() {
@@ -700,6 +719,8 @@
             document.getElementById('setProgKeahlian').value = dataProfil.progKeahlian || '';
             document.getElementById('setKonsKeahlian').value = dataProfil.konsKeahlian || '';
             document.getElementById('setTahun').value = dataProfil.tahun || '';
+            document.getElementById('inputLogoSekolah').value = '';
+            renderLogoPreview();
             const modal = document.getElementById('modalSettings');
             modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
@@ -722,6 +743,45 @@
             renderProfil();
             tutupSettings();
             showToast('Profil berhasil diperbarui! ✅');
+        }
+
+        function renderLogoPreview() {
+            const img = document.getElementById('previewLogoSekolah');
+            const placeholder = document.getElementById('placeholderLogo');
+            if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                img.src = dataProfil.logoSekolah;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        async function previewLogoUpload(input) {
+            if (input.files && input.files[0]) {
+                showToast('⏳ Memproses logo...');
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const img = new Image();
+                    img.onload = async function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 300;
+                        let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        dataProfil.logoSekolah = canvas.toDataURL('image/jpeg', 0.8);
+                        renderLogoPreview();
+                        renderProfil();
+                        await localforage.setItem('profilPKL', dataProfil);
+                        showToast('Logo berhasil diupload! ✅');
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         window.onload = async function() {
@@ -1005,6 +1065,7 @@
                         dataProfil = { ...dataProfil, ...parsed.profil };
                         await localforage.setItem('profilPKL', dataProfil);
                         renderProfil();
+                        renderLogoPreview();
                     }
                     dataTelahBerubah = true;
                     renderSemuaData();
