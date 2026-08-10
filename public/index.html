@@ -505,42 +505,42 @@
         }
         animateParticles();
 
-        // LOGO DEFAULT SMKN KUDU (TETAP TANPA BERGANTUNG FETCH/NETWORK)
-        function generateDefaultLogoBase64() {
+        // LOGO SMKN KUDU OTOMATIS GENERATOR DENGAN CANVAS (100% PASTI TAMPIL TANPA CORS)
+        function buatLogoSmknKuduPNG() {
             const cvs = document.createElement('canvas');
-            cvs.width = 200; cvs.height = 200;
+            cvs.width = 250; cvs.height = 250;
             const c = cvs.getContext('2d');
             
-            // Lingkaran Luar Biru
+            // Outer Ring Blue
             c.fillStyle = '#1e3a8a';
             c.beginPath();
-            c.arc(100, 100, 90, 0, Math.PI * 2);
+            c.arc(125, 125, 110, 0, Math.PI * 2);
             c.fill();
 
-            // Lingkaran Emas
-            c.strokeStyle = '#f59e0b';
-            c.lineWidth = 6;
+            // Gold Border
+            c.strokeStyle = '#d97706';
+            c.lineWidth = 8;
             c.beginPath();
-            c.arc(100, 100, 82, 0, Math.PI * 2);
+            c.arc(125, 125, 100, 0, Math.PI * 2);
             c.stroke();
 
-            // Lingkaran Dalam Putih
+            // Inner Circle White
             c.fillStyle = '#ffffff';
             c.beginPath();
-            c.arc(100, 100, 70, 0, Math.PI * 2);
+            c.arc(125, 125, 92, 0, Math.PI * 2);
             c.fill();
 
-            // Teks SMKN KUDU
+            // Text SMKN KUDU
             c.fillStyle = '#1e3a8a';
-            c.font = 'bold 22px Arial';
+            c.font = 'bold 28px Arial';
             c.textAlign = 'center';
-            c.fillText('SMKN', 100, 90);
-            c.fillText('KUDU', 100, 118);
+            c.fillText('SMKN', 125, 115);
+            c.fillText('KUDU', 125, 150);
 
             return cvs.toDataURL('image/png');
         }
 
-        const LOGO_DEFAULT = generateDefaultLogoBase64();
+        const LOGO_DEFAULT_PNG = buatLogoSmknKuduPNG();
 
         // ================= DATA & STATE =================
         let dataLaporan = [];
@@ -738,7 +738,7 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT;
+                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT_PNG;
             }
         }
 
@@ -786,7 +786,7 @@
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.remove('hidden');
             } else {
-                img.src = LOGO_DEFAULT;
+                img.src = LOGO_DEFAULT_PNG;
                 img.classList.remove('hidden');
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.add('hidden');
@@ -1158,16 +1158,16 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN LOGO INSTAN MURNI
+        // GENERATOR PDF DENGAN LOGO BASE64 LOKAL PASTI MUNCUL
         function downloadPDF(opsiCover) {
-            showToast("⏳ Memuat aset & membuat PDF...");
+            showToast("⏳ Membuat PDF...");
 
             try {
                 const docContent = [];
 
                 // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
-                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT;
+                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT_PNG;
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
