@@ -83,12 +83,16 @@
         .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .area-kertas table { border-collapse: collapse !important; font-size: 11px !important; width: 100% !important; min-width: 0 !important; table-layout: fixed; }
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
-        .area-kertas td img { display: block; margin: 0 auto; max-height: 80px; max-width: 100%; object-fit: contain; }
+        .area-kertas td img { display: block; margin: 0 auto; max-height: 75px; max-width: 100%; object-fit: contain; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
         .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
         
+        /* CONTAINER LOGO KOVER DIPASTIKAN UTUH TANPA TERPOTONG */
+        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 15px 0 25px 0; }
+        .logo-kover-container img { width: auto; height: auto; max-width: 140px; max-height: 140px; object-fit: contain; display: block; }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
@@ -265,12 +269,12 @@
                     <div class="space-y-3 mb-4">
                         <div>
                             <label class="block text-xs font-semibold mb-1 text-slate-400">URL Gambar (Catbox/Direct Link PNG)</label>
-                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/xxxxxx.png">
+                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/9h9bfe.png">
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                        <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
                             <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
                             <span id="placeholderLogo" class="text-2xl">🏫</span>
                         </div>
@@ -433,7 +437,12 @@
                             <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                             <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
                             <h3 style="font-size: 16px; font-weight: normal; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
-                            <img id="coverLogoSekolah" src="" alt="Logo Sekolah" style="max-height: 120px; max-width: 150px; margin: 0 auto 25px auto; display: block; object-fit: contain;">
+                            
+                            <!-- CONTAINER LOGO TERPISAH YANG DI-FIX CSS-NYA -->
+                            <div class="logo-kover-container">
+                                <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
+                            </div>
+
                             <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
                             <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
                                 <tr><td style="border: none !important; text-align: left; width: 80px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
@@ -513,7 +522,7 @@
         }
         animateParticles();
 
-        // LOGO DEFAULT SMKN KUDU
+        // LOGO DEFAULT SMKN KUDU (CANVAS RINGAN RES 250x250)
         function buatLogoSmknKuduPNG() {
             const cvs = document.createElement('canvas');
             cvs.width = 250; cvs.height = 250;
@@ -908,7 +917,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= SIMPAN DATA BARU (OPTIMASI KOMPRESI ULTIMATE) =================
+        // ================= SIMPAN DATA BARU (SUPER RINGAN PDF) =================
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -926,15 +935,14 @@
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        // KOMPRESI TINGGI: MAKSIMAL PANJANG 220PX UNTUK MENGHEMAT UKURAN FILE PDF
-                        const MAX_WIDTH = 220;
+                        // DIMENSI DILIMIT BILA DIBAWAH 200PX DENGAN COMPRESSION HIGH KUALITAS 0.3
+                        const MAX_WIDTH = 200;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        // KUALITAS JPEG 0.35 CUKUP UNTUK DOKUMEN LAPORAN RINGAN
-                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.35);
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.3);
                         await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                     }
                     img.src = e.target.result;
@@ -998,13 +1006,13 @@
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 220;
+                        const MAX_WIDTH = 200;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.35);
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.3);
                         finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                     }
                     img.src = e.target.result;
@@ -1208,14 +1216,13 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN DESAIN LOGO & FOTO YANG PROPORSIONAL DAN FILE RINGAN
+        // GENERATOR PDF DENGAN LOGO PROPORSIONAL & RINGAN
         async function downloadPDF(opsiCover) {
-            showToast("⏳ Membuat PDF ringan...");
+            showToast("⏳ Memuat aset & membuat PDF...");
 
             try {
                 const docContent = [];
 
-                // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
                     let logoRaw = LOGO_DEFAULT_PNG;
 
@@ -1233,8 +1240,8 @@
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
                         { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 4] },
                         { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
-                        // FIT PROPORSIONAL LOGO AGAR TIDAK GEPENG (MAKS MAX 120x120)
-                        { image: logoBase64, fit: [120, 120], alignment: 'center', margin: [0, 0, 0, 25] },
+                        // PENGATURAN FIT AGAR LOGO SEGI ENAM / BULET BISA DITAMPILKAN SECARA UTUH
+                        { image: logoBase64, fit: [140, 140], alignment: 'center', margin: [0, 0, 0, 25] },
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
@@ -1266,7 +1273,6 @@
                     );
                 }
 
-                // 2. TAMPILAN PER BULAN & BEDA HALAMAN SETIAP BULAN
                 const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
 
                 unikBulan.forEach((bulan, bIdx) => {
@@ -1297,8 +1303,7 @@
                     dataBulanIni.forEach((item, idx) => {
                         let fotoCell = { text: '-', alignment: 'center' };
                         if (item.foto && item.foto.trim() !== '') {
-                            // FIT PROPORSIONAL FOTO BUKTI TANPA MERUSAK ASPECT RATIO
-                            fotoCell = { image: item.foto, fit: [60, 60], alignment: 'center' };
+                            fotoCell = { image: item.foto, fit: [55, 55], alignment: 'center' };
                         }
 
                         tableBody.push([
@@ -1339,7 +1344,6 @@
                     }
                 };
 
-                // PEMICU PDF
                 pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
                 showToast("PDF berhasil diunduh! 📥");
 
