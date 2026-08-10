@@ -268,7 +268,7 @@
                         </div>
                         <div class="flex-1">
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-sm" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default dari GitHub.</p>
+                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default SMKN Kudu.</p>
                         </div>
                         <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
@@ -505,26 +505,42 @@
         }
         animateParticles();
 
-        // 🔗 URL GAMBAR LOGO RAW DARI GITHUB
-        // Kamu bisa mengganti URL di bawah ini dengan link RAW foto milikmu di GitHub
-        const GITHUB_LOGO_URL = "https://raw.githubusercontent.com/Lukigays/Laporan-pkl/main/logosmknkudu.png";
+        // LOGO DEFAULT SMKN KUDU (TETAP TANPA BERGANTUNG FETCH/NETWORK)
+        function generateDefaultLogoBase64() {
+            const cvs = document.createElement('canvas');
+            cvs.width = 200; cvs.height = 200;
+            const c = cvs.getContext('2d');
+            
+            // Lingkaran Luar Biru
+            c.fillStyle = '#1e3a8a';
+            c.beginPath();
+            c.arc(100, 100, 90, 0, Math.PI * 2);
+            c.fill();
 
-        // MENGONVERSI URL GAMBAR GITHUB MENJADI BASE64 UNTUK PDFMAKE
-        async function getBase64FromUrl(url) {
-            try {
-                const res = await fetch(url);
-                const blob = await res.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                });
-            } catch (e) {
-                console.warn("Gagal memuat logo dari GitHub:", e);
-                return null;
-            }
+            // Lingkaran Emas
+            c.strokeStyle = '#f59e0b';
+            c.lineWidth = 6;
+            c.beginPath();
+            c.arc(100, 100, 82, 0, Math.PI * 2);
+            c.stroke();
+
+            // Lingkaran Dalam Putih
+            c.fillStyle = '#ffffff';
+            c.beginPath();
+            c.arc(100, 100, 70, 0, Math.PI * 2);
+            c.fill();
+
+            // Teks SMKN KUDU
+            c.fillStyle = '#1e3a8a';
+            c.font = 'bold 22px Arial';
+            c.textAlign = 'center';
+            c.fillText('SMKN', 100, 90);
+            c.fillText('KUDU', 100, 118);
+
+            return cvs.toDataURL('image/png');
         }
+
+        const LOGO_DEFAULT = generateDefaultLogoBase64();
 
         // ================= DATA & STATE =================
         let dataLaporan = [];
@@ -722,7 +738,7 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : GITHUB_LOGO_URL;
+                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT;
             }
         }
 
@@ -770,7 +786,7 @@
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.remove('hidden');
             } else {
-                img.src = GITHUB_LOGO_URL;
+                img.src = LOGO_DEFAULT;
                 img.classList.remove('hidden');
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.add('hidden');
@@ -782,7 +798,7 @@
             await localforage.setItem('profilPKL', dataProfil);
             renderLogoPreview();
             renderProfil();
-            showToast('Logo diubah ke default GitHub! 🏫');
+            showToast('Logo diubah ke default SMKN Kudu! 🏫');
         }
 
         async function previewLogoUpload(input) {
@@ -1142,8 +1158,8 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN LOGO DARI GITHUB / CUSTOM BASE64
-        async function downloadPDF(opsiCover) {
+        // GENERATOR PDF DENGAN LOGO INSTAN MURNI
+        function downloadPDF(opsiCover) {
             showToast("⏳ Memuat aset & membuat PDF...");
 
             try {
@@ -1151,28 +1167,14 @@
 
                 // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
-                    let logoBase64 = null;
-
-                    if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                        logoBase64 = dataProfil.logoSekolah;
-                    } else {
-                        logoBase64 = await getBase64FromUrl(GITHUB_LOGO_URL);
-                    }
+                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT;
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
                         { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] }
-                    );
-
-                    if (logoBase64) {
-                        docContent.push({ image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 25] });
-                    } else {
-                        docContent.push({ text: '\n[ LOGO SEKOLAH ]\n\n', alignment: 'center', fontSize: 10, margin: [0, 0, 0, 15] });
-                    }
-
-                    docContent.push(
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
+                        { image: logoBase64, width: 110, alignment: 'center', margin: [0, 0, 0, 25] },
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
