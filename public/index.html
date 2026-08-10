@@ -505,13 +505,40 @@
         }
         animateParticles();
 
+        // GENERATOR LOGO SMKN KUDU OTOMATIS (PNG BASE64 100% VALID UNTUK PDFMAKE)
+        function buatLogoDefaultPNG() {
+            const cvs = document.createElement('canvas');
+            cvs.width = 200; cvs.height = 200;
+            const c = cvs.getContext('2d');
+            
+            // Roda Gigi Biru
+            c.fillStyle = '#1d4ed8';
+            c.beginPath();
+            c.arc(100, 100, 80, 0, Math.PI * 2);
+            c.fill();
+
+            // Lingkaran Putih Tengah
+            c.fillStyle = '#ffffff';
+            c.beginPath();
+            c.arc(100, 100, 50, 0, Math.PI * 2);
+            c.fill();
+
+            // Teks SMKN KUDU
+            c.fillStyle = '#1e3a8a';
+            c.font = 'bold 22px Arial';
+            c.textAlign = 'center';
+            c.fillText('SMKN', 100, 95);
+            c.fillText('KUDU', 100, 120);
+
+            return cvs.toDataURL('image/png');
+        }
+
+        const DEFAULT_LOGO_BASE64 = buatLogoDefaultPNG();
+
         // ================= DATA & STATE =================
         let dataLaporan = [];
         let dataTelahBerubah = false;
         let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '' };
-        
-        // LOGO SMKN KUDU DEFAULT BASE64 JPEG MURNI
-        const DEFAULT_LOGO_BASE64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARERER4RHGQaG2RnURNRZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2RnZ2P/wAARCAA8AEADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi42Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAM0BAAAe3pKKKACmSSJFG0kjBUQFmY9AB3p9MmiSeF4pVDxupVlI4IPUUAO/zn2/Co3d1kjURlgxILAgBeCcn64/Wpdv+feopoIptgljWTawdQfXp/WgCWl/z24oooAKKKKACiiigCtf3aWVq0zjdzhVHUsc4H54qS1m+02kU4Ur5iB9ueRkdKl3LnG4Z+tIskbdJEP0IoAZNPFAoMzqilgoLHqSa/9k=";
 
         const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
@@ -1123,7 +1150,7 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN BASE64 JPEG LOKAL LENGKAP & PRESISI
+        // GENERATOR PDF TERUBAH DENGAN PENATAAN KOVER TERTATA DAN LOGO PASTI MUNCUL
         function downloadPDF(opsiCover) {
             showToast("⏳ Membuat PDF...");
 
@@ -1137,9 +1164,9 @@
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
-                        { text: 'DI', style: 'headerSub', margin: [0, 8, 0, 4] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 4] },
                         { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
-                        { image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 20] },
+                        { image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 25] },
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
@@ -1243,7 +1270,7 @@
                     }
                 };
 
-                // PEMICU UTAMA HP
+                // PEMICU UTAMA PDF
                 pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
                 showToast("PDF berhasil diunduh! 📥");
 
