@@ -85,13 +85,12 @@
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
         .area-kertas td img { display: block; margin: 0 auto; max-height: 75px; max-width: 100%; object-fit: contain; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-        .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; }
+        .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; min-height: 980px; display: flex; flex-direction: column; justify-content: space-between; padding-top: 10px; padding-bottom: 20px; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
         
-        /* CONTAINER LOGO KOVER DIPASTIKAN UTUH TANPA TERPOTONG */
-        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 15px 0 25px 0; }
-        .logo-kover-container img { width: auto; height: auto; max-width: 140px; max-height: 140px; object-fit: contain; display: block; }
+        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 30px 0; }
+        .logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -269,7 +268,7 @@
                     <div class="space-y-3 mb-4">
                         <div>
                             <label class="block text-xs font-semibold mb-1 text-slate-400">URL Gambar (Catbox/Direct Link PNG)</label>
-                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/9h9bfe.png">
+                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/xxxxxx.png">
                         </div>
                     </div>
 
@@ -433,29 +432,32 @@
                     <div class="watermark">LAPORAN PKL BY LUKYY</div>
                     <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
                         <div class="header-print" id="koverPrintSection">
-                            <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
-                            <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
-                            <p style="margin: 15px 0; font-size: 16px; font-weight: bold;">DI</p>
-                            <h3 style="font-size: 16px; font-weight: normal; margin-bottom: 25px;" id="coverAlamat">Alamat Tempat PKL</h3>
-                            
-                            <!-- CONTAINER LOGO TERPISAH YANG DI-FIX CSS-NYA -->
-                            <div class="logo-kover-container">
-                                <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
+                            <div>
+                                <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
+                                <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                                <p style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold;">DI</p>
+                                <h3 style="font-size: 16px; font-weight: normal;" id="coverAlamat">Alamat Tempat PKL</h3>
+                                
+                                <div class="logo-kover-container">
+                                    <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
+                                </div>
+
+                                <p style="font-size: 16px; margin-bottom: 12px;">Disusun Oleh:</p>
+                                <table style="border: none !important; margin: 0 auto; width: 320px; font-size: 15px;">
+                                    <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
+                                    <tr><td style="border: none !important; text-align: left; padding: 2px !important;">Kelas</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverKelas">XII</span></td></tr>
+                                    <tr><td style="border: none !important; text-align: left; padding: 2px !important;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
+                                </table>
                             </div>
 
-                            <p style="font-size: 16px; margin-bottom: 10px;">Disusun Oleh:</p>
-                            <table style="border: none !important; margin: 10px auto; width: 300px; font-size: 15px;">
-                                <tr><td style="border: none !important; text-align: left; width: 80px;">Nama</td><td style="border: none !important; text-align: left;">: <span id="coverNama">LUKYY</span></td></tr>
-                                <tr><td style="border: none !important; text-align: left;">Kelas</td><td style="border: none !important; text-align: left;">: <span id="coverKelas">XII</span></td></tr>
-                                <tr><td style="border: none !important; text-align: left;">NIS/NISN</td><td style="border: none !important; text-align: left;">: <span id="coverNis">/</span></td></tr>
-                            </table>
-                            <br><br>
-                            <h3 style="font-size: 17px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
-                            <table style="border: none !important; margin: 15px auto; width: 400px; font-size: 15px;">
-                                <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 220px;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold;">: <span id="coverProgKeahlian"></span></td></tr>
-                                <tr><td style="border: none !important; text-align: left; font-weight: bold;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold;">: <span id="coverKonsKeahlian"></span></td></tr>
-                            </table>
-                            <h4 style="font-size: 16px; margin-top: 30px;">TAHUN <span id="coverTahun">2026...</span></h4>
+                            <div>
+                                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                                <table style="border: none !important; margin: 0 auto 20px auto; width: 440px; font-size: 14px;">
+                                    <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 230px; padding: 2px !important;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverProgKeahlian"></span></td></tr>
+                                    <tr><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
+                                </table>
+                                <h4 style="font-size: 16px; font-weight: bold; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
+                            </div>
                         </div>
                         <div id="wadahTabelBulan"></div>
                     </div>
@@ -522,7 +524,7 @@
         }
         animateParticles();
 
-        // LOGO DEFAULT SMKN KUDU (CANVAS RINGAN RES 250x250)
+        // LOGO DEFAULT SMKN KUDU
         function buatLogoSmknKuduPNG() {
             const cvs = document.createElement('canvas');
             cvs.width = 250; cvs.height = 250;
@@ -917,7 +919,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= SIMPAN DATA BARU (SUPER RINGAN PDF) =================
+        // ================= SIMPAN DATA BARU =================
         async function tambahBaris() {
             const tanggalInput = document.getElementById('inputTanggal').value;
             const uraian = document.getElementById('inputUraian').value;
@@ -935,7 +937,6 @@
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        // DIMENSI DILIMIT BILA DIBAWAH 200PX DENGAN COMPRESSION HIGH KUALITAS 0.3
                         const MAX_WIDTH = 200;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
@@ -1216,9 +1217,9 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN LOGO PROPORSIONAL & RINGAN
+        // GENERATOR PDF DENGAN KOVER RAPI SESUAI RUJUKAN FOTO 2
         async function downloadPDF(opsiCover) {
-            showToast("⏳ Memuat aset & membuat PDF...");
+            showToast("⏳ Membuat PDF...");
 
             try {
                 const docContent = [];
@@ -1238,14 +1239,16 @@
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
-                        { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
-                        // PENGATURAN FIT AGAR LOGO SEGI ENAM / BULET BISA DITAMPILKAN SECARA UTUH
-                        { image: logoBase64, fit: [140, 140], alignment: 'center', margin: [0, 0, 0, 25] },
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 15, 0, 4] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 30] },
+                        
+                        // LOGO KOVER
+                        { image: logoBase64, fit: [150, 150], alignment: 'center', margin: [0, 0, 0, 35] },
+                        
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 15] },
                         {
                             table: {
-                                widths: [75, 10, 170],
+                                widths: [80, 10, 180],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
@@ -1254,12 +1257,13 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 0, 0, 30]
+                            margin: [0, 0, 0, 140] // SPACER AGAR NAMA TAHUN DAN SEKOLAH TURUN KE BAGIAN BAWAH A4
                         },
+                        
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
                         {
                             table: {
-                                widths: [150, 10, 180],
+                                widths: [160, 10, 200],
                                 body: [
                                     [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.progKeahlian || '', bold: true, border: [] }],
                                     [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.konsKeahlian || '', bold: true, border: [] }]
@@ -1267,7 +1271,7 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 6, 0, 30]
+                            margin: [0, 6, 0, 12]
                         },
                         { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', pageBreak: 'after' }
                     );
