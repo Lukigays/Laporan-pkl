@@ -85,11 +85,12 @@
         .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
         .area-kertas td img { display: block; margin: 0 auto; max-height: 75px; max-width: 100%; object-fit: contain; }
         .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-        .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; min-height: 980px; display: flex; flex-direction: column; justify-content: space-between; padding-top: 10px; padding-bottom: 20px; }
+        
+        .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; min-height: 1000px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; box-sizing: border-box; }
         .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
         
-        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 30px 0; }
+        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 35px 0; }
         .logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -262,13 +263,13 @@
                     </div>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
-                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah (Catbox / Direct Link / Upload)</h4>
-                    <p class="text-xs text-slate-400 mb-3">Masukkan link gambar Catbox / Direct PNG Transparan atau upload gambar langsung.</p>
+                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah (Postimages / Direct Link / Upload File)</h4>
+                    <p class="text-xs text-slate-400 mb-3">Upload dari galeri HP atau tempel URL Direct Link PNG (Postimages/ImgBB).</p>
                     
                     <div class="space-y-3 mb-4">
                         <div>
-                            <label class="block text-xs font-semibold mb-1 text-slate-400">URL Gambar (Catbox/Direct Link PNG)</label>
-                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/xxxxxx.png">
+                            <label class="block text-xs font-semibold mb-1 text-slate-400">Direct Link URL (Postimages / ImgBB)</label>
+                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://i.postimg.cc/xxxx/logo.png">
                         </div>
                     </div>
 
@@ -279,7 +280,7 @@
                         </div>
                         <div class="flex-1">
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-xs" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Atau pilih file dari galeri HP.</p>
+                            <p class="text-xs text-slate-500 mt-1">*Atau pilih file foto dari galeri HP.</p>
                         </div>
                         <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
@@ -524,33 +525,6 @@
         }
         animateParticles();
 
-        // LOGO DEFAULT SMKN KUDU
-        function buatLogoSmknKuduPNG() {
-            const cvs = document.createElement('canvas');
-            cvs.width = 250; cvs.height = 250;
-            const c = cvs.getContext('2d');
-            
-            c.fillStyle = '#1e3a8a';
-            c.beginPath(); c.arc(125, 125, 110, 0, Math.PI * 2); c.fill();
-
-            c.strokeStyle = '#d97706';
-            c.lineWidth = 8;
-            c.beginPath(); c.arc(125, 125, 100, 0, Math.PI * 2); c.stroke();
-
-            c.fillStyle = '#ffffff';
-            c.beginPath(); c.arc(125, 125, 92, 0, Math.PI * 2); c.fill();
-
-            c.fillStyle = '#1e3a8a';
-            c.font = 'bold 28px Arial';
-            c.textAlign = 'center';
-            c.fillText('SMKN', 125, 115);
-            c.fillText('KUDU', 125, 150);
-
-            return cvs.toDataURL('image/png');
-        }
-
-        const LOGO_DEFAULT_PNG = buatLogoSmknKuduPNG();
-
         function konversiUrlGambarKeBase64(url) {
             return new Promise((resolve) => {
                 if (!url || url.startsWith('data:image')) {
@@ -771,13 +745,18 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                let logoSrc = LOGO_DEFAULT_PNG;
+                let logoSrc = '';
                 if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
                     logoSrc = dataProfil.logoCatboxUrl;
                 } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
                     logoSrc = dataProfil.logoSekolah;
                 }
-                logoEl.src = logoSrc;
+                if (logoSrc !== '') {
+                    logoEl.src = logoSrc;
+                    logoEl.parentElement.style.display = 'flex';
+                } else {
+                    logoEl.parentElement.style.display = 'none';
+                }
             }
         }
 
@@ -841,9 +820,8 @@
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.remove('hidden');
             } else {
-                img.src = LOGO_DEFAULT_PNG;
-                img.classList.remove('hidden');
-                placeholder.classList.add('hidden');
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
                 if (btnHapus) btnHapus.classList.add('hidden');
             }
         }
@@ -855,18 +833,18 @@
             await localforage.setItem('profilPKL', dataProfil);
             renderLogoPreview();
             renderProfil();
-            showToast('Logo diubah ke default SMKN Kudu! 🏫');
+            showToast('Logo berhasil dihapus! 🗑️');
         }
 
         async function previewLogoUpload(input) {
             if (input.files && input.files[0]) {
-                showToast('⏳ Memproses logo PNG...');
+                showToast('⏳ Memproses logo...');
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 250;
+                        const MAX_WIDTH = 300;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
@@ -1217,7 +1195,7 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN KOVER RAPI SESUAI RUJUKAN FOTO 2
+        // GENERATOR PDF DENGAN DESAIN BESARAN A4 DAN TAHUN PRESISI DI BAWAH
         async function downloadPDF(opsiCover) {
             showToast("⏳ Membuat PDF...");
 
@@ -1225,26 +1203,32 @@
                 const docContent = [];
 
                 if (opsiCover === 'dengan') {
-                    let logoRaw = LOGO_DEFAULT_PNG;
-
+                    let logoRaw = '';
                     if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
                         logoRaw = dataProfil.logoCatboxUrl;
                     } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
                         logoRaw = dataProfil.logoSekolah;
                     }
 
-                    let logoBase64 = await konversiUrlGambarKeBase64(logoRaw);
-                    if (!logoBase64) logoBase64 = LOGO_DEFAULT_PNG;
+                    let logoBase64 = null;
+                    if (logoRaw !== '') {
+                        logoBase64 = await konversiUrlGambarKeBase64(logoRaw);
+                    }
 
-                    docContent.push(
+                    const coverStack = [
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
                         { text: 'DI', style: 'headerSub', margin: [0, 15, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 30] },
-                        
-                        // LOGO KOVER
-                        { image: logoBase64, fit: [150, 150], alignment: 'center', margin: [0, 0, 0, 35] },
-                        
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 25] }
+                    ];
+
+                    if (logoBase64) {
+                        coverStack.push({ image: logoBase64, fit: [150, 150], alignment: 'center', margin: [0, 0, 0, 30] });
+                    } else {
+                        coverStack.push({ text: '', margin: [0, 0, 0, 80] });
+                    }
+
+                    coverStack.push(
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 15] },
                         {
                             table: {
@@ -1257,9 +1241,8 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 0, 0, 140] // SPACER AGAR NAMA TAHUN DAN SEKOLAH TURUN KE BAGIAN BAWAH A4
+                            margin: [0, 0, 0, 150] // PUSHER SPACING AGAR NAMA TAHUN DAN SEKOLAH TEPAT DI DASAR A4
                         },
-                        
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool' },
                         {
                             table: {
@@ -1271,10 +1254,12 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 6, 0, 12]
+                            margin: [0, 6, 0, 15]
                         },
                         { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', pageBreak: 'after' }
                     );
+
+                    docContent.push(...coverStack);
                 }
 
                 const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
