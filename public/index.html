@@ -268,7 +268,7 @@
                         </div>
                         <div class="flex-1">
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-sm" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default SMKN Kudu.</p>
+                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default dari GitHub.</p>
                         </div>
                         <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
@@ -505,35 +505,26 @@
         }
         animateParticles();
 
-        // GENERATOR LOGO SMKN KUDU OTOMATIS (PNG BASE64 100% VALID UNTUK PDFMAKE)
-        function buatLogoDefaultPNG() {
-            const cvs = document.createElement('canvas');
-            cvs.width = 200; cvs.height = 200;
-            const c = cvs.getContext('2d');
-            
-            // Roda Gigi Biru
-            c.fillStyle = '#1d4ed8';
-            c.beginPath();
-            c.arc(100, 100, 80, 0, Math.PI * 2);
-            c.fill();
+        // 🔗 URL GAMBAR LOGO RAW DARI GITHUB
+        // Kamu bisa mengganti URL di bawah ini dengan link RAW foto milikmu di GitHub
+        const GITHUB_LOGO_URL = "https://raw.githubusercontent.com/LUKYY/laporan-pkl/main/logo.png";
 
-            // Lingkaran Putih Tengah
-            c.fillStyle = '#ffffff';
-            c.beginPath();
-            c.arc(100, 100, 50, 0, Math.PI * 2);
-            c.fill();
-
-            // Teks SMKN KUDU
-            c.fillStyle = '#1e3a8a';
-            c.font = 'bold 22px Arial';
-            c.textAlign = 'center';
-            c.fillText('SMKN', 100, 95);
-            c.fillText('KUDU', 100, 120);
-
-            return cvs.toDataURL('image/png');
+        // MENGONVERSI URL GAMBAR GITHUB MENJADI BASE64 UNTUK PDFMAKE
+        async function getBase64FromUrl(url) {
+            try {
+                const res = await fetch(url);
+                const blob = await res.blob();
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                console.warn("Gagal memuat logo dari GitHub:", e);
+                return null;
+            }
         }
-
-        const DEFAULT_LOGO_BASE64 = buatLogoDefaultPNG();
 
         // ================= DATA & STATE =================
         let dataLaporan = [];
@@ -731,7 +722,7 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : DEFAULT_LOGO_BASE64;
+                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : GITHUB_LOGO_URL;
             }
         }
 
@@ -779,8 +770,9 @@
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.remove('hidden');
             } else {
-                img.classList.add('hidden');
-                placeholder.classList.remove('hidden');
+                img.src = GITHUB_LOGO_URL;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.add('hidden');
             }
         }
@@ -790,7 +782,7 @@
             await localforage.setItem('profilPKL', dataProfil);
             renderLogoPreview();
             renderProfil();
-            showToast('Logo diubah ke default SMKN Kudu! 🏫');
+            showToast('Logo diubah ke default GitHub! 🏫');
         }
 
         async function previewLogoUpload(input) {
@@ -1150,23 +1142,37 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF TERUBAH DENGAN PENATAAN KOVER TERTATA DAN LOGO PASTI MUNCUL
-        function downloadPDF(opsiCover) {
-            showToast("⏳ Membuat PDF...");
+        // GENERATOR PDF DENGAN LOGO DARI GITHUB / CUSTOM BASE64
+        async function downloadPDF(opsiCover) {
+            showToast("⏳ Memuat aset & membuat PDF...");
 
             try {
                 const docContent = [];
 
                 // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
-                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : DEFAULT_LOGO_BASE64;
+                    let logoBase64 = null;
+
+                    if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                        logoBase64 = dataProfil.logoSekolah;
+                    } else {
+                        logoBase64 = await getBase64FromUrl(GITHUB_LOGO_URL);
+                    }
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
                         { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle' },
                         { text: 'DI', style: 'headerSub', margin: [0, 10, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] },
-                        { image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 25] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 20] }
+                    );
+
+                    if (logoBase64) {
+                        docContent.push({ image: logoBase64, width: 120, alignment: 'center', margin: [0, 0, 0, 25] });
+                    } else {
+                        docContent.push({ text: '\n[ LOGO SEKOLAH ]\n\n', alignment: 'center', fontSize: 10, margin: [0, 0, 0, 15] });
+                    }
+
+                    docContent.push(
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
