@@ -259,16 +259,24 @@
                     </div>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
-                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah</h4>
-                    <p class="text-xs text-slate-400 mb-3">Upload logo sekolah Anda untuk ditampilkan di cover laporan.</p>
+                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah (Catbox / Direct Link / Upload)</h4>
+                    <p class="text-xs text-slate-400 mb-3">Masukkan link gambar Catbox / Imgur (PNG Transparan) atau upload gambar secara manual.</p>
+                    
+                    <div class="space-y-3 mb-4">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-slate-400">URL Gambar (Catbox/Direct Link PNG)</label>
+                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://files.catbox.moe/9h9bfe.png">
+                        </div>
+                    </div>
+
                     <div class="flex items-center gap-4">
                         <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                             <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
                             <span id="placeholderLogo" class="text-2xl">🏫</span>
                         </div>
                         <div class="flex-1">
-                            <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-sm" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Kosongkan jika ingin menggunakan logo default SMKN Kudu.</p>
+                            <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-xs" onchange="previewLogoUpload(this)">
+                            <p class="text-xs text-slate-500 mt-1">*Atau pilih file dari galeri HP.</p>
                         </div>
                         <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
@@ -505,32 +513,22 @@
         }
         animateParticles();
 
-        // LOGO SMKN KUDU OTOMATIS GENERATOR DENGAN CANVAS (100% PASTI TAMPIL TANPA CORS)
+        // LOGO SMKN KUDU DEFAULT GENERATOR (PNG TRANS)
         function buatLogoSmknKuduPNG() {
             const cvs = document.createElement('canvas');
             cvs.width = 250; cvs.height = 250;
             const c = cvs.getContext('2d');
             
-            // Outer Ring Blue
             c.fillStyle = '#1e3a8a';
-            c.beginPath();
-            c.arc(125, 125, 110, 0, Math.PI * 2);
-            c.fill();
+            c.beginPath(); c.arc(125, 125, 110, 0, Math.PI * 2); c.fill();
 
-            // Gold Border
             c.strokeStyle = '#d97706';
             c.lineWidth = 8;
-            c.beginPath();
-            c.arc(125, 125, 100, 0, Math.PI * 2);
-            c.stroke();
+            c.beginPath(); c.arc(125, 125, 100, 0, Math.PI * 2); c.stroke();
 
-            // Inner Circle White
             c.fillStyle = '#ffffff';
-            c.beginPath();
-            c.arc(125, 125, 92, 0, Math.PI * 2);
-            c.fill();
+            c.beginPath(); c.arc(125, 125, 92, 0, Math.PI * 2); c.fill();
 
-            // Text SMKN KUDU
             c.fillStyle = '#1e3a8a';
             c.font = 'bold 28px Arial';
             c.textAlign = 'center';
@@ -542,10 +540,35 @@
 
         const LOGO_DEFAULT_PNG = buatLogoSmknKuduPNG();
 
+        // HELPER KONVERSI URL ONLINE (CATBOX / DLL) JADI BASE64 UNTUK PDFMAKE
+        function konversiUrlGambarKeBase64(url) {
+            return new Promise((resolve) => {
+                if (!url || url.startsWith('data:image')) {
+                    resolve(url);
+                    return;
+                }
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = function() {
+                    console.warn("Gagal konversi gambar dari URL:", url);
+                    resolve(null);
+                };
+                img.src = url;
+            });
+        }
+
         // ================= DATA & STATE =================
         let dataLaporan = [];
         let dataTelahBerubah = false;
-        let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '' };
+        let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '', logoCatboxUrl: '' };
 
         const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
@@ -738,7 +761,13 @@
             document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
             const logoEl = document.getElementById('coverLogoSekolah');
             if (logoEl) {
-                logoEl.src = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT_PNG;
+                let logoSrc = LOGO_DEFAULT_PNG;
+                if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+                    logoSrc = dataProfil.logoCatboxUrl;
+                } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                    logoSrc = dataProfil.logoSekolah;
+                }
+                logoEl.src = logoSrc;
             }
         }
 
@@ -750,6 +779,7 @@
             document.getElementById('setProgKeahlian').value = dataProfil.progKeahlian || '';
             document.getElementById('setKonsKeahlian').value = dataProfil.konsKeahlian || '';
             document.getElementById('setTahun').value = dataProfil.tahun || '';
+            document.getElementById('inputUrlLogoCatbox').value = dataProfil.logoCatboxUrl || '';
             document.getElementById('inputLogoSekolah').value = '';
             renderLogoPreview();
             const modal = document.getElementById('modalSettings');
@@ -769,6 +799,7 @@
             dataProfil.progKeahlian = document.getElementById('setProgKeahlian').value.trim();
             dataProfil.konsKeahlian = document.getElementById('setKonsKeahlian').value.trim();
             dataProfil.tahun = document.getElementById('setTahun').value.trim() || '2026...';
+            dataProfil.logoCatboxUrl = document.getElementById('inputUrlLogoCatbox').value.trim();
             await localforage.setItem('profilPKL', dataProfil);
             dataTelahBerubah = true;
             renderProfil();
@@ -776,12 +807,26 @@
             showToast('Profil berhasil diperbarui! ✅');
         }
 
+        function simpanUrlLogoCatbox(url) {
+            dataProfil.logoCatboxUrl = url.trim();
+            renderLogoPreview();
+            renderProfil();
+        }
+
         function renderLogoPreview() {
             const img = document.getElementById('previewLogoSekolah');
             const placeholder = document.getElementById('placeholderLogo');
             const btnHapus = document.getElementById('btnHapusLogo');
-            if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                img.src = dataProfil.logoSekolah;
+            
+            let targetSrc = '';
+            if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+                targetSrc = dataProfil.logoCatboxUrl;
+            } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                targetSrc = dataProfil.logoSekolah;
+            }
+
+            if (targetSrc !== '') {
+                img.src = targetSrc;
                 img.classList.remove('hidden');
                 placeholder.classList.add('hidden');
                 if (btnHapus) btnHapus.classList.remove('hidden');
@@ -795,6 +840,8 @@
 
         async function hapusLogoSekolah() {
             dataProfil.logoSekolah = '';
+            dataProfil.logoCatboxUrl = '';
+            document.getElementById('inputUrlLogoCatbox').value = '';
             await localforage.setItem('profilPKL', dataProfil);
             renderLogoPreview();
             renderProfil();
@@ -803,23 +850,25 @@
 
         async function previewLogoUpload(input) {
             if (input.files && input.files[0]) {
-                showToast('⏳ Memproses logo...');
+                showToast('⏳ Memproses logo PNG...');
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     const img = new Image();
                     img.onload = async function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 250;
+                        const MAX_WIDTH = 300;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        dataProfil.logoSekolah = canvas.toDataURL('image/jpeg', 0.6);
+                        dataProfil.logoSekolah = canvas.toDataURL('image/png');
+                        dataProfil.logoCatboxUrl = '';
+                        document.getElementById('inputUrlLogoCatbox').value = '';
                         renderLogoPreview();
                         renderProfil();
                         await localforage.setItem('profilPKL', dataProfil);
-                        showToast('Logo berhasil diupload! ✅');
+                        showToast('Logo PNG transparan berhasil disimpan! ✅');
                     }
                     img.src = e.target.result;
                 }
@@ -1158,16 +1207,26 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN LOGO BASE64 LOKAL PASTI MUNCUL
-        function downloadPDF(opsiCover) {
-            showToast("⏳ Membuat PDF...");
+        // GENERATOR PDF DENGAN SUPPORT CATBOX / URL DIRECT / BASE64
+        async function downloadPDF(opsiCover) {
+            showToast("⏳ Memuat aset & membuat PDF...");
 
             try {
                 const docContent = [];
 
                 // 1. OPSI DENGAN KOVER
                 if (opsiCover === 'dengan') {
-                    let logoBase64 = (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') ? dataProfil.logoSekolah : LOGO_DEFAULT_PNG;
+                    let logoRaw = LOGO_DEFAULT_PNG;
+
+                    if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+                        logoRaw = dataProfil.logoCatboxUrl;
+                    } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                        logoRaw = dataProfil.logoSekolah;
+                    }
+
+                    // Konversi ke Base64 (Aman untuk Catbox & Local)
+                    let logoBase64 = await konversiUrlGambarKeBase64(logoRaw);
+                    if (!logoBase64) logoBase64 = LOGO_DEFAULT_PNG;
 
                     docContent.push(
                         { text: 'LAPORAN', style: 'headerTitle' },
