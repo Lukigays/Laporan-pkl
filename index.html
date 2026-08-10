@@ -526,7 +526,7 @@
         animateParticles();
 
         // LOGIKA KOMPRESI GAMBAR RINGAN BERBASIS CANVAS[span_6](start_span)[span_6](end_span)
-        function kompresGambarRingan(dataBase64, maxDimensi = 150, kualitas = 0.25) {
+        function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
             return new Promise((resolve) => {
                 if (!dataBase64 || !dataBase64.startsWith('data:image')) {
                     resolve(dataBase64);
@@ -563,7 +563,7 @@
         }
 
         // FUNGSI BARU: Konversi URL/Base64 gambar ke format PDF-ready (JPEG base64)
-        async function getImageBase64ForPdf(source, maxDimensi = 150, kualitas = 0.4) {
+        async function getImageBase64ForPdf(source, maxDimensi = 200, kualitas = 0.6) {
             // Jika sudah base64, kompres langsung
             if (source && source.startsWith('data:image')) {
                 return await kompresGambarRingan(source, maxDimensi, kualitas);
@@ -919,7 +919,7 @@
                 showToast('⏳ Memproses kompresi logo...');
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    const compressedLogo = await kompresGambarRingan(e.target.result, 180, 0.5);
+                    const compressedLogo = await kompresGambarRingan(e.target.result, 200, 0.7);
                     dataProfil.logoSekolah = compressedLogo;
                     dataProfil.logoCatboxUrl = '';
                     document.getElementById('inputUrlLogoCatbox').value = '';
@@ -981,7 +981,7 @@
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     // MENGGUNAKAN LOGIKA KOMPRESI FOTO CANVAS[span_8](start_span)[span_8](end_span)
-                    fotoBase64 = await kompresGambarRingan(e.target.result, 150, 0.25);
+                    fotoBase64 = await kompresGambarRingan(e.target.result, 200, 0.6);
                     await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
@@ -1040,7 +1040,7 @@
                 showToast('⏳ Memproses kompresi foto...');
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    fotoBase64 = await kompresGambarRingan(e.target.result, 150, 0.25);
+                    fotoBase64 = await kompresGambarRingan(e.target.result, 200, 0.6);
                     finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
                 }
                 reader.readAsDataURL(fotoInput.files[0]);
@@ -1259,7 +1259,7 @@
 
                     let logoBase64 = null;
                     if (logoRaw !== '') {
-                        logoBase64 = await getImageBase64ForPdf(logoRaw, 150, 0.4);
+                        logoBase64 = await getImageBase64ForPdf(logoRaw, 200, 0.6);
                     }
 
                     const coverStack = [
@@ -1342,7 +1342,7 @@
                         let fotoCell = { text: '-', alignment: 'center' };
                         
                         if (item.foto && item.foto.trim() !== '') {
-                            const fotoCompressed = await kompresGambarRingan(item.foto, 120, 0.25);
+                            const fotoCompressed = await kompresGambarRingan(item.foto, 150, 0.5);
                             fotoCell = { image: fotoCompressed, fit: [50, 50], alignment: 'center' };
                         }
 
