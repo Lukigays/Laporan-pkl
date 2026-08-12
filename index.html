@@ -1311,12 +1311,12 @@
                         coverStack.push({ text: '', margin: [0, 0, 0, 120] });
                     }
 
-                    // Identitas Siswa
+                    // Identitas Siswa (Posisi diatur dengan margin [80, 0, 0, 110] agar lebih bergeser ke kanan dan sejajar)
                     coverStack.push(
                         { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
-                                widths: [75, 10, 200],
+                                widths: [90, 10, 220],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
@@ -1324,9 +1324,8 @@
                                 ]
                             },
                             layout: 'noBorders',
-                            alignment: 'center',
                             fontSize: 11,
-                            margin: [0, 0, 0, 110] // Margin bawah besar mendorong bagian sekolah ke posisi paling bawah A4
+                            margin: [80, 0, 0, 110] // Margin kiri [80] menggeser tabel ke kanan
                         },
                         // Identitas Sekolah (Posisi Bawah Halaman)
                         { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 0, 0, 10] },
