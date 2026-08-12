@@ -264,7 +264,7 @@
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
                     <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah</h4>
-                    <p class="text-xs text-slate-400 mb-3">Upload foto logo sekolah dari galeri HP atau tempel URL Direct Link PNG[span_4](start_span)[span_4](end_span).</p>
+                    <p class="text-xs text-slate-400 mb-3">Upload foto logo sekolah dari galeri HP atau tempel URL Direct Link PNG.</p>
                     
                     <div class="space-y-3 mb-4">
                         <div>
@@ -280,7 +280,7 @@
                         </div>
                         <div class="flex-1">
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-xs" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Pilih file foto dari galeri HP[span_5](start_span)[span_5](end_span).</p>
+                            <p class="text-xs text-slate-500 mt-1">*Pilih file foto dari galeri HP.</p>
                         </div>
                         <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
                     </div>
@@ -525,7 +525,7 @@
         }
         animateParticles();
 
-        // LOGIKA KOMPRESI GAMBAR RINGAN BERBASIS CANVAS[span_6](start_span)[span_6](end_span)
+        // LOGIKA KOMPRESI GAMBAR RINGAN BERBASIS CANVAS
         function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
             return new Promise((resolve) => {
                 if (!dataBase64 || !dataBase64.startsWith('data:image')) {
@@ -533,15 +533,12 @@
                     return;
                 }
 
-                // Safety timeout: if compression takes > 10s, return original
                 const timeoutId = setTimeout(() => {
                     console.warn('Kompresi timeout, mengembalikan gambar asli');
                     resolve(dataBase64);
                 }, 10000);
 
                 const img = new Image();
-                // JANGAN set crossOrigin untuk data URL base64 lokal!
-                // crossOrigin pada data URL bisa menyebabkan CORS error di beberapa browser
                 img.onload = function() {
                     clearTimeout(timeoutId);
                     try {
@@ -564,7 +561,6 @@
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
-                        // Fill white background untuk JPEG
                         ctx.fillStyle = '#FFFFFF';
                         ctx.fillRect(0, 0, width, height);
                         ctx.drawImage(img, 0, 0, width, height);
@@ -584,13 +580,10 @@
             });
         }
 
-        // FUNGSI BARU: Konversi URL/Base64 gambar ke format PDF-ready (JPEG base64)
         async function getImageBase64ForPdf(source, maxDimensi = 200, kualitas = 0.6) {
-            // Jika sudah base64, kompres langsung
             if (source && source.startsWith('data:image')) {
                 return await kompresGambarRingan(source, maxDimensi, kualitas);
             }
-            // Jika URL eksternal, fetch lalu konversi via canvas
             if (source && source.startsWith('http')) {
                 try {
                     const response = await fetch(source, { mode: 'cors' });
@@ -614,10 +607,8 @@
                     return canvas.toDataURL('image/jpeg', kualitas);
                 } catch (err) {
                     console.warn('Fetch CORS gagal, mencoba fallback Image:', err.message);
-                    // Fallback: coba load via Image + canvas tanpa crossOrigin dulu
                     return new Promise((resolve) => {
                         const img = new Image();
-                        // Coba tanpa crossOrigin dulu untuk URL direct
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
                             let width = img.width;
@@ -639,7 +630,6 @@
                             console.error('Gagal memuat gambar dari URL:', source);
                             resolve(null);
                         };
-                        // Safety timeout
                         setTimeout(() => { resolve(null); }, 8000);
                         img.src = source;
                     });
@@ -851,7 +841,7 @@
                     logoSrc = dataProfil.logoSekolah;
                 }
                 if (logoSrc !== '') {
-                    logoEl.parentElement.style.display = 'none'; // sembunyikan dulu
+                    logoEl.parentElement.style.display = 'none';
                     logoEl.src = logoSrc;
                     logoEl.onload = function() { logoEl.parentElement.style.display = 'flex'; };
                     logoEl.onerror = function() { logoEl.parentElement.style.display = 'none'; console.warn('Gagal memuat logo:', logoSrc); };
@@ -938,7 +928,6 @@
             showToast('Logo berhasil dihapus! 🗑️');
         }
 
-        // AMBIL LOGO SEKOLAH DAN KOMPRESI VIA CANVAS (DARI LOGIKA REFERENSI)[span_7](start_span)[span_7](end_span)
         async function previewLogoUpload(input) {
             if (input.files && input.files[0]) {
                 showToast('⏳ Memproses kompresi logo...');
@@ -1016,7 +1005,6 @@
             }
         }
 
-        // Helper: baca file dan kompres dengan error handling lengkap
         function bacaDanKompresFile(file, maxDimensi = 200, kualitas = 0.6) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1288,7 +1276,7 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN KOMPRESI LENGKAP PADA KOVER SEPERTI KOVER REFERENSI FOTO 2
+        // GENERATOR PDF DENGAN PROPORSI PAS (1 HALAMAN COVER FIXED)
         async function downloadPDF(opsiCover) {
             showToast("⏳ Mengompresi & Membuat PDF...");
 
@@ -1305,30 +1293,30 @@
 
                     let logoBase64 = null;
                     if (logoRaw !== '') {
-                        logoBase64 = await getImageBase64ForPdf(logoRaw, 200, 0.6);
+                        logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
                     }
 
-                    // Tata letak cover: menyebar vertikal memenuhi halaman A4
-                    // mirip justify-content: space-between di CSS
                     const coverStack = [
-                        // Grup Atas
-                        { text: 'LAPORAN', style: 'headerTitle', margin: [0, 80, 0, 2] },
-                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 2, 0, 2] },
-                        { text: 'DI', style: 'headerSub', margin: [0, 20, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 4, 0, 50] }
+                        // Judul Atas
+                        { text: 'LAPORAN', style: 'headerTitle', margin: [0, 10, 0, 2] },
+                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 0, 0, 12] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 0, 0, 4] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 25] }
                     ];
 
+                    // Logo Sekolah
                     if (logoBase64) {
-                        coverStack.push({ image: logoBase64, fit: [130, 130], alignment: 'center', margin: [0, 40, 0, 60] });
+                        coverStack.push({ image: logoBase64, fit: [100, 100], alignment: 'center', margin: [0, 0, 0, 30] });
                     } else {
-                        coverStack.push({ text: '', margin: [0, 80, 0, 100] });
+                        coverStack.push({ text: '', margin: [0, 0, 0, 40] });
                     }
 
+                    // Identitas Siswa
                     coverStack.push(
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 40, 0, 15] },
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 10, margin: [0, 0, 0, 8] },
                         {
                             table: {
-                                widths: [80, 10, 180],
+                                widths: [70, 10, 180],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
@@ -1337,12 +1325,14 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 0, 0, 120]
+                            fontSize: 10,
+                            margin: [0, 0, 0, 45]
                         },
-                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 20, 0, 5] },
+                        // Identitas Sekolah
+                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 0, 0, 8] },
                         {
                             table: {
-                                widths: [160, 10, 200],
+                                widths: [150, 10, 210],
                                 body: [
                                     [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.progKeahlian || '', bold: true, border: [] }],
                                     [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.konsKeahlian || '', bold: true, border: [] }]
@@ -1350,9 +1340,10 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            margin: [0, 6, 0, 15]
+                            fontSize: 10,
+                            margin: [0, 0, 0, 15]
                         },
-                        { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 15, 0, 60], pageBreak: 'after' }
+                        { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 0, 0, 0], pageBreak: 'after' }
                     );
 
                     docContent.push(...coverStack);
@@ -1386,13 +1377,9 @@
                         ]
                     ];
 
-                    // KOMPRESI PARALEL: proses semua foto bulan ini sekaligus agar tidak hang
                     const fotoPromises = dataBulanIni.map(item => {
                         if (item.foto && item.foto.trim() !== '') {
-                            return kompresGambarRingan(item.foto, 150, 0.5).catch(err => {
-                                console.warn('Gagal kompres foto PDF:', err);
-                                return null;
-                            });
+                            return kompresGambarRingan(item.foto, 150, 0.5).catch(err => null);
                         }
                         return Promise.resolve(null);
                     });
@@ -1407,10 +1394,10 @@
                         }
 
                         tableBody.push([
-                            { text: idx + 1, alignment: 'center', fontSize: 10 },
-                            { text: item.hari, fontSize: 10 },
-                            { text: item.tanggal, fontSize: 10 },
-                            { text: item.uraian, fontSize: 10 },
+                            { text: idx + 1, alignment: 'center', fontSize: 9 },
+                            { text: item.hari, fontSize: 9 },
+                            { text: item.tanggal, fontSize: 9 },
+                            { text: item.uraian, fontSize: 9 },
                             fotoCell
                         ]);
                     }
@@ -1418,7 +1405,7 @@
                     blockElement.stack.push({
                         table: {
                             headerRows: 1,
-                            widths: [25, 50, 60, '*', 70],
+                            widths: [25, 45, 60, '*', 65],
                             dontBreakRows: true,
                             body: tableBody
                         },
@@ -1433,14 +1420,14 @@
 
                 const docDefinition = {
                     pageSize: 'A4',
-                    pageMargins: [40, 40, 40, 40],
+                    pageMargins: [35, 35, 35, 35],
                     content: docContent,
                     styles: {
-                        headerTitle: { fontSize: 15, bold: true, alignment: 'center', margin: [0, 1, 0, 1] },
-                        headerSub: { fontSize: 13, bold: true, alignment: 'center' },
-                        headerAddress: { fontSize: 12, alignment: 'center' },
-                        headerSchool: { fontSize: 13, bold: true, alignment: 'center', margin: [0, 5, 0, 5] },
-                        tableHeader: { bold: true, fontSize: 10, color: 'black' }
+                        headerTitle: { fontSize: 13, bold: true, alignment: 'center' },
+                        headerSub: { fontSize: 11, bold: true, alignment: 'center' },
+                        headerAddress: { fontSize: 10, alignment: 'center' },
+                        headerSchool: { fontSize: 11, bold: true, alignment: 'center' },
+                        tableHeader: { bold: true, fontSize: 9, color: 'black' }
                     }
                 };
 
