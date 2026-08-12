@@ -1276,7 +1276,7 @@
             downloadPDF(opsi);
         }
 
-        // GENERATOR PDF DENGAN PROPORSI PAS (1 HALAMAN COVER FIXED)
+        // GENERATOR PDF DENGAN DISTRIBUTION SPACING PRESISI (COVER MEMENUHI HALAMAN A4)
         async function downloadPDF(opsiCover) {
             showToast("⏳ Mengompresi & Membuat PDF...");
 
@@ -1297,26 +1297,26 @@
                     }
 
                     const coverStack = [
-                        // Judul Atas
-                        { text: 'LAPORAN', style: 'headerTitle', margin: [0, 10, 0, 2] },
-                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 0, 0, 12] },
-                        { text: 'DI', style: 'headerSub', margin: [0, 0, 0, 4] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 25] }
+                        // Header Judul Atas
+                        { text: 'LAPORAN', style: 'headerTitle', margin: [0, 15, 0, 2] },
+                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 0, 0, 15] },
+                        { text: 'DI', style: 'headerSub', margin: [0, 0, 0, 6] },
+                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 45] }
                     ];
 
-                    // Logo Sekolah
+                    // Logo Sekolah (Jarak diperlebar agar seimbang)
                     if (logoBase64) {
-                        coverStack.push({ image: logoBase64, fit: [100, 100], alignment: 'center', margin: [0, 0, 0, 30] });
+                        coverStack.push({ image: logoBase64, fit: [110, 110], alignment: 'center', margin: [0, 0, 0, 65] });
                     } else {
-                        coverStack.push({ text: '', margin: [0, 0, 0, 40] });
+                        coverStack.push({ text: '', margin: [0, 0, 0, 120] });
                     }
 
                     // Identitas Siswa
                     coverStack.push(
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 10, margin: [0, 0, 0, 8] },
+                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                         {
                             table: {
-                                widths: [70, 10, 180],
+                                widths: [75, 10, 200],
                                 body: [
                                     [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
                                     [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
@@ -1325,14 +1325,14 @@
                             },
                             layout: 'noBorders',
                             alignment: 'center',
-                            fontSize: 10,
-                            margin: [0, 0, 0, 45]
+                            fontSize: 11,
+                            margin: [0, 0, 0, 110] // Margin bawah besar mendorong bagian sekolah ke posisi paling bawah A4
                         },
-                        // Identitas Sekolah
-                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 0, 0, 8] },
+                        // Identitas Sekolah (Posisi Bawah Halaman)
+                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 0, 0, 10] },
                         {
                             table: {
-                                widths: [150, 10, 210],
+                                widths: [160, 10, 220],
                                 body: [
                                     [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.progKeahlian || '', bold: true, border: [] }],
                                     [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.konsKeahlian || '', bold: true, border: [] }]
@@ -1341,7 +1341,7 @@
                             layout: 'noBorders',
                             alignment: 'center',
                             fontSize: 10,
-                            margin: [0, 0, 0, 15]
+                            margin: [0, 0, 0, 25]
                         },
                         { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 0, 0, 0], pageBreak: 'after' }
                     );
@@ -1420,13 +1420,13 @@
 
                 const docDefinition = {
                     pageSize: 'A4',
-                    pageMargins: [35, 35, 35, 35],
+                    pageMargins: [40, 40, 40, 40],
                     content: docContent,
                     styles: {
-                        headerTitle: { fontSize: 13, bold: true, alignment: 'center' },
-                        headerSub: { fontSize: 11, bold: true, alignment: 'center' },
-                        headerAddress: { fontSize: 10, alignment: 'center' },
-                        headerSchool: { fontSize: 11, bold: true, alignment: 'center' },
+                        headerTitle: { fontSize: 14, bold: true, alignment: 'center' },
+                        headerSub: { fontSize: 12, bold: true, alignment: 'center' },
+                        headerAddress: { fontSize: 11, alignment: 'center' },
+                        headerSchool: { fontSize: 12, bold: true, alignment: 'center' },
                         tableHeader: { bold: true, fontSize: 9, color: 'black' }
                     }
                 };
