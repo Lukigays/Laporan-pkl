@@ -15,6 +15,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+    <!-- LIBRARY WORD EXPORT (FileSaver & html-docx / docx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -59,6 +63,8 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(192,38,211,0.4); }
         .btn-primary:active { transform: translateY(0) scale(0.98); }
         .btn-primary span { position: relative; z-index: 1; }
+        .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(37,99,235,0.4); }
         .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s ease; }
         .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(192,38,211,0.4); box-shadow: 0 0 20px rgba(192,38,211,0.1); }
         .btn-glow { box-shadow: 0 0 20px rgba(192,38,211,0.3); }
@@ -183,9 +189,9 @@
     <div id="modalExportOspi" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
             <div class="text-4xl mb-3">📑</div>
-            <h3 class="font-display font-bold text-xl mb-2 gradient-text">Opsi Ekspor PDF</h3>
-            <p class="text-sm text-slate-400 mb-8">Pilih format dokumen PDF yang ingin Anda unduh:</p>
-            <div class="space-y-3 mb-8 text-left">
+            <h3 class="font-display font-bold text-xl mb-2 gradient-text">Opsi Ekspor Dokumen</h3>
+            <p class="text-sm text-slate-400 mb-6">Pilih format dan kelengkapan dokumen yang ingin Anda unduh:</p>
+            <div class="space-y-3 mb-6 text-left">
                 <label class="flex items-center gap-4 p-4 rounded-2xl glass-panel cursor-pointer hover:border-accent/30 transition-all group">
                     <input type="radio" name="opsiCover" value="dengan" checked class="w-5 h-5 accent-accent">
                     <div>
@@ -201,9 +207,12 @@
                     </div>
                 </label>
             </div>
-            <div class="flex gap-3">
-                <button onclick="tutupOspiExport()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
-                <button onclick="prosesEksekusiPDF()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>Unduh PDF</span></button>
+            <div class="flex flex-col gap-3">
+                <div class="flex gap-3">
+                    <button onclick="prosesEksekusiPDF()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>📥 Export PDF</span></button>
+                    <button onclick="prosesEksekusiWord()" class="flex-1 py-3.5 btn-blue rounded-2xl text-sm font-bold shadow-lg"><span>📄 Export Word</span></button>
+                </div>
+                <button onclick="tutupOspiExport()" class="w-full py-2.5 glass-panel rounded-2xl text-xs font-bold hover:bg-white/5 transition-all text-slate-400">Batal</button>
             </div>
         </div>
     </div>
@@ -318,7 +327,7 @@
                         <span class="gradient-text-hero">Laporan PKL</span><br>
                         <span class="text-white">by <span class="gradient-text">LUKYY</span></span>
                     </h1>
-                    <p class="text-slate-400 text-sm md:text-base max-w-md leading-relaxed">Catat, kelola, dan ekspor laporan kegiatan PKL harian Anda dengan antarmuka futuristik yang elegan.</p>
+                    <p class="text-slate-400 text-sm md:text-base max-w-md leading-relaxed">Catat, kelola, dan ekspor laporan kegiatan PKL harian Anda ke PDF & Word dengan antarmuka futuristik yang elegan.</p>
                 </div>
                 <div class="flex flex-wrap gap-3 animate-fade-in animate-delay-2">
                     <button onclick="bukaTourManual()" class="glass-panel glass-panel-hover px-5 py-3 rounded-2xl flex items-center gap-2 text-sm font-semibold transition-all"><span>💡</span> Panduan</button>
@@ -416,7 +425,9 @@
 
                 <div class="glass-panel rounded-3xl p-5 md:p-6 mb-8 space-y-5 no-print relative z-10 animate-fade-in">
                     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                        <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-8 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export PDF</span></button>
+                        <div class="flex gap-2">
+                            <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-6 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export Dokumen</span></button>
+                        </div>
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                             <select id="filterBulan" onchange="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold"><option value="SEMUA">Filter: Semua Bulan</option></select>
                             <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold" placeholder="Cari laporan...">
@@ -775,10 +786,10 @@
 
         // ================= TOUR =================
         const langkahTour = [
-            { icon: '🚀', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda dengan mudah.' },
+            { icon: '🚀', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda ke PDF & Word dengan mudah.' },
             { icon: '📝', title: 'Tab Input Data', desc: 'Gunakan tab ini untuk mencatat kegiatan baru harian Anda.' },
             { icon: '✏️', title: 'Tab Pengeditan Laporan', desc: 'Pilih dan edit catatan laporan sebelumnya secara cepat.' },
-            { icon: '📋', title: 'Tab Laporan & PDF', desc: 'Lihat ringkasan statistik, saring data, lalu unduh dokumen ke format PDF.' }
+            { icon: '📋', title: 'Tab Laporan & Export', desc: 'Lihat ringkasan statistik, saring data, lalu unduh dokumen ke format PDF atau Word (.docx).' }
         ];
         let indexTourAktif = 0;
 
@@ -1275,6 +1286,153 @@
             const opsi = document.querySelector('input[name="opsiCover"]:checked') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
             tutupOspiExport();
             downloadPDF(opsi);
+        }
+
+        function prosesEksekusiWord() {
+            const opsi = document.querySelector('input[name="opsiCover"]:checked') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
+            tutupOspiExport();
+            downloadWord(opsi);
+        }
+
+        // GENERATOR WORD (.DOCX) SAMA SEPERTI PDFMAKE DENGAN STRUKTUR DOKUMEN PRESISI
+        async function downloadWord(opsiCover) {
+            showToast("⏳ Menyiapkan & Membuat Dokumen Word...");
+
+            try {
+                let logoRaw = '';
+                if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+                    logoRaw = dataProfil.logoCatboxUrl;
+                } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+                    logoRaw = dataProfil.logoSekolah;
+                }
+
+                let logoBase64 = null;
+                if (logoRaw !== '') {
+                    logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
+                }
+
+                let htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>Laporan PKL</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.3; margin: 2cm; }
+                        h2 { text-align: center; font-size: 15pt; font-weight: bold; margin: 2px 0; }
+                        h3 { text-align: center; font-size: 13pt; font-weight: bold; margin: 2px 0; }
+                        p { text-align: center; margin: 4px 0; }
+                        table.identitas { border-collapse: collapse; margin: 15px auto; width: 70%; font-size: 11pt; }
+                        table.identitas td { border: none; padding: 4px; }
+                        table.laporan { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 10pt; }
+                        table.laporan th, table.laporan td { border: 1px solid black; padding: 6px; text-align: left; vertical-align: top; }
+                        table.laporan th { background-color: #f0f0f0; text-align: center; font-weight: bold; }
+                        .page-break { page-break-before: always; }
+                        .center { text-align: center; }
+                        .bold { font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                `;
+
+                if (opsiCover === 'dengan') {
+                    htmlContent += `
+                    <div style="text-align: center;">
+                        <h2>LAPORAN</h2>
+                        <h2>PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                        <p style="font-weight: bold; margin-top: 15px;">DI</p>
+                        <h3>${dataProfil.alamat || 'Alamat Tempat PKL'}</h3>
+                        <br>
+                        ${logoBase64 ? `<div style="text-align:center; margin: 25px 0;"><img src="${logoBase64}" width="120" style="display:block; margin:auto;" /></div>` : '<br><br>'}
+                        <p style="margin-top: 20px;">Disusun Oleh:</p>
+                        <table class="identitas">
+                            <tr><td width="30%">Nama</td><td width="5%">:</td><td><b>${dataProfil.nama || 'LUKYY'}</b></td></tr>
+                            <tr><td>Kelas</td><td>:</td><td>${dataProfil.kelas || 'XII'}</td></tr>
+                            <tr><td>NIS/NISN</td><td>:</td><td>${dataProfil.nis || '/'}</td></tr>
+                        </table>
+                        <br><br>
+                        <h3>SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                        <table class="identitas">
+                            <tr><td width="45%"><b>PROGRAM KEAHLIAN</b></td><td width="5%">:</td><td><b>${dataProfil.progKeahlian || ''}</b></td></tr>
+                            <tr><td><b>KONSENTRASI KEAHLIAN</b></td><td>:</td><td><b>${dataProfil.konsKeahlian || ''}</b></td></tr>
+                        </table>
+                        <h3>TAHUN ${dataProfil.tahun || '2026...'}</h3>
+                    </div>
+                    <div class="page-break"></div>
+                    `;
+                }
+
+                const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
+
+                for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
+                    const bulan = unikBulan[bIdx];
+                    const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
+                    if (dataBulanIni.length === 0) continue;
+
+                    if (bIdx > 0) {
+                        htmlContent += `<div class="page-break"></div>`;
+                    }
+
+                    htmlContent += `
+                    <div>
+                        <p style="text-align:left; font-weight:bold; font-size:11pt; margin-bottom:2px;">1. Laporan Kegiatan Harian</p>
+                        <p style="text-align:left; font-weight:bold; font-size:11pt; margin-bottom:10px;">b. Bulan ${bulan.toUpperCase()}</p>
+                        <table class="laporan">
+                            <thead>
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th width="12%">Hari</th>
+                                    <th width="15%">Tanggal</th>
+                                    <th>Uraian Kegiatan</th>
+                                    <th width="18%">Foto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    for (let idx = 0; idx < dataBulanIni.length; idx++) {
+                        const item = dataBulanIni[idx];
+                        let imgTag = '-';
+                        if (item.foto && item.foto.trim() !== '') {
+                            const compressedImg = await kompresGambarRingan(item.foto, 120, 0.5).catch(() => null);
+                            if (compressedImg) {
+                                imgTag = `<img src="${compressedImg}" width="70" style="display:block; margin:auto;" />`;
+                            }
+                        }
+
+                        htmlContent += `
+                            <tr>
+                                <td style="text-align:center;">${idx + 1}</td>
+                                <td>${item.hari}</td>
+                                <td>${item.tanggal}</td>
+                                <td>${item.uraian}</td>
+                                <td style="text-align:center;">${imgTag}</td>
+                            </tr>
+                        `;
+                    }
+
+                    htmlContent += `
+                            </tbody>
+                        </table>
+                    </div>
+                    `;
+                }
+
+                htmlContent += `
+                </body>
+                </html>
+                `;
+
+                const blob = new Blob(['﻿' + htmlContent], {
+                    type: 'application/msword'
+                });
+
+                saveAs(blob, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.doc`);
+                showToast("Dokumen Word berhasil diunduh! 📄");
+
+            } catch (err) {
+                console.error(err);
+                showToast("❌ Error Word Export: " + err.message);
+            }
         }
 
         // GENERATOR PDF DENGAN DISTRIBUTION SPACING PRESISI (COVER MEMENUHI HALAMAN A4)
