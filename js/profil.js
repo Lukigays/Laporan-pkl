@@ -1,0 +1,142 @@
+// ============================================================
+// PROFIL PENGGUNA & LOGO SEKOLAH (Pengaturan)
+// ============================================================
+
+async function muatProfil() {
+    try {
+        const profil = await localforage.getItem('profilPKL');
+        if (profil) dataProfil = { ...dataProfil, ...profil };
+    } catch (err) { console.error(err); }
+    renderProfil();
+    renderLogoPreview();
+}
+
+function renderProfil() {
+    document.getElementById('coverNama').textContent = dataProfil.nama || 'LUKYY';
+    document.getElementById('coverKelas').textContent = dataProfil.kelas || 'XII';
+    document.getElementById('coverNis').textContent = dataProfil.nis || '/';
+    document.getElementById('coverAlamat').textContent = dataProfil.alamat || 'Alamat Tempat PKL';
+    document.getElementById('coverProgKeahlian').textContent = dataProfil.progKeahlian || '';
+    document.getElementById('coverKonsKeahlian').textContent = dataProfil.konsKeahlian || '';
+    document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
+    const logoEl = document.getElementById('coverLogoSekolah');
+    if (logoEl) {
+        let logoSrc = '';
+        if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+            logoSrc = dataProfil.logoCatboxUrl;
+        } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+            logoSrc = dataProfil.logoSekolah;
+        }
+        if (logoSrc !== '') {
+            logoEl.parentElement.style.display = 'none';
+            logoEl.src = logoSrc;
+            logoEl.onload = function() { logoEl.parentElement.style.display = 'flex'; };
+            logoEl.onerror = function() {
+                logoEl.parentElement.style.display = 'none';
+                console.warn('Gagal memuat logo:', logoSrc);
+            };
+        } else {
+            logoEl.src = '';
+            logoEl.parentElement.style.display = 'none';
+        }
+    }
+}
+
+// ---------- Modal Pengaturan ----------
+function bukaSettings() {
+    document.getElementById('setNama').value = dataProfil.nama || '';
+    document.getElementById('setKelas').value = dataProfil.kelas || '';
+    document.getElementById('setNis').value = dataProfil.nis || '';
+    document.getElementById('setAlamat').value = dataProfil.alamat || '';
+    document.getElementById('setProgKeahlian').value = dataProfil.progKeahlian || '';
+    document.getElementById('setKonsKeahlian').value = dataProfil.konsKeahlian || '';
+    document.getElementById('setTahun').value = dataProfil.tahun || '';
+    document.getElementById('inputUrlLogoCatbox').value = dataProfil.logoCatboxUrl || '';
+    document.getElementById('inputLogoSekolah').value = '';
+    renderLogoPreview();
+    const modal = document.getElementById('modalSettings');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.remove('opacity-0'), 10);
+}
+
+function tutupSettings() {
+    const modal = document.getElementById('modalSettings');
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+async function simpanSettings() {
+    dataProfil.nama = document.getElementById('setNama').value.trim() || 'LUKYY';
+    dataProfil.kelas = document.getElementById('setKelas').value.trim() || 'XII';
+    dataProfil.nis = document.getElementById('setNis').value.trim();
+    dataProfil.alamat = document.getElementById('setAlamat').value.trim() || 'Alamat Tempat PKL';
+    dataProfil.progKeahlian = document.getElementById('setProgKeahlian').value.trim();
+    dataProfil.konsKeahlian = document.getElementById('setKonsKeahlian').value.trim();
+    dataProfil.tahun = document.getElementById('setTahun').value.trim() || '2026...';
+    dataProfil.logoCatboxUrl = document.getElementById('inputUrlLogoCatbox').value.trim();
+    await localforage.setItem('profilPKL', dataProfil);
+    dataTelahBerubah = true;
+    renderProfil();
+    tutupSettings();
+    showToast('Profil berhasil diperbarui! ✅');
+}
+
+// ---------- Logo Sekolah ----------
+function simpanUrlLogoCatbox(url) {
+    dataProfil.logoCatboxUrl = url.trim();
+    renderLogoPreview();
+    renderProfil();
+}
+
+function renderLogoPreview() {
+    const img = document.getElementById('previewLogoSekolah');
+    const placeholder = document.getElementById('placeholderLogo');
+    const btnHapus = document.getElementById('btnHapusLogo');
+
+    let targetSrc = '';
+    if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
+        targetSrc = dataProfil.logoCatboxUrl;
+    } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
+        targetSrc = dataProfil.logoSekolah;
+    }
+
+    if (targetSrc !== '') {
+        img.src = targetSrc;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        if (btnHapus) btnHapus.classList.remove('hidden');
+    } else {
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        if (btnHapus) btnHapus.classList.add('hidden');
+    }
+}
+
+async function hapusLogoSekolah() {
+    dataProfil.logoSekolah = '';
+    dataProfil.logoCatboxUrl = '';
+    document.getElementById('inputUrlLogoCatbox').value = '';
+    await localforage.setItem('profilPKL', dataProfil);
+    renderLogoPreview();
+    renderProfil();
+    showToast('Logo berhasil dihapus! 🗑️');
+}
+
+async function previewLogoUpload(input) {
+    if (input.files && input.files[0]) {
+        showToast('⏳ Memproses kompresi logo...');
+        try {
+            const compressedLogo = await bacaDanKompresFile(input.files[0], 200, 0.7);
+            dataProfil.logoSekolah = compressedLogo;
+            dataProfil.logoCatboxUrl = '';
+            document.getElementById('inputUrlLogoCatbox').value = '';
+            renderLogoPreview();
+            renderProfil();
+            await localforage.setItem('profilPKL', dataProfil);
+            showToast('Logo berhasil dikompresi & disimpan! ✅');
+        } catch (err) {
+            console.error('Error kompresi logo:', err);
+            showToast('❌ Gagal memproses logo, coba file lain!');
+        }
+    }
+}
