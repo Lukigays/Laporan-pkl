@@ -1,3 +1,34 @@
+// ============================================================
+// EKSPOR PDF (pdfMake) — Cover + Tabel per Bulan
+// ============================================================
+
+// ---------- Modal Opsi Ekspor ----------
+function bukaOspiExport() {
+    const modal = document.getElementById('modalExportOspi');
+    if (!modal) {
+        // Safe-guard jika modal tidak ditemukan di HTML
+        downloadPDF('dengan');
+        return;
+    }
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.remove('opacity-0'), 10);
+}
+
+function tutupOspiExport() {
+    const modal = document.getElementById('modalExportOspi');
+    if (!modal) return;
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+function prosesEksekusiPDF() {
+    const opsi = document.querySelector('input[name="opsiCover"]:checked')
+        ? document.querySelector('input[name="opsiCover"]:checked').value
+        : 'dengan';
+    tutupOspiExport();
+    downloadPDF(opsi);
+}
+
 // ---------- Generator PDF ----------
 async function downloadPDF(opsiCover) {
     showToast("⏳ Mengompresi & Membuat PDF...");
@@ -15,7 +46,7 @@ async function downloadPDF(opsiCover) {
 
             let logoBase64 = null;
             if (logoRaw !== '') {
-                logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
+                logoBase64 = await getImageBase64ForPdf(logoRaw, 250, 0.7);
             }
 
             const coverStack = [
@@ -97,7 +128,7 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            // 1. Kompresi dinaikkan ukurannya ke 300px agar tidak pecah saat diperbesar
+            // 1. Resolusi kompresi dinaikkan ke 300px agar foto jernih
             const fotoPromises = dataBulanIni.map(item => {
                 if (item.foto && item.foto.trim() !== '') {
                     return kompresGambarRingan(item.foto, 300, 0.6).catch(err => null);
@@ -110,7 +141,7 @@ async function downloadPDF(opsiCover) {
                 const item = dataBulanIni[idx];
                 let fotoCell = { text: '-', alignment: 'center' };
 
-                // 2. Dimensi foto diperbesar ke [100, 100]
+                // 2. Dimensi batas foto diperbesar ke 100x100
                 if (fotoHasil[idx]) {
                     fotoCell = { image: fotoHasil[idx], fit: [100, 100], alignment: 'center' };
                 }
