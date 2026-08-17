@@ -1,5 +1,5 @@
 // ============================================================
-// EKSPOR WORD (.docx) — Menggunakan docx.js (Ringan & Jernih)
+// EKSPOR WORD (.docx) — Menggunakan docx.js (Rapi & Presisi)
 // ============================================================
 
 function bukaOspiExportWord() {
@@ -50,15 +50,21 @@ async function getGambarUint8Array(source, maxDimensi = 300, kualitas = 0.6) {
 async function downloadWord(opsiCover) {
     showToast("⏳ Mengompresi & Membuat Dokumen Word...");
 
-    // Cek ketersediaan library docx di objek window
     const docxLib = window.docx;
     if (!docxLib) {
-        showToast("❌ Library docx belum siap/termuat! Periksa koneksi internet.");
+        showToast("❌ Library docx belum siap/termuat!");
         return;
     }
 
     try {
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak } = docxLib;
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak, BorderStyle } = docxLib;
+
+        const borderKosong = {
+            top: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
+            bottom: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
+            left: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
+            right: { style: BorderStyle.NONE, size: 0, color: "AUTO" }
+        };
 
         const sectionsChildren = [];
 
@@ -105,26 +111,41 @@ async function downloadWord(opsiCover) {
                 sectionsChildren.push(new Paragraph({ spaceAfter: 800, children: [] }));
             }
 
-            // Biodata Siswa
+            // Identitas Siswa
             sectionsChildren.push(
                 new Paragraph({
                     alignment: AlignmentType.CENTER,
                     spaceAfter: 200,
                     children: [new TextRun({ text: "Disusun Oleh:", size: 22, font: "Times New Roman" })]
                 }),
-                new Paragraph({
+                new Table({
+                    width: { size: 9000, type: WidthType.DXA },
                     alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: `Nama       :  ${dataProfil.nama || 'LUKYY'}`, size: 22, font: "Times New Roman" })]
+                    rows: [
+                        new TableRow({
+                            children: [
+                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "Nama", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.nama || 'LUKYY', size: 22, font: "Times New Roman" })] })] }),
+                            ]
+                        }),
+                        new TableRow({
+                            children: [
+                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "Kelas", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.kelas || 'XII', size: 22, font: "Times New Roman" })] })] }),
+                            ]
+                        }),
+                        new TableRow({
+                            children: [
+                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "NIS/NISN", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
+                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.nis || '/', size: 22, font: "Times New Roman" })] })] }),
+                            ]
+                        })
+                    ]
                 }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: `Kelas        :  ${dataProfil.kelas || 'XII'}`, size: 22, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spaceAfter: 600,
-                    children: [new TextRun({ text: `NIS/NISN  :  ${dataProfil.nis || '/'}`, size: 22, font: "Times New Roman" })]
-                }),
+                new Paragraph({ spaceAfter: 600, children: [] }),
                 new Paragraph({
                     alignment: AlignmentType.CENTER,
                     spaceAfter: 200,
@@ -143,7 +164,7 @@ async function downloadWord(opsiCover) {
                     alignment: AlignmentType.CENTER,
                     children: [new TextRun({ text: `TAHUN ${dataProfil.tahun || '2026...'}`, bold: true, size: 24, font: "Times New Roman" })]
                 }),
-                new Paragraph({ children: [new PageBreak()] }) // Pindah Halaman setelah Cover
+                new Paragraph({ children: [new PageBreak()] })
             );
         }
 
@@ -155,7 +176,7 @@ async function downloadWord(opsiCover) {
             const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
             if (dataBulanIni.length === 0) continue;
 
-            if (bIdx > 0 && opsiCover === 'tanpa') {
+            if (bIdx > 0 || opsiCover === 'tanpa') {
                 sectionsChildren.push(new Paragraph({ children: [new PageBreak()] }));
             }
 
@@ -169,22 +190,27 @@ async function downloadWord(opsiCover) {
                 })
             );
 
-            // Baris Judul Tabel (Header)
+            // Menentukan lebar pasti untuk masing-masing kolom dalam DXA (1 pt = 20 dxa)
+            const wNo = 600;       // ~30pt
+            const wHari = 1200;    // ~60pt
+            const wTanggal = 1500; // ~75pt
+            const wUraian = 4200;  // ~210pt
+            const wFoto = 1800;    // ~90pt
+
             const tableRows = [
                 new TableRow({
                     cantSplit: true,
                     tableHeader: true,
                     children: [
-                        new TableCell({ width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "No", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: 12, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Hari", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: 15, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Tanggal", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: 48, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Uraian Kegiatan", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: 20, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Foto", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: wNo, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "No", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: wHari, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Hari", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: wTanggal, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Tanggal", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: wUraian, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Uraian Kegiatan", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: wFoto, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Foto", bold: true, size: 18, font: "Times New Roman" })] })] }),
                     ]
                 })
             ];
 
-            // Isi Data Baris Tabel
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
                 let fotoCellParagraph = new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "-", size: 18, font: "Times New Roman" })] });
@@ -197,7 +223,7 @@ async function downloadWord(opsiCover) {
                             children: [
                                 new ImageRun({
                                     data: imgBytes,
-                                    transformation: { width: 90, height: 90 }
+                                    transformation: { width: 80, height: 80 }
                                 })
                             ]
                         });
@@ -208,27 +234,26 @@ async function downloadWord(opsiCover) {
                     new TableRow({
                         cantSplit: true,
                         children: [
-                            new TableCell({ width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: 12, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.hari, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: 15, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.tanggal, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: 48, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.uraian, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: 20, type: WidthType.PERCENTAGE }, children: [fotoCellParagraph] }),
+                            new TableCell({ width: { size: wNo, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: wHari, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.hari, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: wTanggal, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.tanggal, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: wUraian, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.uraian, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: wFoto, type: WidthType.DXA }, children: [fotoCellParagraph] }),
                         ]
                     })
                 );
             }
 
-            // Gabungkan Tabel ke Dokumen
             sectionsChildren.push(
                 new Table({
-                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    width: { size: 9300, type: WidthType.DXA },
+                    alignment: AlignmentType.CENTER,
                     rows: tableRows
                 }),
                 new Paragraph({ spaceAfter: 400, children: [] })
             );
         }
 
-        // Buat File Dokumen Word
         const doc = new Document({
             sections: [{
                 properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
