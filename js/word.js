@@ -1,5 +1,5 @@
 // ============================================================
-// EKSPOR WORD (.docx) — Cover + Tabel per Bulan
+// EKSPOR WORD (.docx) — Menggunakan docx.js (Ringan & Jernih)
 // ============================================================
 
 function bukaOspiExportWord() {
@@ -27,51 +27,210 @@ function prosesEksekusiWord() {
     downloadWord(opsi);
 }
 
+// Helper konversi Base64 / URL Gambar ke Uint8Array agar file Word kecil
+async function getGambarUint8Array(source, maxDimensi = 300, kualitas = 0.6) {
+    try {
+        let base64 = await getImageBase64ForPdf(source, maxDimensi, kualitas);
+        if (!base64) return null;
+        
+        const base64Data = base64.split(',')[1];
+        const binaryString = window.atob(base64Data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+    } catch (e) {
+        console.warn("Gagal konversi gambar ke Word:", e);
+        return null;
+    }
+}
+
 async function downloadWord(opsiCover) {
-    showToast("⏳ Membuat dokumen Word...");
+    showToast("⏳ Mengompresi & Membuat Dokumen Word...");
 
     try {
-        const areaCetak = document.getElementById('areaCetak').cloneNode(true);
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak, BorderStyle } = docx;
 
-        // Jika user memilih 'tanpa' cover, hapus section kover
-        if (opsiCover === 'tanpa') {
-            const coverEl = areaCetak.querySelector('#koverPrintSection');
-            if (coverEl) coverEl.remove();
+        const sectionsChildren = [];
+
+        // ---------- HALAMAN COVER ----------
+        if (opsiCover === 'dengan') {
+            sectionsChildren.push(
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: "LAPORAN", bold: true, size: 28, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: "PRAKTEK KERJA LAPANGAN (PKL)", bold: true, size: 28, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: "DI", bold: true, size: 24, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spaceAfter: 400,
+                    children: [new TextRun({ text: (dataProfil.alamat || "Alamat Tempat PKL").toUpperCase(), size: 22, font: "Times New Roman" })]
+                })
+            );
+
+            // Logo Sekolah
+            let logoRaw = dataProfil.logoCatboxUrl || dataProfil.logoSekolah || '';
+            let logoBytes = await getGambarUint8Array(logoRaw, 200, 0.7);
+
+            if (logoBytes) {
+                sectionsChildren.push(
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spaceAfter: 400,
+                        children: [
+                            new ImageRun({
+                                data: logoBytes,
+                                transformation: { width: 110, height: 110 }
+                            })
+                        ]
+                    })
+                );
+            } else {
+                sectionsChildren.push(new Paragraph({ spaceAfter: 800, children: [] }));
+            }
+
+            // Biodata Siswa
+            sectionsChildren.push(
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spaceAfter: 200,
+                    children: [new TextRun({ text: "Disusun Oleh:", size: 22, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: `Nama       :  ${dataProfil.nama || 'LUKYY'}`, size: 22, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: `Kelas        :  ${dataProfil.kelas || 'XII'}`, size: 22, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spaceAfter: 600,
+                    children: [new TextRun({ text: `NIS/NISN  :  ${dataProfil.nis || '/'}`, size: 22, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spaceAfter: 200,
+                    children: [new TextRun({ text: "SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG", bold: true, size: 24, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: `PROGRAM KEAHLIAN : ${(dataProfil.progKeahlian || '').toUpperCase()}`, bold: true, size: 20, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spaceAfter: 400,
+                    children: [new TextRun({ text: `KONSENTRASI KEAHLIAN : ${(dataProfil.konsKeahlian || '').toUpperCase()}`, bold: true, size: 20, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: `TAHUN ${dataProfil.tahun || '2026...'}`, bold: true, size: 24, font: "Times New Roman" })]
+                }),
+                new Paragraph({ children: [new PageBreak()] }) // Pindah Halaman setelah Cover
+            );
         }
 
-        // Hapus elemen watermark agar tidak mengacak layout Word
-        const watermark = areaCetak.querySelector('.watermark');
-        if (watermark) watermark.remove();
+        // ---------- TABEL LAPORAN PER BULAN ----------
+        const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
 
-        // Menyusun HTML khusus dengan inline style dokumen Word
-        const contentHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; }
-                    h2, h3, h4 { text-align: center; margin: 4px 0; }
-                    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-                    th, td { border: 1pt solid #000; padding: 6px; vertical-align: top; }
-                    th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
-                    td img { max-width: 120px; max-height: 120px; display: block; margin: 0 auto; }
-                    .header-print { text-align: center; }
-                    .logo-kover-container { text-align: center; margin: 20px 0; }
-                    .logo-kover-container img { max-width: 150px; max-height: 150px; }
-                </style>
-            </head>
-            <body>
-                ${areaCetak.innerHTML}
-            </body>
-            </html>
-        `;
+        for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
+            const bulan = unikBulan[bIdx];
+            const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
+            if (dataBulanIni.length === 0) continue;
 
-        // Konversi HTML ke blob .docx
-        const converted = htmlDocx.asBlob(contentHtml);
-        
-        // Unduh file menggunakan FileSaver.js
-        saveAs(converted, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.docx`);
+            if (bIdx > 0 && opsiCover === 'tanpa') {
+                sectionsChildren.push(new Paragraph({ children: [new PageBreak()] }));
+            }
+
+            sectionsChildren.push(
+                new Paragraph({
+                    children: [new TextRun({ text: "1. Laporan Kegiatan Harian", bold: true, size: 22, font: "Times New Roman" })]
+                }),
+                new Paragraph({
+                    spaceAfter: 200,
+                    children: [new TextRun({ text: "b. Bulan " + bulan.toUpperCase(), bold: true, size: 22, font: "Times New Roman" })]
+                })
+            );
+
+            // Baris Judul Tabel (Header)
+            const tableRows = [
+                new TableRow({
+                    cantSplit: true,
+                    tableHeader: true,
+                    children: [
+                        new TableCell({ width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "No", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: 12, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Hari", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: 15, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Tanggal", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: 48, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Uraian Kegiatan", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                        new TableCell({ width: { size: 20, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Foto", bold: true, size: 18, font: "Times New Roman" })] })] }),
+                    ]
+                })
+            ];
+
+            // Isi Data Baris Tabel
+            for (let idx = 0; idx < dataBulanIni.length; idx++) {
+                const item = dataBulanIni[idx];
+                let fotoCellParagraph = new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "-", size: 18, font: "Times New Roman" })] });
+
+                if (item.foto && item.foto.trim() !== '') {
+                    const imgBytes = await getGambarUint8Array(item.foto, 250, 0.6);
+                    if (imgBytes) {
+                        fotoCellParagraph = new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                                new ImageRun({
+                                    data: imgBytes,
+                                    transformation: { width: 90, height: 90 }
+                                })
+                            ]
+                        });
+                    }
+                }
+
+                tableRows.push(
+                    new TableRow({
+                        cantSplit: true,
+                        children: [
+                            new TableCell({ width: { size: 5, type: WidthType.PERCENTAGE }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: 12, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.hari, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: 15, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.tanggal, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: 48, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.uraian, size: 18, font: "Times New Roman" })] })] }),
+                            new TableCell({ width: { size: 20, type: WidthType.PERCENTAGE }, children: [fotoCellParagraph] }),
+                        ]
+                    })
+                );
+            }
+
+            // Gabungkan Tabel ke Dokumen
+            sectionsChildren.push(
+                new Table({
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    rows: tableRows
+                }),
+                new Paragraph({ spaceAfter: 400, children: [] })
+            );
+        }
+
+        // Buat File Dokumen Word
+        const doc = new Document({
+            sections: [{
+                properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
+                children: sectionsChildren
+            }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.docx`);
         showToast("Dokumen Word berhasil diunduh! 📥");
 
     } catch (err) {
