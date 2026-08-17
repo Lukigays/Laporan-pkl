@@ -1,5 +1,5 @@
 // ============================================================
-// EKSPOR WORD (.doc) — Metode Native HTML (Anti Rusak & Rapi di HP)
+// EKSPOR WORD (.doc) — Metode HTML Klasik 100% Anti Menciut & Anti Rusak
 // ============================================================
 
 function bukaOspiExportWord() {
@@ -34,174 +34,169 @@ async function downloadWord(opsiCover) {
         let logoRaw = dataProfil.logoCatboxUrl || dataProfil.logoSekolah || '';
         let logoBase64 = '';
         if (logoRaw !== '') {
-            try {
-                // Kompresi logo agar file Word tidak berat
-                logoBase64 = await getImageBase64ForPdf(logoRaw, 150, 0.8);
-            } catch(e) {
-                console.log("Logo error", e);
-            }
+            // Kompresi logo agar file Word tidak berat
+            logoBase64 = await getImageBase64ForPdf(logoRaw, 150, 0.7);
         }
 
-        let htmlContent = '';
-
-        // 1. BAGIAN COVER
+        let htmlCover = '';
         if (opsiCover === 'dengan') {
-            htmlContent += `
-                <div style="text-align: center; font-family: 'Times New Roman', serif;">
+            // Kover menggunakan tag HTML murni dan lebar persentase (100%)
+            htmlCover = `
+                <div style="text-align: center; page-break-after: always; font-family: 'Times New Roman', serif;">
                     <br><br>
-                    <span style="font-size: 18pt; font-weight: bold;">LAPORAN</span><br>
-                    <span style="font-size: 18pt; font-weight: bold;">PRAKTEK KERJA LAPANGAN (PKL)</span><br><br><br>
-                    <span style="font-size: 14pt; font-weight: bold;">DI</span><br>
-                    <span style="font-size: 14pt; font-weight: bold;">${(dataProfil.alamat || 'ALAMAT TEMPAT PKL').toUpperCase()}</span><br><br><br><br>
+                    <b style="font-size: 18pt;">LAPORAN</b><br>
+                    <b style="font-size: 18pt;">PRAKTEK KERJA LAPANGAN (PKL)</b><br><br><br>
+                    <b style="font-size: 14pt;">DI</b><br>
+                    <span style="font-size: 14pt;">${(dataProfil.alamat || 'Alamat Tempat PKL').toUpperCase()}</span><br><br><br><br>
 
-                    ${logoBase64 ? `<img src="${logoBase64}" width="120" height="120" />` : '<br><br><br>'}
-                    
+                    ${logoBase64 ? `<img src="${logoBase64}" width="120" height="120" />` : '<br><br><br><br><br>'}
                     <br><br><br><br>
+
                     <span style="font-size: 12pt;">Disusun Oleh:</span><br><br>
 
-                    <!-- Menggunakan width persentase agar rapi di layar HP -->
-                    <table style="width: 70%; margin: 0 auto; font-size: 12pt; text-align: left; border: none;">
+                    <table border="0" width="100%" style="font-size: 12pt; text-align: left;">
                         <tr>
-                            <td style="width: 30%; border: none; padding: 5px;">Nama</td>
-                            <td style="width: 5%; border: none; padding: 5px;">:</td>
-                            <td style="width: 65%; border: none; padding: 5px; font-weight: bold;">${dataProfil.nama || 'LUKYY'}</td>
+                            <td width="25%"></td>
+                            <td width="15%">Nama</td>
+                            <td width="5%">:</td>
+                            <td width="55%"><b>${dataProfil.nama || 'LUKYY'}</b></td>
                         </tr>
                         <tr>
-                            <td style="border: none; padding: 5px;">Kelas</td>
-                            <td style="border: none; padding: 5px;">:</td>
-                            <td style="border: none; padding: 5px;">${dataProfil.kelas || 'XII'}</td>
+                            <td width="25%"></td>
+                            <td>Kelas</td>
+                            <td>:</td>
+                            <td>${dataProfil.kelas || 'XII'}</td>
                         </tr>
                         <tr>
-                            <td style="border: none; padding: 5px;">NIS/NISN</td>
-                            <td style="border: none; padding: 5px;">:</td>
-                            <td style="border: none; padding: 5px;">${dataProfil.nis || '/'}</td>
-                        </tr>
-                    </table>
-
-                    <br><br><br><br><br>
-                    <span style="font-size: 14pt; font-weight: bold;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</span><br><br>
-                    
-                    <table style="width: 90%; margin: 0 auto; font-size: 11pt; text-align: left; font-weight: bold; border: none;">
-                        <tr>
-                            <td style="width: 45%; border: none; padding: 5px;">PROGRAM KEAHLIAN</td>
-                            <td style="width: 5%; border: none; padding: 5px;">:</td>
-                            <td style="width: 50%; border: none; padding: 5px;">${(dataProfil.progKeahlian || '').toUpperCase()}</td>
-                        </tr>
-                        <tr>
-                            <td style="border: none; padding: 5px;">KONSENTRASI KEAHLIAN</td>
-                            <td style="border: none; padding: 5px;">:</td>
-                            <td style="border: none; padding: 5px;">${(dataProfil.konsKeahlian || '').toUpperCase()}</td>
+                            <td width="25%"></td>
+                            <td>NIS/NISN</td>
+                            <td>:</td>
+                            <td>${dataProfil.nis || '/'}</td>
                         </tr>
                     </table>
 
                     <br><br><br><br>
-                    <span style="font-size: 14pt; font-weight: bold;">TAHUN ${dataProfil.tahun || '2026'}</span>
+
+                    <b style="font-size: 14pt;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</b><br><br>
                     
-                    <!-- Tag khusus pemisah halaman untuk Microsoft Word -->
-                    <br clear="all" style="page-break-before: always;" />
+                    <table border="0" width="100%" style="font-size: 11pt; text-align: left; font-weight: bold;">
+                        <tr>
+                            <td width="15%"></td>
+                            <td width="30%">PROGRAM KEAHLIAN</td>
+                            <td width="5%">:</td>
+                            <td width="50%">${(dataProfil.progKeahlian || '').toUpperCase()}</td>
+                        </tr>
+                        <tr>
+                            <td width="15%"></td>
+                            <td>KONSENTRASI KEAHLIAN</td>
+                            <td>:</td>
+                            <td>${(dataProfil.konsKeahlian || '').toUpperCase()}</td>
+                        </tr>
+                    </table>
+
+                    <br><br><br>
+                    <b style="font-size: 14pt;">TAHUN ${dataProfil.tahun || '2026'}</b>
                 </div>
             `;
         }
 
-        // 2. BAGIAN TABEL
         const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
+        let htmlTabel = '';
 
         for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
             const bulan = unikBulan[bIdx];
             const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
             if (dataBulanIni.length === 0) continue;
 
-            if (bIdx > 0 || opsiCover === 'tanpa') {
-                if (bIdx > 0) htmlContent += `<br clear="all" style="page-break-before: always;" />`;
-            }
+            let pageBreak = (bIdx > 0 || opsiCover === 'tanpa') ? 'page-break-before: always;' : '';
 
-            htmlContent += `
-                <div style="font-family: 'Times New Roman', serif;">
-                    <p style="font-size: 12pt; font-weight: bold; margin: 0 0 5px 0;">1. Laporan Kegiatan Harian</p>
-                    <p style="font-size: 12pt; font-weight: bold; margin: 0 0 15px 0;">b. Bulan ${bulan.toUpperCase()}</p>
+            htmlTabel += `
+                <div style="${pageBreak} font-family: 'Times New Roman', serif;">
+                    <p style="font-size: 12pt; font-weight: bold; margin-bottom: 15px;">
+                        1. Laporan Kegiatan Harian<br>
+                        b. Bulan ${bulan.toUpperCase()}
+                    </p>
                     
-                    <!-- Kunci rapi di HP: width: 100% dan pembagian kolom menggunakan persentase -->
-                    <table border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse; font-size: 11pt; text-align: left;">
+                    <!-- Tabel diset lebar 100% agar otomatis presisi di layar HP -->
+                    <table border="1" width="100%" cellpadding="6" cellspacing="0" style="border-collapse: collapse; font-size: 11pt; text-align: left;">
                         <tr style="background-color: #f2f2f2; text-align: center; font-weight: bold;">
-                            <td style="width: 5%;">No</td>
-                            <td style="width: 15%;">Hari</td>
-                            <td style="width: 15%;">Tanggal</td>
-                            <td style="width: 45%;">Uraian Kegiatan</td>
-                            <td style="width: 20%;">Foto</td>
+                            <td width="5%">No</td>
+                            <td width="15%">Hari</td>
+                            <td width="20%">Tanggal</td>
+                            <td width="40%">Uraian Kegiatan</td>
+                            <td width="20%">Foto</td>
                         </tr>
             `;
 
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
                 let fotoHtml = '-';
-
                 if (item.foto && item.foto.trim() !== '') {
-                    try {
-                        const compressed = await kompresGambarRingan(item.foto, 150, 0.6);
-                        fotoHtml = `<img src="${compressed}" style="width: 80px; height: auto;" />`;
-                    } catch (e) {
-                        fotoHtml = '-';
-                    }
+                    const compressed = await kompresGambarRingan(item.foto, 200, 0.6);
+                    fotoHtml = `<img src="${compressed}" width="80" />`;
                 }
 
-                htmlContent += `
+                htmlTabel += `
                     <tr>
-                        <td style="text-align: center; vertical-align: middle;">${idx + 1}</td>
-                        <td style="vertical-align: middle;">${item.hari || ''}</td>
-                        <td style="vertical-align: middle;">${item.tanggal || ''}</td>
-                        <td style="vertical-align: middle;">${item.uraian || ''}</td>
-                        <td style="text-align: center; vertical-align: middle;">${fotoHtml}</td>
+                        <td align="center" valign="top">${idx + 1}</td>
+                        <td valign="top">${item.hari}</td>
+                        <td valign="top">${item.tanggal}</td>
+                        <td valign="top">${item.uraian}</td>
+                        <td align="center" valign="top">${fotoHtml}</td>
                     </tr>
                 `;
             }
 
-            htmlContent += `
+            htmlTabel += `
                     </table>
                 </div>
             `;
         }
 
-        // 3. PEMBUNGKUS STANDAR MICROSOFT WORD
+        // Pembungkus resmi yang dikenali semua aplikasi Word HP
         const fullDocument = `
-            <html xmlns:v="urn:schemas-microsoft-com:vml"
-                  xmlns:o="urn:schemas-microsoft-com:office:office"
-                  xmlns:w="urn:schemas-microsoft-com:office:word"
-                  xmlns:m="http://schemas-microsoft.com/office/2004/12/omml"
-                  xmlns="http://www.w3.org/TR/REC-html40">
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head>
-                <meta charset="utf-8">
-                <title>Laporan PKL LUKYY</title>
+                <meta charset='utf-8'>
+                <title>Laporan PKL</title>
                 <!--[if gte mso 9]>
                 <xml>
-                    <w:WordDocument>
-                        <w:View>Print</w:View>
-                        <w:Zoom>100</w:Zoom>
-                        <w:DoNotOptimizeForBrowser/>
-                    </w:WordDocument>
+                <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:DoNotOptimizeForBrowser/>
+                </w:WordDocument>
                 </xml>
                 <![endif]-->
                 <style>
-                    /* Setup Margin dan Kertas A4 */
-                    @page Section1 {
-                        size: 21cm 29.7cm; 
-                        margin: 2.5cm 2cm 2.5cm 2cm;
+                    @page {
                         mso-page-orientation: portrait;
+                        size: 21cm 29.7cm; /* Ukuran A4 */
+                        margin: 2.5cm 2cm 2.5cm 2cm;
                     }
-                    div.Section1 { page: Section1; }
+                    body {
+                        font-family: 'Times New Roman', serif;
+                        color: #000000;
+                    }
+                    /* Mengamankan agar teks tidak turun vertikal */
+                    table {
+                        table-layout: fixed;
+                        word-wrap: break-word;
+                    }
                 </style>
             </head>
             <body>
-                <div class="Section1">
-                    ${htmlContent}
-                </div>
+                ${htmlCover}
+                ${htmlTabel}
             </body>
             </html>
         `;
 
-        // Format .doc (bukan .docx) dijamin langsung terbaca oleh semua jenis Office Mobile
-        const blob = new Blob(['\ufeff' + fullDocument], { type: 'application/msword' });
+        const blob = new Blob(['\ufeff' + fullDocument], {
+            type: 'application/msword'
+        });
+
         saveAs(blob, \`Laporan_PKL_\${dataProfil.nama || 'LUKYY'}.doc\`);
-        
         showToast("Dokumen Word berhasil diunduh! 📥");
 
     } catch (err) {
