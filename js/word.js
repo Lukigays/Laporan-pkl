@@ -1,5 +1,5 @@
 // ============================================================
-// EKSPOR WORD (.docx) — Tampilan Rapi & Presisi Seputar PDF
+// EKSPOR WORD (.doc) — Metode HTML Klasik (Anti Berantakan)
 // ============================================================
 
 function bukaOspiExportWord() {
@@ -34,35 +34,63 @@ async function downloadWord(opsiCover) {
         let logoRaw = dataProfil.logoCatboxUrl || dataProfil.logoSekolah || '';
         let logoBase64 = '';
         if (logoRaw !== '') {
-            logoBase64 = await getImageBase64ForPdf(logoRaw, 200, 0.7);
+            // Kompresi logo untuk Word
+            logoBase64 = await getImageBase64ForPdf(logoRaw, 150, 0.7);
         }
 
         let htmlCover = '';
         if (opsiCover === 'dengan') {
+            // Kover menggunakan tag HTML murni (br, b, center) agar stabil di Word HP
             htmlCover = `
-                <div class="page-cover" style="text-align: center; page-break-after: always; padding-top: 20px;">
-                    <h2 style="font-size: 16pt; margin: 0; font-weight: bold;">LAPORAN</h2>
-                    <h2 style="font-size: 16pt; margin: 0 0 15px 0; font-weight: bold;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
-                    <p style="font-size: 12pt; margin: 0 0 5px 0; font-weight: bold;">DI</p>
-                    <h3 style="font-size: 12pt; margin: 0 0 45px 0; font-weight: normal;">${(dataProfil.alamat || 'Alamat Tempat PKL').toUpperCase()}</h3>
+                <div style="text-align: center; page-break-after: always; font-family: 'Times New Roman', serif;">
+                    <br><br>
+                    <b style="font-size: 18pt;">LAPORAN</b><br>
+                    <b style="font-size: 18pt;">PRAKTEK KERJA LAPANGAN (PKL)</b><br><br><br>
+                    <b style="font-size: 14pt;">DI</b><br>
+                    <span style="font-size: 14pt;">${(dataProfil.alamat || 'Alamat Tempat PKL').toUpperCase()}</span><br><br><br><br>
+
+                    ${logoBase64 ? `<img src="${logoBase64}" width="120" height="120" />` : '<br><br><br><br><br>'}
+                    <br><br><br><br>
+
+                    <span style="font-size: 12pt;">Disusun Oleh:</span><br><br>
+
+                    <table border="0" width="350" align="center" style="font-size: 12pt; text-align: left;">
+                        <tr>
+                            <td width="100">Nama</td>
+                            <td width="20">:</td>
+                            <td>${dataProfil.nama || 'LUKYY'}</td>
+                        </tr>
+                        <tr>
+                            <td>Kelas</td>
+                            <td>:</td>
+                            <td>${dataProfil.kelas || 'XII'}</td>
+                        </tr>
+                        <tr>
+                            <td>NIS/NISN</td>
+                            <td>:</td>
+                            <td>${dataProfil.nis || '/'}</td>
+                        </tr>
+                    </table>
+
+                    <br><br><br><br>
+
+                    <b style="font-size: 14pt;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</b><br><br>
                     
-                    <div style="margin: 30px 0;">
-                        ${logoBase64 ? `<img src="${logoBase64}" style="width: 120px; height: auto;" />` : '<div style="height: 120px;"></div>'}
-                    </div>
-
-                    <p style="font-size: 11pt; margin-bottom: 10px;">Disusun Oleh:</p>
-                    <table style="border: none !important; width: 320px; margin: 0 auto 50px auto; font-size: 11pt; text-align: left;">
-                        <tr><td style="border: none !important; width: 90px; padding: 2px;">Nama</td><td style="border: none !important; width: 10px; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.nama || 'LUKYY'}</td></tr>
-                        <tr><td style="border: none !important; padding: 2px;">Kelas</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.kelas || 'XII'}</td></tr>
-                        <tr><td style="border: none !important; padding: 2px;">NIS/NISN</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.nis || '/'}</td></tr>
+                    <table border="0" width="550" align="center" style="font-size: 11pt; text-align: left; font-weight: bold;">
+                        <tr>
+                            <td width="230">PROGRAM KEAHLIAN</td>
+                            <td width="20">:</td>
+                            <td>${(dataProfil.progKeahlian || '').toUpperCase()}</td>
+                        </tr>
+                        <tr>
+                            <td>KONSENTRASI KEAHLIAN</td>
+                            <td>:</td>
+                            <td>${(dataProfil.konsKeahlian || '').toUpperCase()}</td>
+                        </tr>
                     </table>
 
-                    <h3 style="font-size: 12pt; font-weight: bold; margin: 0 0 10px 0;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
-                    <table style="border: none !important; width: 450px; margin: 0 auto 30px auto; font-size: 10pt; text-align: left; font-weight: bold;">
-                        <tr><td style="border: none !important; width: 200px; padding: 2px;">PROGRAM KEAHLIAN</td><td style="border: none !important; width: 10px; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${(dataProfil.progKeahlian || '').toUpperCase()}</td></tr>
-                        <tr><td style="border: none !important; padding: 2px;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${(dataProfil.konsKeahlian || '').toUpperCase()}</td></tr>
-                    </table>
-                    <h4 style="font-size: 12pt; font-weight: bold; margin-top: 20px;">TAHUN ${dataProfil.tahun || '2026...'}</h4>
+                    <br><br><br>
+                    <b style="font-size: 14pt;">TAHUN ${dataProfil.tahun || '2026...'}</b>
                 </div>
             `;
         }
@@ -75,53 +103,54 @@ async function downloadWord(opsiCover) {
             const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
             if (dataBulanIni.length === 0) continue;
 
-            let pageBreakCss = (bIdx > 0 || opsiCover === 'tanpa') ? 'page-break-before: always;' : '';
+            let pageBreak = (bIdx > 0 || opsiCover === 'tanpa') ? 'page-break-before: always;' : '';
 
             htmlTabel += `
-                <div style="${pageBreakCss} margin-top: 20px;">
-                    <div style="font-size: 11pt; font-weight: bold; margin-bottom: 10px;">
-                        <p style="margin: 0;">1. Laporan Kegiatan Harian</p>
-                        <p style="margin: 0;">b. Bulan ${bulan.toUpperCase()}</p>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt;" border="1">
-                        <thead>
-                            <tr style="background-color: #f2f2f2;">
-                                <th style="width: 5%; padding: 6px; text-align: center;">No</th>
-                                <th style="width: 12%; padding: 6px; text-align: left;">Hari</th>
-                                <th style="width: 15%; padding: 6px; text-align: left;">Tanggal</th>
-                                <th style="width: 48%; padding: 6px; text-align: left;">Uraian Kegiatan</th>
-                                <th style="width: 20%; padding: 6px; text-align: center;">Foto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div style="${pageBreak} font-family: 'Times New Roman', serif;">
+                    <p style="font-size: 12pt; font-weight: bold; margin-bottom: 15px;">
+                        1. Laporan Kegiatan Harian<br>
+                        b. Bulan ${bulan.toUpperCase()}
+                    </p>
+                    
+                    <!-- Tabel diset lebar mutlak 650 (Standar A4 Margin) agar tidak mengecil di HP -->
+                    <table border="1" width="650" cellpadding="6" cellspacing="0" style="border-collapse: collapse; font-size: 11pt; text-align: left;">
+                        <tr style="background-color: #f2f2f2; text-align: center; font-weight: bold;">
+                            <td width="30">No</td>
+                            <td width="80">Hari</td>
+                            <td width="90">Tanggal</td>
+                            <td width="330">Uraian Kegiatan</td>
+                            <td width="120">Foto</td>
+                        </tr>
             `;
 
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
                 let fotoHtml = '-';
                 if (item.foto && item.foto.trim() !== '') {
-                    const compressed = await kompresGambarRingan(item.foto, 250, 0.6);
-                    fotoHtml = `<img src="${compressed}" style="max-width: 100px; max-height: 100px; object-fit: contain; display: block; margin: 0 auto;" />`;
+                    // Kompresi agar foto Word tidak berat
+                    const compressed = await kompresGambarRingan(item.foto, 200, 0.6);
+                    // Gunakan HTML property width="90" bukan CSS
+                    fotoHtml = `<img src="${compressed}" width="90" />`;
                 }
 
                 htmlTabel += `
                     <tr>
-                        <td style="padding: 6px; text-align: center; vertical-align: top;">${idx + 1}</td>
-                        <td style="padding: 6px; vertical-align: top;">${item.hari}</td>
-                        <td style="padding: 6px; vertical-align: top;">${item.tanggal}</td>
-                        <td style="padding: 6px; vertical-align: top;">${item.uraian}</td>
-                        <td style="padding: 6px; text-align: center; vertical-align: top;">${fotoHtml}</td>
+                        <td align="center" valign="top">${idx + 1}</td>
+                        <td valign="top">${item.hari}</td>
+                        <td valign="top">${item.tanggal}</td>
+                        <td valign="top">${item.uraian}</td>
+                        <td align="center" valign="top">${fotoHtml}</td>
                     </tr>
                 `;
             }
 
             htmlTabel += `
-                        </tbody>
                     </table>
                 </div>
             `;
         }
 
+        // Tag khusus pembungkus Word
         const fullDocument = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head>
@@ -138,20 +167,13 @@ async function downloadWord(opsiCover) {
                 <![endif]-->
                 <style>
                     @page {
-                        size: A4;
-                        margin: 20mm 20mm 20mm 20mm;
+                        mso-page-orientation: portrait;
+                        size: 21cm 29.7cm; /* Ukuran A4 */
+                        margin: 2.5cm 2cm 2.5cm 2cm;
                     }
                     body {
                         font-family: 'Times New Roman', serif;
                         color: #000000;
-                        background-color: #ffffff;
-                    }
-                    table {
-                        border-collapse: collapse;
-                    }
-                    td, th {
-                        border: 1px solid #000000;
-                        word-wrap: break-word;
                     }
                 </style>
             </head>
