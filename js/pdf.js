@@ -1,28 +1,3 @@
-// ============================================================
-// EKSPOR PDF (pdfMake) — Cover + Tabel per Bulan
-// ============================================================
-
-// ---------- Modal Opsi Ekspor ----------
-function bukaOspiExport() {
-    const modal = document.getElementById('modalExportOspi');
-    modal.classList.remove('hidden');
-    setTimeout(() => modal.classList.remove('opacity-0'), 10);
-}
-
-function tutupOspiExport() {
-    const modal = document.getElementById('modalExportOspi');
-    modal.classList.add('opacity-0');
-    setTimeout(() => modal.classList.add('hidden'), 300);
-}
-
-function prosesEksekusiPDF() {
-    const opsi = document.querySelector('input[name="opsiCover"]:checked')
-        ? document.querySelector('input[name="opsiCover"]:checked').value
-        : 'dengan';
-    tutupOspiExport();
-    downloadPDF(opsi);
-}
-
 // ---------- Generator PDF ----------
 async function downloadPDF(opsiCover) {
     showToast("⏳ Mengompresi & Membuat PDF...");
@@ -122,9 +97,10 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
+            // 1. Kompresi dinaikkan ukurannya ke 300px agar tidak pecah saat diperbesar
             const fotoPromises = dataBulanIni.map(item => {
                 if (item.foto && item.foto.trim() !== '') {
-                    return kompresGambarRingan(item.foto, 150, 0.5).catch(err => null);
+                    return kompresGambarRingan(item.foto, 300, 0.6).catch(err => null);
                 }
                 return Promise.resolve(null);
             });
@@ -134,8 +110,9 @@ async function downloadPDF(opsiCover) {
                 const item = dataBulanIni[idx];
                 let fotoCell = { text: '-', alignment: 'center' };
 
+                // 2. Dimensi foto diperbesar ke [100, 100]
                 if (fotoHasil[idx]) {
-                    fotoCell = { image: fotoHasil[idx], fit: [50, 50], alignment: 'center' };
+                    fotoCell = { image: fotoHasil[idx], fit: [100, 100], alignment: 'center' };
                 }
 
                 tableBody.push([
@@ -147,10 +124,11 @@ async function downloadPDF(opsiCover) {
                 ]);
             }
 
+            // 3. Lebar kolom foto diperbesar menjadi 110
             blockElement.stack.push({
                 table: {
                     headerRows: 1,
-                    widths: [25, 45, 60, '*', 65],
+                    widths: [20, 40, 55, '*', 110],
                     dontBreakRows: true,
                     body: tableBody
                 },
