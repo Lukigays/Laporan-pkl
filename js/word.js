@@ -50,8 +50,15 @@ async function getGambarUint8Array(source, maxDimensi = 300, kualitas = 0.6) {
 async function downloadWord(opsiCover) {
     showToast("⏳ Mengompresi & Membuat Dokumen Word...");
 
+    // Cek ketersediaan library docx di objek window
+    const docxLib = window.docx;
+    if (!docxLib) {
+        showToast("❌ Library docx belum siap/termuat! Periksa koneksi internet.");
+        return;
+    }
+
     try {
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak, BorderStyle } = docx;
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak } = docxLib;
 
         const sectionsChildren = [];
 
