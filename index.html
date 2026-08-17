@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<script>(function(s){s.dataset.zone='11500942',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0f">
@@ -14,6 +13,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Library Ekspor Word -->
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -125,8 +128,37 @@
                 </label>
             </div>
             <div class="flex gap-3">
-                <button onclick="tutupOspiExport()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
-                <button onclick="prosesEksekusiPDF()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>Unduh PDF</span></button>
+                <button type="button" onclick="tutupOspiExport()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
+                <button type="button" onclick="prosesEksekusiPDF()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>Unduh PDF</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Opsi Ekspor Word -->
+    <div id="modalExportOspiWord" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
+        <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
+            <div class="text-4xl mb-3">📄</div>
+            <h3 class="font-display font-bold text-xl mb-2 gradient-text">Opsi Ekspor Word</h3>
+            <p class="text-sm text-slate-400 mb-8">Pilih format dokumen Word (.docx) yang ingin Anda unduh:</p>
+            <div class="space-y-3 mb-8 text-left">
+                <label class="flex items-center gap-4 p-4 rounded-2xl glass-panel cursor-pointer hover:border-accent/30 transition-all group">
+                    <input type="radio" name="opsiCoverWord" value="dengan" checked class="w-5 h-5 accent-accent">
+                    <div>
+                        <p class="font-semibold text-sm group-hover:text-accent-light transition-colors">Dengan Judul & Kover Laporan</p>
+                        <p class="text-xs text-slate-500">Mencetak halaman kover lengkap beserta tabel.</p>
+                    </div>
+                </label>
+                <label class="flex items-center gap-4 p-4 rounded-2xl glass-panel cursor-pointer hover:border-accent/30 transition-all group">
+                    <input type="radio" name="opsiCoverWord" value="tanpa" class="w-5 h-5 accent-accent">
+                    <div>
+                        <p class="font-semibold text-sm group-hover:text-accent-light transition-colors">Hanya Tabel Saja</p>
+                        <p class="text-xs text-slate-500">Langsung mencetak halaman data tabel kegiatan harian.</p>
+                    </div>
+                </label>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="tutupOspiExportWord()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
+                <button type="button" onclick="prosesEksekusiWord()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>Unduh Word</span></button>
             </div>
         </div>
     </div>
@@ -342,7 +374,11 @@
 
                 <div class="glass-panel rounded-3xl p-5 md:p-6 mb-8 space-y-5 no-print relative z-10 animate-fade-in">
                     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                        <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-8 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export PDF</span></button>
+                        <!-- Tombol Export PDF dan Word -->
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-6 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export PDF</span></button>
+                            <button onclick="bukaOspiExportWord()" id="btnDownloadWord" class="py-3.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap transition-all"><span>📄 Export Word</span></button>
+                        </div>
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                             <select id="filterBulan" onchange="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold"><option value="SEMUA">Filter: Semua Bulan</option></select>
                             <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold" placeholder="Cari laporan...">
@@ -409,7 +445,7 @@
         </div>
     </nav>
 
-    <!-- Script aplikasi (urutan penting: config → utils → fitur → main) -->
+    <!-- Script aplikasi (urutan pemanggilan) -->
     <script src="js/particles.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
@@ -418,6 +454,7 @@
     <script src="js/laporan.js"></script>
     <script src="js/backup.js"></script>
     <script src="js/pdf.js"></script>
+    <script src="js/word.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
