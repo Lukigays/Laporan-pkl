@@ -178,8 +178,9 @@ body {
 .area-kertas table {
     border-collapse: collapse !important;
     font-size: 11px !important;
-    width: 100% !important; min-width: 0 !important;
-    table-layout: fixed;
+    width: 100% !important;
+    min-width: 600px !important; /* Diperbarui agar tabel punya batas lebar minimal */
+    table-layout: auto !important; /* Diperbarui agar lebar kolom menyesuaikan isi */
 }
 .area-kertas th, .area-kertas td {
     border: 1px solid black !important;
@@ -187,7 +188,13 @@ body {
     vertical-align: top; color: black !important;
     word-break: break-word;
 }
-.area-kertas td img { display: block; margin: 0 auto; max-height: 75px; max-width: 100%; object-fit: contain; }
+.area-kertas td img { 
+    display: block; 
+    margin: 0 auto; 
+    max-height: 150px; /* Diperbesar agar foto terlihat jelas */
+    max-width: 100%; 
+    object-fit: contain; 
+}
 .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
 
 .header-print {
@@ -211,13 +218,17 @@ body {
 .logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
 
 /* ---------- Scrollbar ---------- */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(192,38,211,0.5); }
 
 /* ---------- Tabel & select ---------- */
-.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrapper { 
+    width: 100%; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+}
 select.glass-input {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
