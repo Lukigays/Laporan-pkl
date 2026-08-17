@@ -6,103 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0f">
     <title>LAPORAN PKL BY LUKYY</title>
+
+    <!-- Library eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- LIBRARY PDFMAKE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    colors: {
-                        void: '#030308',
-                        midnight: '#0a0a12',
-                        surface: '#12121a',
-                        accent: { DEFAULT: '#c026d3', light: '#d946ef', dark: '#a21caf' },
-                        cosmic: { purple: '#7c3aed', violet: '#8b5cf6', pink: '#ec4899', rose: '#f43f5e' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root { --glow-primary: 0 0 40px rgba(192,38,211,0.3); }
-        * { scrollbar-width: thin; scrollbar-color: rgba(192,38,211,0.3) transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: #030308; color: #f1f5f9; overflow-x: hidden; min-height: 100vh; }
-        .cosmic-bg { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(192,38,211,0.1) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.05) 0%, transparent 70%), #030308; }
-        .cosmic-orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; pointer-events: none; animation: orbFloat 20s ease-in-out infinite; }
-        .orb-1 { width: 400px; height: 400px; background: rgba(124,58,237,0.2); top: -10%; right: -5%; }
-        .orb-2 { width: 300px; height: 300px; background: rgba(192,38,211,0.15); bottom: 10%; left: -5%; animation-delay: -7s; }
-        .orb-3 { width: 250px; height: 250px; background: rgba(236,72,153,0.1); top: 40%; left: 30%; animation-delay: -14s; }
-        @keyframes orbFloat { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-30px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.95); } }
-        #particles-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.6; }
-        .glass-panel { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
-        .glass-panel-hover:hover { background: rgba(255,255,255,0.05); border-color: rgba(192,38,211,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(192,38,211,0.1), inset 0 1px 0 rgba(255,255,255,0.1); }
-        .glass-input { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s ease; }
-        .glass-input:focus { outline: none; border-color: rgba(192,38,211,0.5); box-shadow: 0 0 0 3px rgba(192,38,211,0.1), 0 0 20px rgba(192,38,211,0.1); background: rgba(255,255,255,0.05); }
-        .glass-input::placeholder { color: rgba(255,255,255,0.3); }
-        .gradient-text { background: linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #ec4899 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .gradient-text-hero { background: linear-gradient(135deg, #ffffff 0%, #e9d5ff 30%, #c026d3 60%, #7c3aed 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .btn-primary { background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%); color: white; border: none; position: relative; overflow: hidden; transition: all 0.3s ease; }
-        .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, #c026d3 0%, #ec4899 100%); opacity: 0; transition: opacity 0.3s ease; }
-        .btn-primary:hover::before { opacity: 1; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(192,38,211,0.4); }
-        .btn-primary:active { transform: translateY(0) scale(0.98); }
-        .btn-primary span { position: relative; z-index: 1; }
-        .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s ease; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(192,38,211,0.4); box-shadow: 0 0 20px rgba(192,38,211,0.1); }
-        .btn-glow { box-shadow: 0 0 20px rgba(192,38,211,0.3); }
-        .nav-item { position: relative; transition: all 0.3s ease; }
-        .nav-item.active { background: rgba(192,38,211,0.15); border: 1px solid rgba(192,38,211,0.3); color: #d946ef; box-shadow: 0 0 20px rgba(192,38,211,0.15); }
-        .nav-item.active::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #d946ef; box-shadow: 0 0 10px #d946ef; }
-        .tab-content { opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); position: absolute; width: 100%; pointer-events: none; visibility: hidden; }
-        .tab-content.active { opacity: 1; transform: translateY(0); position: relative; pointer-events: auto; visibility: visible; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeInUp 0.6s ease forwards; }
-        .animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-        .animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-        .animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
-        .animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
-        .modal-overlay { background: rgba(3,3,8,0.8); backdrop-filter: blur(12px); }
-        .modal-content { background: linear-gradient(180deg, rgba(18,18,26,0.95), rgba(10,10,18,0.98)); border: 1px solid rgba(192,38,211,0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.1); }
-        .stat-card { position: relative; overflow: hidden; }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #c026d3, #7c3aed, transparent); opacity: 0.5; }
-        .stat-card .stat-icon { background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,38,211,0.2)); border: 1px solid rgba(192,38,211,0.2); }
-        .badge-cosmic { background: rgba(192,38,211,0.1); border: 1px solid rgba(192,38,211,0.2); color: #d946ef; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; }
-        .danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
-        
-        .area-kertas { font-family: "Times New Roman", Times, serif; background-color: white !important; color: black !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .area-kertas table { border-collapse: collapse !important; font-size: 11px !important; width: 100% !important; min-width: 0 !important; table-layout: fixed; }
-        .area-kertas th, .area-kertas td { border: 1px solid black !important; padding: 6px 8px !important; vertical-align: top; color: black !important; word-break: break-word; }
-        .area-kertas td img { display: block; margin: 0 auto; width: 140px; height: 140px; object-fit: cover; border-radius: 4px; }
-        .area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-        
-        .header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; min-height: 1000px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; box-sizing: border-box; }
-        .header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
-        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800; white-space: nowrap; pointer-events: none; z-index: 1; user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em; }
-        
-        .logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 35px 0; }
-        .logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(192,38,211,0.5); }
-        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        select.glass-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
-        .hero-section { position: relative; padding: 3rem 0 2rem; }
-        @media (max-width: 768px) { .hero-section { padding: 2rem 0 1rem; } .orb-1, .orb-2, .orb-3 { display: none; } }
-    </style>
+    <!-- Konfigurasi & style aplikasi -->
+    <script src="js/config.js"></script>
+    <script>initTailwindConfig();</script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="antialiased min-h-screen pb-40 md:pb-32">
     <div class="cosmic-bg"></div>
@@ -111,6 +29,7 @@
     <div class="cosmic-orb orb-3"></div>
     <canvas id="particles-canvas"></canvas>
 
+    <!-- Toast -->
     <div id="toast-container" class="fixed top-6 right-6 z-[110] transform translate-x-full opacity-0 pointer-events-none transition-all duration-300">
         <div id="toast-box" class="glass-panel px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl border-l-4 border-l-accent">
             <span id="toast-icon" class="text-xl">✨</span>
@@ -118,6 +37,7 @@
         </div>
     </div>
 
+    <!-- Modal Reset Password -->
     <div id="modalResetPassword" class="fixed inset-0 z-[130] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
             <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent pointer-events-none"></div>
@@ -129,6 +49,7 @@
         </div>
     </div>
 
+    <!-- Modal Tour -->
     <div id="modalTour" class="fixed inset-0 z-[120] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-lg rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cosmic-purple via-accent to-cosmic-pink"></div>
@@ -150,6 +71,7 @@
         </div>
     </div>
 
+    <!-- Modal Auth -->
     <div id="modalAuth" class="fixed inset-0 z-[105] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
@@ -180,6 +102,7 @@
         </div>
     </div>
 
+    <!-- Modal Opsi Ekspor PDF -->
     <div id="modalExportOspi" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
             <div class="text-4xl mb-3">📑</div>
@@ -208,54 +131,7 @@
         </div>
     </div>
 
-    
-    <div id="modalKamera" class="fixed inset-0 z-[98] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-lg rounded-3xl flex flex-col overflow-hidden p-0">
-            <div class="p-5 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-purple to-accent flex items-center justify-center text-lg">📷</div>
-                    <h3 class="font-display font-bold text-lg">Ambil Foto Langsung</h3>
-                </div>
-                <button onclick="tutupKamera()" class="hover:text-accent-light text-2xl font-light transition-colors">&times;</button>
-            </div>
-            <div class="p-6 space-y-5">
-                <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-black/50 border border-white/10">
-                    <video id="videoKamera" class="w-full h-full object-cover" autoplay playsinline muted></video>
-                    <div id="kameraLoading" class="absolute inset-0 flex items-center justify-center bg-black/60 z-10">
-                        <div class="text-center">
-                            <div class="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                            <p class="text-sm text-slate-400">Memuat kamera...</p>
-                        </div>
-                    </div>
-                    <div id="kameraError" class="absolute inset-0 flex items-center justify-center bg-black/80 z-10 hidden">
-                        <div class="text-center p-4">
-                            <div class="text-4xl mb-2">⚠️</div>
-                            <p class="text-sm text-slate-300 font-semibold mb-1">Tidak dapat mengakses kamera</p>
-                            <p class="text-xs text-slate-500">Pastikan izin kamera diizinkan di browser Anda.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button onclick="gantiKamera()" class="glass-panel px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-white/5 transition-all flex items-center gap-2">
-                        <span>🔄</span> Ganti Kamera
-                    </button>
-                    <div class="flex gap-3">
-                        <button onclick="tutupKamera()" class="px-6 py-3 glass-panel rounded-xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
-                        <button onclick="captureFoto()" class="px-8 py-3 btn-primary rounded-xl text-sm font-bold shadow-lg flex items-center gap-2">
-                            <span>📸</span> Ambil Foto
-                        </button>
-                    </div>
-                </div>
-                <div id="previewHasilKamera" class="hidden">
-                    <p class="text-xs font-semibold text-slate-400 mb-2">Preview Hasil:</p>
-                    <div class="w-32 h-32 rounded-xl overflow-hidden border border-white/10 bg-black/30">
-                        <img id="imgPreviewKamera" src="" class="w-full h-full object-cover">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Modal Pengaturan -->
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-2xl rounded-3xl flex flex-col overflow-hidden max-h-[90vh]">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
@@ -314,14 +190,12 @@
                 <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
                     <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah</h4>
                     <p class="text-xs text-slate-400 mb-3">Upload foto logo sekolah dari galeri HP atau tempel URL Direct Link PNG.</p>
-                    
                     <div class="space-y-3 mb-4">
                         <div>
                             <label class="block text-xs font-semibold mb-1 text-slate-400">Direct Link URL (Opsional)</label>
                             <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://i.postimg.cc/xxxx/logo.png">
                         </div>
                     </div>
-
                     <div class="flex items-center gap-4">
                         <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
                             <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
@@ -357,6 +231,7 @@
         </div>
     </div>
 
+    <!-- Konten Utama -->
     <div class="max-w-6xl mx-auto px-4 md:px-8 relative pt-6 md:pt-0">
         <div class="hero-section no-print">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
@@ -375,6 +250,7 @@
         </div>
 
         <div class="relative min-h-[500px]">
+            <!-- Tab Input -->
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in animate-delay-3">
                     <div class="flex items-center gap-4 mb-8">
@@ -395,18 +271,7 @@
                         </div>
                         <div class="lg:col-span-4">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Upload Foto Bukti</label>
-                            <div class="flex flex-col md:flex-row gap-3 items-start">
-                                <input type="file" id="inputFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
-                                <button onclick="bukaKamera('input')" type="button" class="btn-secondary py-3 px-5 rounded-2xl text-sm font-bold flex items-center gap-2 whitespace-nowrap hover:border-accent/40">
-                                    <span>📷</span> Ambil Foto
-                                </button>
-                            </div>
-                            <div id="previewFotoInput" class="hidden mt-3">
-                                <div class="w-28 h-28 rounded-xl overflow-hidden border border-white/10 bg-black/30 inline-block">
-                                    <img id="imgPreviewInput" src="" class="w-full h-full object-cover">
-                                </div>
-                                <button onclick="hapusFotoKamera('input')" class="ml-2 text-xs text-red-400 hover:text-red-300 font-bold">🗑️ Hapus</button>
-                            </div>
+                            <input type="file" id="inputFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
                         </div>
                     </div>
                     <div class="mt-8 flex justify-end">
@@ -415,6 +280,7 @@
                 </div>
             </div>
 
+            <!-- Tab Edit -->
             <div id="tabEdit" class="tab-content pb-10">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in">
                     <div class="flex items-center gap-4 mb-8">
@@ -442,19 +308,8 @@
                         </div>
                         <div class="lg:col-span-4">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Ganti Foto Bukti (Opsional)</label>
-                            <div class="flex flex-col md:flex-row gap-3 items-start">
-                                <input type="file" id="editFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
-                                <button onclick="bukaKamera('edit')" type="button" class="btn-secondary py-3 px-5 rounded-2xl text-sm font-bold flex items-center gap-2 whitespace-nowrap hover:border-accent/40">
-                                    <span>📷</span> Ambil Foto
-                                </button>
-                            </div>
+                            <input type="file" id="editFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
                             <p class="text-xs text-slate-500 mt-2">*Kosongkan jika foto tidak ingin diubah.</p>
-                            <div id="previewFotoEdit" class="hidden mt-3">
-                                <div class="w-28 h-28 rounded-xl overflow-hidden border border-white/10 bg-black/30 inline-block">
-                                    <img id="imgPreviewEdit" src="" class="w-full h-full object-cover">
-                                </div>
-                                <button onclick="hapusFotoKamera('edit')" class="ml-2 text-xs text-red-400 hover:text-red-300 font-bold">🗑️ Hapus</button>
-                            </div>
                         </div>
                         <div class="lg:col-span-4 flex flex-wrap gap-3 justify-end pt-4">
                             <button onclick="hapusLaporanSelected()" class="py-3.5 px-6 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold rounded-2xl text-sm transition-all">🗑️ Hapus Laporan</button>
@@ -464,6 +319,7 @@
                 </div>
             </div>
 
+            <!-- Tab Laporan -->
             <div id="tabLaporan" class="tab-content">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
                     <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-1">
@@ -509,11 +365,9 @@
                                 <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                                 <p style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold;">DI</p>
                                 <h3 style="font-size: 16px; font-weight: normal;" id="coverAlamat">Alamat Tempat PKL</h3>
-                                
                                 <div class="logo-kover-container">
                                     <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
                                 </div>
-
                                 <p style="font-size: 16px; margin-bottom: 12px;">Disusun Oleh:</p>
                                 <table style="border: none !important; margin: 0 auto; width: 320px; font-size: 15px;">
                                     <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
@@ -521,7 +375,6 @@
                                     <tr><td style="border: none !important; text-align: left; padding: 2px !important;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
                                 </table>
                             </div>
-
                             <div>
                                 <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
                                 <table style="border: none !important; margin: 0 auto 20px auto; width: 440px; font-size: 14px;">
@@ -538,6 +391,7 @@
         </div>
     </div>
 
+    <!-- Navigasi Bawah -->
     <nav class="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div class="glass-panel p-2 rounded-3xl flex gap-1 shadow-2xl shadow-black/50">
             <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
@@ -555,1088 +409,15 @@
         </div>
     </nav>
 
-    <script>
-        // ================= PARTICLES =================
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3; this.opacity = Math.random() * 0.5 + 0.1;
-                this.hue = Math.random() * 60 + 270;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-            }
-            draw() {
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`; ctx.fill();
-            }
-        }
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            particles.forEach((p1, i) => {
-                particles.slice(i + 1).forEach(p2 => {
-                    const dx = p1.x - p2.x, dy = p1.y - p2.y, dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 100) {
-                        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `hsla(280, 70%, 60%, ${0.1 * (1 - dist / 100)})`; ctx.lineWidth = 0.5; ctx.stroke();
-                    }
-                });
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // LOGIKA KOMPRESI GAMBAR RINGAN BERBASIS CANVAS
-        function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
-            return new Promise((resolve) => {
-                if (!dataBase64 || !dataBase64.startsWith('data:image')) {
-                    resolve(dataBase64);
-                    return;
-                }
-
-                const timeoutId = setTimeout(() => {
-                    console.warn('Kompresi timeout, mengembalikan gambar asli');
-                    resolve(dataBase64);
-                }, 10000);
-
-                const img = new Image();
-                img.onload = function() {
-                    clearTimeout(timeoutId);
-                    try {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height) {
-                            if (width > maxDimensi) {
-                                height = Math.round(height * (maxDimensi / width));
-                                width = maxDimensi;
-                            }
-                        } else {
-                            if (height > maxDimensi) {
-                                width = Math.round(width * (maxDimensi / height));
-                                height = maxDimensi;
-                            }
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(0, 0, width, height);
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const result = canvas.toDataURL('image/jpeg', kualitas);
-                        resolve(result);
-                    } catch (err) {
-                        console.error('Error kompresi canvas:', err);
-                        resolve(dataBase64);
-                    }
-                };
-                img.onerror = function(err) {
-                    clearTimeout(timeoutId);
-                    console.warn('Error load gambar untuk kompresi:', err);
-                    resolve(dataBase64);
-                };
-                img.src = dataBase64;
-            });
-        }
-
-        async function getImageBase64ForPdf(source, maxDimensi = 200, kualitas = 0.6) {
-            if (source && source.startsWith('data:image')) {
-                return await kompresGambarRingan(source, maxDimensi, kualitas);
-            }
-            if (source && source.startsWith('http')) {
-                try {
-                    const response = await fetch(source, { mode: 'cors' });
-                    if (!response.ok) throw new Error('HTTP ' + response.status);
-                    const blob = await response.blob();
-                    const bitmap = await createImageBitmap(blob);
-                    const canvas = document.createElement('canvas');
-                    let width = bitmap.width;
-                    let height = bitmap.height;
-                    if (width > height) {
-                        if (width > maxDimensi) { height = Math.round(height * (maxDimensi / width)); width = maxDimensi; }
-                    } else {
-                        if (height > maxDimensi) { width = Math.round(width * (maxDimensi / height)); height = maxDimensi; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.drawImage(bitmap, 0, 0, width, height);
-                    return canvas.toDataURL('image/jpeg', kualitas);
-                } catch (err) {
-                    console.warn('Fetch CORS gagal, mencoba fallback Image:', err.message);
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > height) {
-                                if (width > maxDimensi) { height = Math.round(height * (maxDimensi / width)); width = maxDimensi; }
-                            } else {
-                                if (height > maxDimensi) { width = Math.round(width * (maxDimensi / height)); height = maxDimensi; }
-                            }
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#FFFFFF';
-                            ctx.fillRect(0, 0, width, height);
-                            ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', kualitas));
-                        };
-                        img.onerror = function() {
-                            console.error('Gagal memuat gambar dari URL:', source);
-                            resolve(null);
-                        };
-                        setTimeout(() => { resolve(null); }, 8000);
-                        img.src = source;
-                    });
-                }
-            }
-            return null;
-        }
-
-
-        // ================= KAMERA =================
-        let streamKamera = null;
-        let targetInputKamera = null;
-        let fotoKameraBase64 = { input: null, edit: null };
-        let facingModeKamera = 'environment';
-
-        function bukaKamera(target) {
-            targetInputKamera = target;
-            const modal = document.getElementById('modalKamera');
-            document.getElementById('kameraLoading').classList.remove('hidden');
-            document.getElementById('kameraError').classList.add('hidden');
-            document.getElementById('previewHasilKamera').classList.add('hidden');
-            document.getElementById('imgPreviewKamera').src = '';
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            startKamera();
-        }
-
-        async function startKamera() {
-            try {
-                if (streamKamera) {
-                    streamKamera.getTracks().forEach(track => track.stop());
-                }
-                const constraints = {
-                    video: { facingMode: facingModeKamera, width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: false
-                };
-                streamKamera = await navigator.mediaDevices.getUserMedia(constraints);
-                const video = document.getElementById('videoKamera');
-                video.srcObject = streamKamera;
-                video.onloadedmetadata = () => {
-                    video.play();
-                    document.getElementById('kameraLoading').classList.add('hidden');
-                };
-            } catch (err) {
-                console.error('Kamera error:', err);
-                document.getElementById('kameraLoading').classList.add('hidden');
-                document.getElementById('kameraError').classList.remove('hidden');
-            }
-        }
-
-        function gantiKamera() {
-            facingModeKamera = facingModeKamera === 'environment' ? 'user' : 'environment';
-            startKamera();
-        }
-
-        function tutupKamera() {
-            const modal = document.getElementById('modalKamera');
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                if (streamKamera) {
-                    streamKamera.getTracks().forEach(track => track.stop());
-                    streamKamera = null;
-                }
-                document.getElementById('videoKamera').srcObject = null;
-            }, 300);
-        }
-
-        async function captureFoto() {
-            const video = document.getElementById('videoKamera');
-            if (!video || video.readyState !== 4) {
-                showToast('⚠️ Kamera belum siap!');
-                return;
-            }
-            showToast('⏳ Memproses foto...');
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth || 1280;
-                canvas.height = video.videoHeight || 720;
-                const ctx = canvas.getContext('2d');
-                // Flip horizontal jika kamera depan (selfie)
-                if (facingModeKamera === 'user') {
-                    ctx.translate(canvas.width, 0);
-                    ctx.scale(-1, 1);
-                }
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const base64Full = canvas.toDataURL('image/jpeg', 0.9);
-                // Kompresi
-                const base64Compressed = await kompresGambarRingan(base64Full, 200, 0.6);
-                fotoKameraBase64[targetInputKamera] = base64Compressed;
-                // Tampilkan preview
-                document.getElementById('imgPreviewKamera').src = base64Compressed;
-                document.getElementById('previewHasilKamera').classList.remove('hidden');
-                // Update preview di form
-                const previewId = targetInputKamera === 'input' ? 'imgPreviewInput' : 'imgPreviewEdit';
-                const containerId = targetInputKamera === 'input' ? 'previewFotoInput' : 'previewFotoEdit';
-                document.getElementById(previewId).src = base64Compressed;
-                document.getElementById(containerId).classList.remove('hidden');
-                // Kosongkan input file supaya tidak bentrok
-                const fileInputId = targetInputKamera === 'input' ? 'inputFoto' : 'editFoto';
-                document.getElementById(fileInputId).value = '';
-                showToast('✅ Foto berhasil diambil!');
-            } catch (err) {
-                console.error('Capture error:', err);
-                showToast('❌ Gagal mengambil foto!');
-            }
-        }
-
-        function hapusFotoKamera(target) {
-            fotoKameraBase64[target] = null;
-            const previewId = target === 'input' ? 'previewFotoInput' : 'previewFotoEdit';
-            document.getElementById(previewId).classList.add('hidden');
-            const fileInputId = target === 'input' ? 'inputFoto' : 'editFoto';
-            document.getElementById(fileInputId).value = '';
-        }
-
-        // ================= DATA & STATE =================
-        let dataLaporan = [];
-        let dataTelahBerubah = false;
-        let dataProfil = { nama: 'LUKYY', kelas: 'XII', nis: '', alamat: 'Alamat Tempat PKL', progKeahlian: '', konsKeahlian: '', tahun: '2026...', logoSekolah: '', logoCatboxUrl: '' };
-
-        const SUPABASE_URL = "https://tdcgtxoaaplcfpwqvvfe.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_SIoTFjw3KqVQvAVu2AHWuw_B2A5o6Xp";
-        let supabaseClient = null;
-        try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (err) { console.warn("Supabase init failed"); }
-        let currentUser = null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (supabaseClient) {
-                supabaseClient.auth.getSession().then(({ data: { session } }) => { currentUser = session?.user || null; updateAuthUI(); });
-                supabaseClient.auth.onAuthStateChange((event, session) => {
-                    currentUser = session?.user || null; updateAuthUI();
-                    if (event === 'PASSWORD_RECOVERY') bukaModalResetPassword();
-                });
-            } else { updateAuthUI(); }
-        });
-
-        function bukaModalResetPassword() {
-            const modal = document.getElementById('modalResetPassword');
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        }
-
-        async function simpanPasswordBaru() {
-            const pass = document.getElementById('newPasswordInput').value;
-            if (!pass || pass.length < 6) { showToast('⚠️ Password minimal 6 karakter!'); return; }
-            showToast("⏳ Memperbarui password...");
-            const { error } = await supabaseClient.auth.updateUser({ password: pass });
-            if (error) { showToast("❌ " + error.message); }
-            else {
-                document.getElementById('modalResetPassword').classList.add('opacity-0');
-                setTimeout(() => document.getElementById('modalResetPassword').classList.add('hidden'), 300);
-                showToast("🎉 Password berhasil diperbarui!");
-            }
-        }
-
-        function updateAuthUI() {
-            const label = document.getElementById('labelStatusAuth');
-            const btnIn = document.getElementById('wrapperTombolAuth');
-            const btnSync = document.getElementById('wrapperTombolSync');
-            if (currentUser) {
-                label.innerText = `Status: Masuk sebagai (${currentUser.email})`;
-                btnIn.classList.add('hidden'); btnSync.classList.remove('hidden');
-            } else {
-                label.innerText = "Status: Belum masuk akun cloud.";
-                btnIn.classList.remove('hidden'); btnSync.classList.add('hidden');
-            }
-        }
-
-        function bukaModalAuth() {
-            const modal = document.getElementById('modalAuth');
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        }
-
-        function tutupModalAuth() {
-            const modal = document.getElementById('modalAuth');
-            modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        async function prosesLoginAuth() {
-            if (!supabaseClient) { showToast("⚠️ Koneksi cloud belum tersedia!"); return; }
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            if (!email || !password) { showToast('⚠️ Isi email dan password!'); return; }
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) { showToast("❌ " + error.message); }
-            else { tutupModalAuth(); showToast("Berhasil Masuk! 🔓"); tarikDariCloud(); }
-        }
-
-        async function prosesRegisterAuth() {
-            if (!supabaseClient) { showToast("⚠️ Koneksi cloud belum tersedia!"); return; }
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            if (!email || !password) { showToast('⚠️ Isi email dan password!'); return; }
-            const { error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) { showToast("❌ " + error.message); }
-            else { tutupModalAuth(); showToast("Akun berhasil dibuat! Silakan login. 🎉"); }
-        }
-
-        async function prosesLupaPassword() {
-            if (!supabaseClient) { showToast("⚠️ Koneksi cloud belum tersedia!"); return; }
-            const email = document.getElementById('authEmail').value.trim();
-            if (!email) { showToast('⚠️ Isi alamat email terlebih dahulu!'); return; }
-            showToast("⏳ Mengirim link reset password...");
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-            if (error) { showToast("❌ " + error.message); }
-            else { showToast("✅ Link reset password telah dikirim!"); }
-        }
-
-        async function logoutAuth() {
-            if (!supabaseClient) return;
-            try { await supabaseClient.auth.signOut(); showToast("Keluar akun berhasil."); } catch (e) { console.error(e); }
-        }
-
-        async function simpanKeCloud() {
-            if (!supabaseClient || !currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
-            showToast("⏳ Sedang menyimpan data ke Cloud...");
-            try {
-                await supabaseClient.from('laporan_pkl').delete().eq('user_id', currentUser.id);
-                const rowsToInsert = dataLaporan.map(item => ({
-                    user_id: currentUser.id, hari: item.hari, tanggal: item.tanggal,
-                    uraian: item.uraian, foto: item.foto, bulan_label: item.bulanLabel
-                }));
-                const chunkSize = 50;
-                for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
-                    const chunk = rowsToInsert.slice(i, i + chunkSize);
-                    const { error } = await supabaseClient.from('laporan_pkl').insert(chunk);
-                    if (error) throw error;
-                }
-                dataTelahBerubah = false;
-                showToast("✅ Data berhasil disimpan ke Cloud!");
-            } catch (err) { showToast("❌ Gagal sinkronisasi: " + err.message); }
-        }
-
-        async function autoSyncKeCloud() { if (currentUser && dataTelahBerubah && supabaseClient) simpanKeCloud(); }
-
-        async function tarikDariCloud() {
-            if (!supabaseClient || !currentUser) return;
-            showToast("⏳ Mengambil data dari Cloud...");
-            try {
-                const { data, error } = await supabaseClient.from('laporan_pkl').select('*').eq('user_id', currentUser.id).order('id', { ascending: true });
-                if (error) throw error;
-                if (data && data.length > 0) {
-                    dataLaporan = data.map(row => ({ hari: row.hari, tanggal: row.tanggal, uraian: row.uraian, foto: row.foto, bulanLabel: row.bulan_label }));
-                    await localforage.setItem('laporanPKL', dataLaporan);
-                    renderSemuaData();
-                    showToast("✅ Data berhasil ditarik dari Cloud!");
-                } else { showToast("⚠️ Belum ada data di cloud."); }
-            } catch (err) { showToast("❌ Gagal mengambil data dari cloud."); }
-        }
-
-        // ================= TOUR =================
-        const langkahTour = [
-            { icon: '🚀', title: 'Selamat Datang di Laporan PKL', desc: 'Aplikasi canggih untuk menyusun dan mengekspor laporan PKL harian Anda dengan mudah.' },
-            { icon: '📝', title: 'Tab Input Data', desc: 'Gunakan tab ini untuk mencatat kegiatan baru harian Anda.' },
-            { icon: '✏️', title: 'Tab Pengeditan Laporan', desc: 'Pilih dan edit catatan laporan sebelumnya secara cepat.' },
-            { icon: '📋', title: 'Tab Laporan & PDF', desc: 'Lihat ringkasan statistik, saring data, lalu unduh dokumen ke format PDF.' }
-        ];
-        let indexTourAktif = 0;
-
-        function cekDanJalankanTour() { if (!localStorage.getItem('sudahTourPKL')) bukaTourManual(); }
-
-        function bukaTourManual() {
-            indexTourAktif = 0; renderTourStep();
-            const modal = document.getElementById('modalTour');
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        }
-
-        function renderTourStep() {
-            const step = langkahTour[indexTourAktif];
-            document.getElementById('tourIcon').innerText = step.icon;
-            document.getElementById('tourTitle').innerText = step.title;
-            document.getElementById('tourDesc').innerText = step.desc;
-            for (let i = 0; i < 4; i++) {
-                const dot = document.getElementById('dot-' + i);
-                if (i === indexTourAktif) { dot.classList.remove('bg-white/20'); dot.classList.add('bg-accent'); }
-                else { dot.classList.remove('bg-accent'); dot.classList.add('bg-white/20'); }
-            }
-        }
-
-        function lanjutTour() {
-            indexTourAktif++;
-            if (indexTourAktif < langkahTour.length) renderTourStep(); else tutupTour();
-        }
-
-        function lewatiTour() { tutupTour(); }
-
-        function tutupTour() {
-            localStorage.setItem('sudahTourPKL', 'true');
-            const modal = document.getElementById('modalTour');
-            modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        // ================= PROFIL & LOGO SEKOLAH =================
-        async function muatProfil() {
-            try {
-                const profil = await localforage.getItem('profilPKL');
-                if (profil) dataProfil = { ...dataProfil, ...profil };
-            } catch (err) { console.error(err); }
-            renderProfil();
-            renderLogoPreview();
-        }
-
-        function renderProfil() {
-            document.getElementById('coverNama').textContent = dataProfil.nama || 'LUKYY';
-            document.getElementById('coverKelas').textContent = dataProfil.kelas || 'XII';
-            document.getElementById('coverNis').textContent = dataProfil.nis || '/';
-            document.getElementById('coverAlamat').textContent = dataProfil.alamat || 'Alamat Tempat PKL';
-            document.getElementById('coverProgKeahlian').textContent = dataProfil.progKeahlian || '';
-            document.getElementById('coverKonsKeahlian').textContent = dataProfil.konsKeahlian || '';
-            document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
-            const logoEl = document.getElementById('coverLogoSekolah');
-            if (logoEl) {
-                let logoSrc = '';
-                if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
-                    logoSrc = dataProfil.logoCatboxUrl;
-                } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                    logoSrc = dataProfil.logoSekolah;
-                }
-                if (logoSrc !== '') {
-                    logoEl.parentElement.style.display = 'none';
-                    logoEl.src = logoSrc;
-                    logoEl.onload = function() { logoEl.parentElement.style.display = 'flex'; };
-                    logoEl.onerror = function() { logoEl.parentElement.style.display = 'none'; console.warn('Gagal memuat logo:', logoSrc); };
-                } else {
-                    logoEl.src = '';
-                    logoEl.parentElement.style.display = 'none';
-                }
-            }
-        }
-
-        function bukaSettings() {
-            document.getElementById('setNama').value = dataProfil.nama || '';
-            document.getElementById('setKelas').value = dataProfil.kelas || '';
-            document.getElementById('setNis').value = dataProfil.nis || '';
-            document.getElementById('setAlamat').value = dataProfil.alamat || '';
-            document.getElementById('setProgKeahlian').value = dataProfil.progKeahlian || '';
-            document.getElementById('setKonsKeahlian').value = dataProfil.konsKeahlian || '';
-            document.getElementById('setTahun').value = dataProfil.tahun || '';
-            document.getElementById('inputUrlLogoCatbox').value = dataProfil.logoCatboxUrl || '';
-            document.getElementById('inputLogoSekolah').value = '';
-            renderLogoPreview();
-            const modal = document.getElementById('modalSettings');
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        }
-
-        function tutupSettings() {
-            const modal = document.getElementById('modalSettings');
-            modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        async function simpanSettings() {
-            dataProfil.nama = document.getElementById('setNama').value.trim() || 'LUKYY';
-            dataProfil.kelas = document.getElementById('setKelas').value.trim() || 'XII';
-            dataProfil.nis = document.getElementById('setNis').value.trim();
-            dataProfil.alamat = document.getElementById('setAlamat').value.trim() || 'Alamat Tempat PKL';
-            dataProfil.progKeahlian = document.getElementById('setProgKeahlian').value.trim();
-            dataProfil.konsKeahlian = document.getElementById('setKonsKeahlian').value.trim();
-            dataProfil.tahun = document.getElementById('setTahun').value.trim() || '2026...';
-            dataProfil.logoCatboxUrl = document.getElementById('inputUrlLogoCatbox').value.trim();
-            await localforage.setItem('profilPKL', dataProfil);
-            dataTelahBerubah = true;
-            renderProfil();
-            tutupSettings();
-            showToast('Profil berhasil diperbarui! ✅');
-        }
-
-        function simpanUrlLogoCatbox(url) {
-            dataProfil.logoCatboxUrl = url.trim();
-            renderLogoPreview();
-            renderProfil();
-        }
-
-        function renderLogoPreview() {
-            const img = document.getElementById('previewLogoSekolah');
-            const placeholder = document.getElementById('placeholderLogo');
-            const btnHapus = document.getElementById('btnHapusLogo');
-            
-            let targetSrc = '';
-            if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
-                targetSrc = dataProfil.logoCatboxUrl;
-            } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                targetSrc = dataProfil.logoSekolah;
-            }
-
-            if (targetSrc !== '') {
-                img.src = targetSrc;
-                img.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                if (btnHapus) btnHapus.classList.remove('hidden');
-            } else {
-                img.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                if (btnHapus) btnHapus.classList.add('hidden');
-            }
-        }
-
-        async function hapusLogoSekolah() {
-            dataProfil.logoSekolah = '';
-            dataProfil.logoCatboxUrl = '';
-            document.getElementById('inputUrlLogoCatbox').value = '';
-            await localforage.setItem('profilPKL', dataProfil);
-            renderLogoPreview();
-            renderProfil();
-            showToast('Logo berhasil dihapus! 🗑️');
-        }
-
-        async function previewLogoUpload(input) {
-            if (input.files && input.files[0]) {
-                showToast('⏳ Memproses kompresi logo...');
-                try {
-                    const compressedLogo = await bacaDanKompresFile(input.files[0], 200, 0.7);
-                    dataProfil.logoSekolah = compressedLogo;
-                    dataProfil.logoCatboxUrl = '';
-                    document.getElementById('inputUrlLogoCatbox').value = '';
-                    renderLogoPreview();
-                    renderProfil();
-                    await localforage.setItem('profilPKL', dataProfil);
-                    showToast('Logo berhasil dikompresi & disimpan! ✅');
-                } catch (err) {
-                    console.error('Error kompresi logo:', err);
-                    showToast('❌ Gagal memproses logo, coba file lain!');
-                }
-            }
-        }
-
-        window.onload = async function() {
-            try {
-                const dataDariIndexedDB = await localforage.getItem('laporanPKL');
-                if (dataDariIndexedDB !== null) dataLaporan = dataDariIndexedDB;
-            } catch (err) { console.error(err); }
-            await muatProfil();
-            renderSemuaData();
-            cekDanJalankanTour();
-            setInterval(autoSyncKeCloud, 300000);
-        };
-
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            document.getElementById('toast-message').innerText = message;
-            container.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
-            setTimeout(() => { container.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none'); }, 3500);
-        }
-
-        function switchTab(tabName) {
-            const tabInput = document.getElementById('tabInput');
-            const tabEdit = document.getElementById('tabEdit');
-            const tabLaporan = document.getElementById('tabLaporan');
-            const btnInput = document.getElementById('btnTabInput');
-            const btnEdit = document.getElementById('btnTabEdit');
-            const btnLaporan = document.getElementById('btnTabLaporan');
-            [tabInput, tabEdit, tabLaporan].forEach(t => t.classList.remove('active'));
-            [btnInput, btnEdit, btnLaporan].forEach(b => { b.classList.remove('active'); });
-            if (tabName === 'input') { tabInput.classList.add('active'); btnInput.classList.add('active'); }
-            else if (tabName === 'edit') { tabEdit.classList.add('active'); btnEdit.classList.add('active'); updateDropdownEditTab(); }
-            else { tabLaporan.classList.add('active'); btnLaporan.classList.add('active'); }
-            // Reset preview kamera saat pindah tab
-            fotoKameraBase64 = { input: null, edit: null };
-            document.getElementById('previewFotoInput').classList.add('hidden');
-            document.getElementById('previewFotoEdit').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ================= SIMPAN DATA BARU =================
-        async function tambahBaris() {
-            const tanggalInput = document.getElementById('inputTanggal').value;
-            const uraian = document.getElementById('inputUraian').value;
-            const fotoInput = document.getElementById('inputFoto');
-            if (!tanggalInput || !uraian) { showToast('⚠️ Isi Tanggal dan Uraian terlebih dahulu!'); return; }
-            const dateObj = new Date(tanggalInput);
-            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const formatTgl = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
-            const labelBulan = `${['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-            let fotoBase64 = '';
-            if (fotoKameraBase64.input) {
-                fotoBase64 = fotoKameraBase64.input;
-                fotoKameraBase64.input = null;
-                document.getElementById('previewFotoInput').classList.add('hidden');
-                await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-            } else if (fotoInput.files && fotoInput.files[0]) {
-                showToast('⏳ Memproses kompresi foto...');
-                try {
-                    fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
-                    await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-                } catch (err) {
-                    console.error('Error upload foto:', err);
-                    showToast('❌ Gagal memproses foto, coba gambar lain!');
-                }
-            } else {
-                await simpanDataBaru(namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-            }
-        }
-
-        function bacaDanKompresFile(file, maxDimensi = 200, kualitas = 0.6) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        const hasil = await kompresGambarRingan(e.target.result, maxDimensi, kualitas);
-                        resolve(hasil);
-                    } catch (err) {
-                        reject(err);
-                    }
-                };
-                reader.onerror = function(err) {
-                    reject(new Error('Gagal membaca file: ' + (err?.message || 'unknown')));
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function simpanDataBaru(hari, tanggal, uraian, foto, bulanLabel) {
-            dataLaporan.push({ hari, tanggal, uraian, foto, bulanLabel });
-            dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
-            await localforage.setItem('laporanPKL', dataLaporan);
-            dataTelahBerubah = true;
-            renderSemuaData();
-            document.getElementById('inputTanggal').value = '';
-            document.getElementById('inputUraian').value = '';
-            document.getElementById('inputFoto').value = '';
-            fotoKameraBase64.input = null;
-            document.getElementById('previewFotoInput').classList.add('hidden');
-            confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-            showToast('Laporan berhasil disimpan! 🎉');
-            switchTab('laporan');
-        }
-
-        // ================= TAB EDIT =================
-        function updateDropdownEditTab() {
-            const dropdown = document.getElementById('pilihEditDropdown');
-            dropdown.innerHTML = '<option value="">-- Pilih Catatan Laporan --</option>';
-            dataLaporan.forEach((item, idx) => {
-                dropdown.innerHTML += `<option value="${idx}">${item.tanggal} (${item.hari}) - ${item.uraian.substring(0,30)}...</option>`;
-            });
-        }
-
-        function pilihTanggalEditDropdown() {
-            const idx = document.getElementById('pilihEditDropdown').value;
-            const container = document.getElementById('formEditContainer');
-            if (idx === "") { container.classList.add('hidden'); return; }
-            const item = dataLaporan[idx];
-            document.getElementById('editIndexHidden').value = idx;
-            document.getElementById('editTanggal').value = item.tanggal.split('/').reverse().join('-');
-            document.getElementById('editUraian').value = item.uraian;
-            document.getElementById('editFoto').value = '';
-            fotoKameraBase64.edit = null;
-            document.getElementById('previewFotoEdit').classList.add('hidden');
-            container.classList.remove('hidden');
-        }
-
-        async function simpanLaporanEdited() {
-            const idx = document.getElementById('editIndexHidden').value;
-            const tglInput = document.getElementById('editTanggal').value;
-            const uraian = document.getElementById('editUraian').value;
-            const fotoInput = document.getElementById('editFoto');
-            if (!tglInput || !uraian) { showToast('⚠️ Isi Tanggal dan Uraian terlebih dahulu!'); return; }
-            const dateObj = new Date(tglInput);
-            const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const formatTgl = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
-            const labelBulan = `${['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-            let fotoBase64 = dataLaporan[idx].foto;
-            if (fotoKameraBase64.edit) {
-                fotoBase64 = fotoKameraBase64.edit;
-                fotoKameraBase64.edit = null;
-                document.getElementById('previewFotoEdit').classList.add('hidden');
-                await finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-            } else if (fotoInput.files && fotoInput.files[0]) {
-                showToast('⏳ Memproses kompresi foto...');
-                try {
-                    fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
-                    await finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-                } catch (err) {
-                    console.error('Error ganti foto:', err);
-                    showToast('❌ Gagal memproses foto baru, coba gambar lain!');
-                }
-            } else {
-                await finalizeEdit(idx, namaHari[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
-            }
-        }
-
-        async function finalizeEdit(idx, hari, tanggal, uraian, foto, bulanLabel) {
-            dataLaporan[idx] = { hari, tanggal, uraian, foto, bulanLabel };
-            dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
-            await localforage.setItem('laporanPKL', dataLaporan);
-            dataTelahBerubah = true;
-            renderSemuaData();
-            fotoKameraBase64.edit = null;
-            document.getElementById('previewFotoEdit').classList.add('hidden');
-            switchTab('laporan');
-            showToast('Laporan berhasil diperbarui! ✅');
-        }
-
-        async function hapusLaporanSelected() {
-            const idx = document.getElementById('editIndexHidden').value;
-            if (confirm(`Hapus permanen laporan tanggal ${dataLaporan[idx].tanggal}?`)) {
-                dataLaporan.splice(idx, 1);
-                await localforage.setItem('laporanPKL', dataLaporan);
-                dataTelahBerubah = true;
-                renderSemuaData();
-                switchTab('laporan');
-                showToast('Laporan berhasil dihapus! 🗑️');
-            }
-        }
-
-        function resetFilterTanggal() {
-            document.getElementById('filterTglMulai').value = '';
-            document.getElementById('filterTglAkhir').value = '';
-            renderSemuaData();
-        }
-
-        function updateStatistik(dataAktif) {
-            document.getElementById('statTotalHari').innerText = dataAktif.length;
-            document.getElementById('statTotalUraian').innerText = dataAktif.length;
-            document.getElementById('statTotalFoto').innerText = dataAktif.filter(i => i.foto && i.foto.trim() !== '').length;
-            const unikBulan = [...new Set(dataAktif.map(i => i.bulanLabel))].length;
-            document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
-        }
-
-        function renderSemuaData() {
-            const wadahTabel = document.getElementById('wadahTabelBulan');
-            wadahTabel.innerHTML = '';
-            if (dataLaporan.length === 0) {
-                wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
-                updateStatistik([]);
-                return;
-            }
-            const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
-            const filter = document.getElementById('filterBulan');
-            const nilaiFilterSblm = filter.value;
-            filter.innerHTML = '<option value="SEMUA">Filter: Semua Bulan</option>';
-            unikBulan.forEach(b => { filter.innerHTML += `<option value="${b}">${b}</option>`; });
-            if ([...filter.options].some(o => o.value === nilaiFilterSblm)) filter.value = nilaiFilterSblm;
-            const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
-            const bulanDipilih = filter.value === 'SEMUA' ? unikBulan : [filter.value];
-            const tglMulaiVal = document.getElementById('filterTglMulai').value;
-            const tglAkhirVal = document.getElementById('filterTglAkhir').value;
-            const angkaMulai = tglMulaiVal ? parseInt(tglMulaiVal.replace(/-/g, '')) : 0;
-            const angkaAkhir = tglAkhirVal ? parseInt(tglAkhirVal.replace(/-/g, '')) : 99999999;
-            let dataFiltered = dataLaporan.filter(i => {
-                const matchBulan = bulanDipilih.includes(i.bulanLabel);
-                const matchCari = i.uraian.toLowerCase().includes(kataKunci) || i.tanggal.includes(kataKunci);
-                const parts = i.tanggal.split('/');
-                const angkaTgl = parseInt(parts[2] + parts[1] + parts[0]);
-                const matchRentang = angkaTgl >= angkaMulai && angkaTgl <= angkaAkhir;
-                return matchBulan && matchCari && matchRentang;
-            });
-            updateStatistik(dataFiltered);
-            if (dataFiltered.length === 0) {
-                wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Tidak ada data yang sesuai filter.</p>';
-                return;
-            }
-            const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
-            unikBulanFiltered.forEach((bulan) => {
-                const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
-                if (dataBulanIni.length === 0) return;
-                let htmlTabel = `
-                    <div class="block-bulan">
-                        <div class="mb-3 text-base font-bold text-black pt-2">
-                            <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
-                                <thead>
-                                    <tr>
-                                        <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
-                                        <th style="border: 1px solid black; padding: 6px; width: 80px;">Hari</th>
-                                        <th style="border: 1px solid black; padding: 6px; width: 90px;">Tanggal</th>
-                                        <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
-                                        <th style="border: 1px solid black; padding: 6px; width: 160px; text-align: center;">Foto</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-                dataBulanIni.forEach((item, idx) => {
-                    const idxTampil = idx + 1;
-                    htmlTabel += `
-                                    <tr>
-                                        <td style="border: 1px solid black; padding: 5px; text-align: center; width: 40px;">${idxTampil}</td>
-                                        <td style="border: 1px solid black; padding: 5px; width: 80px;">${item.hari}</td>
-                                        <td style="border: 1px solid black; padding: 5px; width: 90px;">${item.tanggal}</td>
-                                        <td style="border: 1px solid black; padding: 5px; width: auto;">${item.uraian}</td>
-                                        <td style="border: 1px solid black; padding: 5px; text-align: center; width: 160px;">
-                                            ${item.foto ? `<img src="${item.foto}" style="width: 140px; height: 140px; object-fit: cover; display: block; margin: 0 auto; border-radius: 4px;" class="border border-gray-300">` : '-'}
-                                        </td>
-                                    </tr>`;
-                });
-                htmlTabel += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>`;
-                wadahTabel.innerHTML += htmlTabel;
-            });
-        }
-
-        function eksporDataJSON() {
-            showToast("⏳ Memproses file Backup...");
-            const jsonString = JSON.stringify({ profil: dataProfil, laporan: dataLaporan }, null, 2);
-            const blob = new Blob([jsonString], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", url);
-            downloadAnchor.setAttribute("download", `Backup_Laporan_PKL_${dataProfil.nama || 'LUKYY'}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 5000);
-            showToast("Data berhasil diekspor! 📤");
-        }
-
-        async function imporDataJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (parsed.laporan && Array.isArray(parsed.laporan)) {
-                        dataLaporan = parsed.laporan;
-                        await localforage.setItem('laporanPKL', dataLaporan);
-                    }
-                    if (parsed.profil) {
-                        dataProfil = { ...dataProfil, ...parsed.profil };
-                        await localforage.setItem('profilPKL', dataProfil);
-                        renderProfil();
-                        renderLogoPreview();
-                    }
-                    dataTelahBerubah = true;
-                    renderSemuaData();
-                    tutupSettings();
-                    showToast("Data berhasil dipulihkan! 🎉");
-                } catch (err) { alert("Format file JSON tidak valid!"); }
-            };
-            reader.readAsText(file);
-        }
-
-        function cekKonfirmasiHapus(inputEl) {
-            const btn = document.getElementById('btnHapusSemuaData');
-            if (inputEl.value.trim() === 'HAPUS') {
-                btn.disabled = false;
-                btn.classList.remove('bg-white/5', 'text-slate-500', 'cursor-not-allowed');
-                btn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
-            } else {
-                btn.disabled = true;
-                btn.classList.add('bg-white/5', 'text-slate-500', 'cursor-not-allowed');
-                btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
-            }
-        }
-
-        async function hapusSemuaDataLaporan() {
-            dataLaporan = [];
-            await localforage.removeItem('laporanPKL');
-            dataTelahBerubah = true;
-            renderSemuaData();
-            document.getElementById('inputKonfirmasiHapus').value = '';
-            cekKonfirmasiHapus(document.getElementById('inputKonfirmasiHapus'));
-            tutupSettings();
-            showToast("Seluruh laporan berhasil dihapus! 🗑️");
-        }
-
-        function bukaOspiExport() {
-            const modal = document.getElementById('modalExportOspi');
-            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
-        }
-
-        function tutupOspiExport() {
-            const modal = document.getElementById('modalExportOspi');
-            modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        function prosesEksekusiPDF() {
-            const opsi = document.querySelector('input[name="opsiCover"]:checked') ? document.querySelector('input[name="opsiCover"]:checked').value : 'dengan';
-            tutupOspiExport();
-            downloadPDF(opsi);
-        }
-
-        // GENERATOR PDF DENGAN DISTRIBUTION SPACING PRESISI (COVER MEMENUHI HALAMAN A4)
-        async function downloadPDF(opsiCover) {
-            showToast("⏳ Mengompresi & Membuat PDF...");
-
-            try {
-                const docContent = [];
-
-                if (opsiCover === 'dengan') {
-                    let logoRaw = '';
-                    if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
-                        logoRaw = dataProfil.logoCatboxUrl;
-                    } else if (dataProfil.logoSekolah && dataProfil.logoSekolah.trim() !== '') {
-                        logoRaw = dataProfil.logoSekolah;
-                    }
-
-                    let logoBase64 = null;
-                    if (logoRaw !== '') {
-                        logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
-                    }
-
-                    const coverStack = [
-                        // Header Judul Atas
-                        { text: 'LAPORAN', style: 'headerTitle', margin: [0, 15, 0, 2] },
-                        { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 0, 0, 15] },
-                        { text: 'DI', style: 'headerSub', margin: [0, 0, 0, 6] },
-                        { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 45] }
-                    ];
-
-                    // Logo Sekolah (Jarak diperlebar agar seimbang)
-                    if (logoBase64) {
-                        coverStack.push({ image: logoBase64, fit: [110, 110], alignment: 'center', margin: [0, 0, 0, 65] });
-                    } else {
-                        coverStack.push({ text: '', margin: [0, 0, 0, 120] });
-                    }
-
-                    // Identitas Siswa (Posisi diatur dengan margin [80, 0, 0, 110] agar lebih bergeser ke kanan dan sejajar)
-                    coverStack.push(
-                        { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
-                        {
-                            table: {
-                                widths: [90, 10, 220],
-                                body: [
-                                    [{ text: 'Nama', border: [] }, { text: ':', border: [] }, { text: dataProfil.nama || 'LUKYY', border: [] }],
-                                    [{ text: 'Kelas', border: [] }, { text: ':', border: [] }, { text: dataProfil.kelas || 'XII', border: [] }],
-                                    [{ text: 'NIS/NISN', border: [] }, { text: ':', border: [] }, { text: dataProfil.nis || '/', border: [] }]
-                                ]
-                            },
-                            layout: 'noBorders',
-                            fontSize: 11,
-                            margin: [80, 0, 0, 110] // Margin kiri [80] menggeser tabel ke kanan
-                        },
-                        // Identitas Sekolah (Posisi Bawah Halaman)
-                        { text: 'SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG', style: 'headerSchool', margin: [0, 0, 0, 10] },
-                        {
-                            table: {
-                                widths: [160, 10, 220],
-                                body: [
-                                    [{ text: 'PROGRAM KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.progKeahlian || '', bold: true, border: [] }],
-                                    [{ text: 'KONSENTRASI KEAHLIAN', bold: true, border: [] }, { text: ':', bold: true, border: [] }, { text: dataProfil.konsKeahlian || '', bold: true, border: [] }]
-                                ]
-                            },
-                            layout: 'noBorders',
-                            alignment: 'center',
-                            fontSize: 10,
-                            margin: [0, 0, 0, 25]
-                        },
-                        { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 0, 0, 0], pageBreak: 'after' }
-                    );
-
-                    docContent.push(...coverStack);
-                }
-
-                const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
-
-                for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
-                    const bulan = unikBulan[bIdx];
-                    const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
-                    if (dataBulanIni.length === 0) continue;
-
-                    const blockElement = {
-                        stack: [
-                            { text: '1. Laporan Kegiatan Harian', fontSize: 11, bold: true, margin: [0, 0, 0, 2] },
-                            { text: 'b. Bulan ' + bulan.toUpperCase(), fontSize: 11, bold: true, margin: [0, 0, 0, 8] }
-                        ]
-                    };
-
-                    if (bIdx > 0 || opsiCover === 'tanpa') {
-                        blockElement.pageBreak = 'before';
-                    }
-
-                    const tableBody = [
-                        [
-                            { text: 'No', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Hari', style: 'tableHeader' },
-                            { text: 'Tanggal', style: 'tableHeader' },
-                            { text: 'Uraian Kegiatan', style: 'tableHeader' },
-                            { text: 'Foto', style: 'tableHeader', alignment: 'center' }
-                        ]
-                    ];
-
-                    const fotoPromises = dataBulanIni.map(item => {
-                        if (item.foto && item.foto.trim() !== '') {
-                            return kompresGambarRingan(item.foto, 150, 0.5).catch(err => null);
-                        }
-                        return Promise.resolve(null);
-                    });
-                    const fotoHasil = await Promise.all(fotoPromises);
-
-                    for (let idx = 0; idx < dataBulanIni.length; idx++) {
-                        const item = dataBulanIni[idx];
-                        let fotoCell = { text: '-', alignment: 'center' };
-
-                        if (fotoHasil[idx]) {
-                            fotoCell = { image: fotoHasil[idx], fit: [120, 120], alignment: 'center' };
-                        }
-
-                        tableBody.push([
-                            { text: idx + 1, alignment: 'center', fontSize: 9 },
-                            { text: item.hari, fontSize: 9 },
-                            { text: item.tanggal, fontSize: 9 },
-                            { text: item.uraian, fontSize: 9 },
-                            fotoCell
-                        ]);
-                    }
-
-                    blockElement.stack.push({
-                        table: {
-                            headerRows: 1,
-                            widths: [30, 50, 65, '*', 140],
-                            dontBreakRows: true,
-                            body: tableBody
-                        },
-                        layout: {
-                            fillColor: function (rowIndex) { return (rowIndex === 0) ? '#f0f0f0' : null; }
-                        },
-                        margin: [0, 0, 0, 15]
-                    });
-
-                    docContent.push(blockElement);
-                }
-
-                const docDefinition = {
-                    pageSize: 'A4',
-                    pageMargins: [40, 40, 40, 40],
-                    content: docContent,
-                    styles: {
-                        headerTitle: { fontSize: 14, bold: true, alignment: 'center' },
-                        headerSub: { fontSize: 12, bold: true, alignment: 'center' },
-                        headerAddress: { fontSize: 11, alignment: 'center' },
-                        headerSchool: { fontSize: 12, bold: true, alignment: 'center' },
-                        tableHeader: { bold: true, fontSize: 9, color: 'black' }
-                    }
-                };
-
-                pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
-                showToast("PDF berhasil diunduh! 📥");
-
-            } catch (err) {
-                console.error(err);
-                showToast("❌ Error PDF: " + err.message);
-            }
-        }
-    </script>
+    <!-- Script aplikasi (urutan penting: config → utils → fitur → main) -->
+    <script src="js/particles.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tour.js"></script>
+    <script src="js/profil.js"></script>
+    <script src="js/laporan.js"></script>
+    <script src="js/backup.js"></script>
+    <script src="js/pdf.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
