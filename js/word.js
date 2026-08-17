@@ -1,5 +1,5 @@
 // ============================================================
-// EKSPOR WORD (.docx) — Menggunakan docx.js (Rapi & Presisi)
+// EKSPOR WORD (.docx) — Tampilan Rapi & Presisi Seputar PDF
 // ============================================================
 
 function bukaOspiExportWord() {
@@ -27,243 +27,146 @@ function prosesEksekusiWord() {
     downloadWord(opsi);
 }
 
-// Helper konversi Base64 / URL Gambar ke Uint8Array agar file Word kecil
-async function getGambarUint8Array(source, maxDimensi = 300, kualitas = 0.6) {
-    try {
-        let base64 = await getImageBase64ForPdf(source, maxDimensi, kualitas);
-        if (!base64) return null;
-        
-        const base64Data = base64.split(',')[1];
-        const binaryString = window.atob(base64Data);
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-        return bytes;
-    } catch (e) {
-        console.warn("Gagal konversi gambar ke Word:", e);
-        return null;
-    }
-}
-
 async function downloadWord(opsiCover) {
     showToast("⏳ Mengompresi & Membuat Dokumen Word...");
 
-    const docxLib = window.docx;
-    if (!docxLib) {
-        showToast("❌ Library docx belum siap/termuat!");
-        return;
-    }
-
     try {
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak, BorderStyle } = docxLib;
-
-        // Perbaikan: Ganti color "AUTO" menjadi "FFFFFF"
-        const borderKosong = {
-            top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-            bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-            left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-            right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
-        };
-
-        const sectionsChildren = [];
-
-        // ---------- HALAMAN COVER ----------
-        if (opsiCover === 'dengan') {
-            sectionsChildren.push(
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: "LAPORAN", bold: true, size: 28, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: "PRAKTEK KERJA LAPANGAN (PKL)", bold: true, size: 28, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: "DI", bold: true, size: 24, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spaceAfter: 400,
-                    children: [new TextRun({ text: (dataProfil.alamat || "Alamat Tempat PKL").toUpperCase(), size: 22, font: "Times New Roman" })]
-                })
-            );
-
-            // Logo Sekolah
-            let logoRaw = dataProfil.logoCatboxUrl || dataProfil.logoSekolah || '';
-            let logoBytes = await getGambarUint8Array(logoRaw, 200, 0.7);
-
-            if (logoBytes) {
-                sectionsChildren.push(
-                    new Paragraph({
-                        alignment: AlignmentType.CENTER,
-                        spaceAfter: 400,
-                        children: [
-                            new ImageRun({
-                                data: logoBytes,
-                                transformation: { width: 110, height: 110 }
-                            })
-                        ]
-                    })
-                );
-            } else {
-                sectionsChildren.push(new Paragraph({ spaceAfter: 800, children: [] }));
-            }
-
-            // Identitas Siswa
-            sectionsChildren.push(
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spaceAfter: 200,
-                    children: [new TextRun({ text: "Disusun Oleh:", size: 22, font: "Times New Roman" })]
-                }),
-                new Table({
-                    width: { size: 9000, type: WidthType.DXA },
-                    alignment: AlignmentType.CENTER,
-                    rows: [
-                        new TableRow({
-                            children: [
-                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "Nama", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.nama || 'LUKYY', size: 22, font: "Times New Roman" })] })] }),
-                            ]
-                        }),
-                        new TableRow({
-                            children: [
-                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "Kelas", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.kelas || 'XII', size: 22, font: "Times New Roman" })] })] }),
-                            ]
-                        }),
-                        new TableRow({
-                            children: [
-                                new TableCell({ borders: borderKosong, width: { size: 1500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: "NIS/NISN", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 300, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: ":", size: 22, font: "Times New Roman" })] })] }),
-                                new TableCell({ borders: borderKosong, width: { size: 7200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: dataProfil.nis || '/', size: 22, font: "Times New Roman" })] })] }),
-                            ]
-                        })
-                    ]
-                }),
-                new Paragraph({ spaceAfter: 600, children: [] }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spaceAfter: 200,
-                    children: [new TextRun({ text: "SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG", bold: true, size: 24, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: `PROGRAM KEAHLIAN : ${(dataProfil.progKeahlian || '').toUpperCase()}`, bold: true, size: 20, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spaceAfter: 400,
-                    children: [new TextRun({ text: `KONSENTRASI KEAHLIAN : ${(dataProfil.konsKeahlian || '').toUpperCase()}`, bold: true, size: 20, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: `TAHUN ${dataProfil.tahun || '2026...'}`, bold: true, size: 24, font: "Times New Roman" })]
-                }),
-                new Paragraph({ children: [new PageBreak()] })
-            );
+        let logoRaw = dataProfil.logoCatboxUrl || dataProfil.logoSekolah || '';
+        let logoBase64 = '';
+        if (logoRaw !== '') {
+            logoBase64 = await getImageBase64ForPdf(logoRaw, 200, 0.7);
         }
 
-        // ---------- TABEL LAPORAN PER BULAN ----------
+        let htmlCover = '';
+        if (opsiCover === 'dengan') {
+            htmlCover = `
+                <div class="page-cover" style="text-align: center; page-break-after: always; padding-top: 20px;">
+                    <h2 style="font-size: 16pt; margin: 0; font-weight: bold;">LAPORAN</h2>
+                    <h2 style="font-size: 16pt; margin: 0 0 15px 0; font-weight: bold;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                    <p style="font-size: 12pt; margin: 0 0 5px 0; font-weight: bold;">DI</p>
+                    <h3 style="font-size: 12pt; margin: 0 0 45px 0; font-weight: normal;">${(dataProfil.alamat || 'Alamat Tempat PKL').toUpperCase()}</h3>
+                    
+                    <div style="margin: 30px 0;">
+                        ${logoBase64 ? `<img src="${logoBase64}" style="width: 120px; height: auto;" />` : '<div style="height: 120px;"></div>'}
+                    </div>
+
+                    <p style="font-size: 11pt; margin-bottom: 10px;">Disusun Oleh:</p>
+                    <table style="border: none !important; width: 320px; margin: 0 auto 50px auto; font-size: 11pt; text-align: left;">
+                        <tr><td style="border: none !important; width: 90px; padding: 2px;">Nama</td><td style="border: none !important; width: 10px; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.nama || 'LUKYY'}</td></tr>
+                        <tr><td style="border: none !important; padding: 2px;">Kelas</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.kelas || 'XII'}</td></tr>
+                        <tr><td style="border: none !important; padding: 2px;">NIS/NISN</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${dataProfil.nis || '/'}</td></tr>
+                    </table>
+
+                    <h3 style="font-size: 12pt; font-weight: bold; margin: 0 0 10px 0;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                    <table style="border: none !important; width: 450px; margin: 0 auto 30px auto; font-size: 10pt; text-align: left; font-weight: bold;">
+                        <tr><td style="border: none !important; width: 200px; padding: 2px;">PROGRAM KEAHLIAN</td><td style="border: none !important; width: 10px; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${(dataProfil.progKeahlian || '').toUpperCase()}</td></tr>
+                        <tr><td style="border: none !important; padding: 2px;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; padding: 2px;">:</td><td style="border: none !important; padding: 2px;">${(dataProfil.konsKeahlian || '').toUpperCase()}</td></tr>
+                    </table>
+                    <h4 style="font-size: 12pt; font-weight: bold; margin-top: 20px;">TAHUN ${dataProfil.tahun || '2026...'}</h4>
+                </div>
+            `;
+        }
+
         const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
+        let htmlTabel = '';
 
         for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
             const bulan = unikBulan[bIdx];
             const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
             if (dataBulanIni.length === 0) continue;
 
-            if (bIdx > 0 || opsiCover === 'tanpa') {
-                sectionsChildren.push(new Paragraph({ children: [new PageBreak()] }));
-            }
+            let pageBreakCss = (bIdx > 0 || opsiCover === 'tanpa') ? 'page-break-before: always;' : '';
 
-            sectionsChildren.push(
-                new Paragraph({
-                    children: [new TextRun({ text: "1. Laporan Kegiatan Harian", bold: true, size: 22, font: "Times New Roman" })]
-                }),
-                new Paragraph({
-                    spaceAfter: 200,
-                    children: [new TextRun({ text: "b. Bulan " + bulan.toUpperCase(), bold: true, size: 22, font: "Times New Roman" })]
-                })
-            );
-
-            // Lebar pasti untuk masing-masing kolom dalam DXA (1 pt = 20 dxa)
-            const wNo = 600;       // ~30pt
-            const wHari = 1200;    // ~60pt
-            const wTanggal = 1500; // ~75pt
-            const wUraian = 4200;  // ~210pt
-            const wFoto = 1800;    // ~90pt
-
-            const tableRows = [
-                new TableRow({
-                    cantSplit: true,
-                    tableHeader: true,
-                    children: [
-                        new TableCell({ width: { size: wNo, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "No", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: wHari, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Hari", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: wTanggal, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Tanggal", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: wUraian, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Uraian Kegiatan", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                        new TableCell({ width: { size: wFoto, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Foto", bold: true, size: 18, font: "Times New Roman" })] })] }),
-                    ]
-                })
-            ];
+            htmlTabel += `
+                <div style="${pageBreakCss} margin-top: 20px;">
+                    <div style="font-size: 11pt; font-weight: bold; margin-bottom: 10px;">
+                        <p style="margin: 0;">1. Laporan Kegiatan Harian</p>
+                        <p style="margin: 0;">b. Bulan ${bulan.toUpperCase()}</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt;" border="1">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="width: 5%; padding: 6px; text-align: center;">No</th>
+                                <th style="width: 12%; padding: 6px; text-align: left;">Hari</th>
+                                <th style="width: 15%; padding: 6px; text-align: left;">Tanggal</th>
+                                <th style="width: 48%; padding: 6px; text-align: left;">Uraian Kegiatan</th>
+                                <th style="width: 20%; padding: 6px; text-align: center;">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
 
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
-                let fotoCellParagraph = new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "-", size: 18, font: "Times New Roman" })] });
-
+                let fotoHtml = '-';
                 if (item.foto && item.foto.trim() !== '') {
-                    const imgBytes = await getGambarUint8Array(item.foto, 250, 0.6);
-                    if (imgBytes) {
-                        fotoCellParagraph = new Paragraph({
-                            alignment: AlignmentType.CENTER,
-                            children: [
-                                new ImageRun({
-                                    data: imgBytes,
-                                    transformation: { width: 80, height: 80 }
-                                })
-                            ]
-                        });
-                    }
+                    const compressed = await kompresGambarRingan(item.foto, 250, 0.6);
+                    fotoHtml = `<img src="${compressed}" style="max-width: 100px; max-height: 100px; object-fit: contain; display: block; margin: 0 auto;" />`;
                 }
 
-                tableRows.push(
-                    new TableRow({
-                        cantSplit: true,
-                        children: [
-                            new TableCell({ width: { size: wNo, type: WidthType.DXA }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${idx + 1}`, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: wHari, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.hari, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: wTanggal, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.tanggal, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: wUraian, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: item.uraian, size: 18, font: "Times New Roman" })] })] }),
-                            new TableCell({ width: { size: wFoto, type: WidthType.DXA }, children: [fotoCellParagraph] }),
-                        ]
-                    })
-                );
+                htmlTabel += `
+                    <tr>
+                        <td style="padding: 6px; text-align: center; vertical-align: top;">${idx + 1}</td>
+                        <td style="padding: 6px; vertical-align: top;">${item.hari}</td>
+                        <td style="padding: 6px; vertical-align: top;">${item.tanggal}</td>
+                        <td style="padding: 6px; vertical-align: top;">${item.uraian}</td>
+                        <td style="padding: 6px; text-align: center; vertical-align: top;">${fotoHtml}</td>
+                    </tr>
+                `;
             }
 
-            sectionsChildren.push(
-                new Table({
-                    width: { size: 9300, type: WidthType.DXA },
-                    alignment: AlignmentType.CENTER,
-                    rows: tableRows
-                }),
-                new Paragraph({ spaceAfter: 400, children: [] })
-            );
+            htmlTabel += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
         }
 
-        const doc = new Document({
-            sections: [{
-                properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
-                children: sectionsChildren
-            }]
+        const fullDocument = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <title>Laporan PKL</title>
+                <!--[if gte mso 9]>
+                <xml>
+                <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:DoNotOptimizeForBrowser/>
+                </w:WordDocument>
+                </xml>
+                <![endif]-->
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 20mm 20mm 20mm 20mm;
+                    }
+                    body {
+                        font-family: 'Times New Roman', serif;
+                        color: #000000;
+                        background-color: #ffffff;
+                    }
+                    table {
+                        border-collapse: collapse;
+                    }
+                    td, th {
+                        border: 1px solid #000000;
+                        word-wrap: break-word;
+                    }
+                </style>
+            </head>
+            <body>
+                ${htmlCover}
+                ${htmlTabel}
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob(['\ufeff' + fullDocument], {
+            type: 'application/msword'
         });
 
-        const blob = await Packer.toBlob(doc);
-        saveAs(blob, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.docx`);
+        saveAs(blob, `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.doc`);
         showToast("Dokumen Word berhasil diunduh! 📥");
 
     } catch (err) {
