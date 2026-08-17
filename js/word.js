@@ -59,11 +59,12 @@ async function downloadWord(opsiCover) {
     try {
         const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, AlignmentType, WidthType, PageBreak, BorderStyle } = docxLib;
 
+        // Perbaikan: Ganti color "AUTO" menjadi "FFFFFF"
         const borderKosong = {
-            top: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
-            bottom: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
-            left: { style: BorderStyle.NONE, size: 0, color: "AUTO" },
-            right: { style: BorderStyle.NONE, size: 0, color: "AUTO" }
+            top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+            bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+            left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+            right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
         };
 
         const sectionsChildren = [];
@@ -190,7 +191,7 @@ async function downloadWord(opsiCover) {
                 })
             );
 
-            // Menentukan lebar pasti untuk masing-masing kolom dalam DXA (1 pt = 20 dxa)
+            // Lebar pasti untuk masing-masing kolom dalam DXA (1 pt = 20 dxa)
             const wNo = 600;       // ~30pt
             const wHari = 1200;    // ~60pt
             const wTanggal = 1500; // ~75pt
