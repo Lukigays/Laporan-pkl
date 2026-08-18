@@ -107,30 +107,96 @@ async function logoutAuth() {
     } catch (e) { console.error(e); }
 }
 
-// ---------- Sinkronisasi Cloud ----------
+// ---------- Fungsi Bantuan Base64 ke Blob ----------
+function base64ToBlob(base64, mime) {
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mime });
+}
+
+// ---------- Sinkronisasi Cloud (Dengan Storage) ----------
 async function simpanKeCloud() {
-    if (!supabaseClient || !currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
-    showToast("⏳ Sedang menyimpan data ke Cloud...");
+    if (!supabaseClient || !currentUser) { 
+        showToast('⚠️ Belum login akun cloud!'); 
+        return; 
+    }
+    
+    showToast("⏳ Sedang mengunggah file ke Storage... (Harap bersabar)");
+
     try {
+        // Hapus data lama di tabel database untuk di-refresh
         await supabaseClient.from('laporan_pkl').delete().eq('user_id', currentUser.id);
-        const rowsToInsert = dataLaporan.map(item => ({
-            user_id: currentUser.id,
-            hari: item.hari,
-            tanggal: item.tanggal,
-            uraian: item.uraian,
-            foto: item.foto,
-            bulan_label: item.bulanLabel
-        }));
-        const chunkSize = 50;
+
+        const rowsToInsert = [];
+
+        // Loop semua data laporan untuk mengecek gambar
+        for (let i = 0; i < dataLaporan.length; i++) {
+            let item = dataLaporan[i];
+            let fotoUrl = item.foto;
+
+            // Jika foto berupa Base64 (ditandai dengan 'data:image'), kita upload ke Storage
+            if (fotoUrl && fotoUrl.startsWith('data:image')) {
+                showToast(`📤 Upload foto ${i + 1} dari ${dataLaporan.length}...`);
+                
+                const mimeType = fotoUrl.match(/data:(.*?);/)[1];
+                const fileBlob = base64ToBlob(fotoUrl, mimeType);
+                const fileExt = mimeType.split('/')[1];
+                // Nama file unik: id_user/timestamp_index.ext
+                const fileName = `${currentUser.id}/${Date.now()}_${i}.${fileExt}`;
+
+                // Upload ke bucket 'foto_pkl'
+                const { data: uploadData, error: uploadError } = await supabaseClient
+                    .storage
+                    .from('foto_pkl')
+                    .upload(fileName, fileBlob, { upsert: true });
+
+                if (uploadError) throw uploadError;
+
+                // Ambil Public URL dari file yang baru diupload
+                const { data: publicUrlData } = supabaseClient
+                    .storage
+                    .from('foto_pkl')
+                    .getPublicUrl(fileName);
+
+                fotoUrl = publicUrlData.publicUrl;
+                
+                // Ganti data base64 lokal dengan URL public agar selamanya ringan
+                dataLaporan[i].foto = fotoUrl; 
+            }
+
+            // Siapkan data teks yang sudah sangat ringan untuk database
+            rowsToInsert.push({
+                user_id: currentUser.id,
+                hari: item.hari,
+                tanggal: item.tanggal,
+                uraian: item.uraian,
+                foto: fotoUrl, // Isinya sekarang hanya "https://..."
+                bulan_label: item.bulanLabel
+            });
+        }
+
+        // Simpan update URL ke penyimpanan lokal perangkat
+        await localforage.setItem('laporanPKL', dataLaporan);
+
+        // Upload data teks ke database tabel 'laporan_pkl'
+        showToast("⏳ Menyimpan data teks ke database...");
+        const chunkSize = 50; // Karena isi cuma teks pendek, kirim 50 sekaligus sangat aman
         for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
             const chunk = rowsToInsert.slice(i, i + chunkSize);
             const { error } = await supabaseClient.from('laporan_pkl').insert(chunk);
             if (error) throw error;
         }
+
         dataTelahBerubah = false;
-        showToast("✅ Data berhasil disimpan ke Cloud!");
+        showToast("✅ Sinkronisasi Cloud sukses 100%!");
+        
     } catch (err) {
-        showToast("❌ Gagal sinkronisasi: " + err.message);
+        console.error("Error upload:", err);
+        showToast("❌ Gagal: " + err.message);
     }
 }
 
