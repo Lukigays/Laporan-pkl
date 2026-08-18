@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#0a0a0f">
     <title>LAPORAN PKL BY LUKYY</title>
 
-    <!-- Library eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -14,11 +13,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
-   <!-- Library Export Word yang Lebih Stabil & Ringan -->
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Konfigurasi & style aplikasi -->
     <script src="js/config.js"></script>
     <script>initTailwindConfig();</script>
     <link rel="stylesheet" href="css/style.css">
@@ -30,7 +29,6 @@
     <div class="cosmic-orb orb-3"></div>
     <canvas id="particles-canvas"></canvas>
 
-    <!-- Toast -->
     <div id="toast-container" class="fixed top-6 right-6 z-[110] transform translate-x-full opacity-0 pointer-events-none transition-all duration-300">
         <div id="toast-box" class="glass-panel px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl border-l-4 border-l-accent">
             <span id="toast-icon" class="text-xl">✨</span>
@@ -38,7 +36,6 @@
         </div>
     </div>
 
-    <!-- Modal Reset Password -->
     <div id="modalResetPassword" class="fixed inset-0 z-[130] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
             <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent pointer-events-none"></div>
@@ -50,7 +47,6 @@
         </div>
     </div>
 
-    <!-- Modal Tour -->
     <div id="modalTour" class="fixed inset-0 z-[120] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-lg rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cosmic-purple via-accent to-cosmic-pink"></div>
@@ -72,7 +68,6 @@
         </div>
     </div>
 
-    <!-- Modal Auth -->
     <div id="modalAuth" class="fixed inset-0 z-[105] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
@@ -103,7 +98,6 @@
         </div>
     </div>
 
-    <!-- Modal Opsi Ekspor PDF -->
     <div id="modalExportOspi" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
             <div class="text-4xl mb-3">📑</div>
@@ -132,7 +126,6 @@
         </div>
     </div>
 
-    <!-- Modal Opsi Ekspor Word -->
     <div id="modalExportOspiWord" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
             <div class="text-4xl mb-3">📄</div>
@@ -161,7 +154,32 @@
         </div>
     </div>
 
-    <!-- Modal Pengaturan -->
+    <div id="modalKamera" class="fixed inset-0 z-[140] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
+        <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-6 text-center relative">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-display font-bold text-lg flex items-center gap-2"><span>📷</span> Kamera Web</h3>
+                <button onclick="tutupKamera()" class="text-3xl font-light hover:text-accent-light leading-none">&times;</button>
+            </div>
+            
+            <div class="relative w-full bg-black rounded-xl overflow-hidden aspect-[3/4] flex justify-center items-center mb-5 border border-white/10 shadow-inner">
+                <video id="videoKamera" autoplay playsinline class="w-full h-full object-cover"></video>
+                <img id="previewHasilKamera" class="w-full h-full object-cover hidden absolute inset-0 z-10" alt="Hasil Foto" />
+            </div>
+
+            <div id="kontrolKameraAktif" class="flex justify-center w-full">
+                <button onclick="ambilFoto()" class="py-4 px-6 btn-primary rounded-2xl text-sm font-bold shadow-lg w-full flex items-center justify-center gap-2">📸 Jepret Foto</button>
+            </div>
+
+            <div id="kontrolKameraHasil" class="hidden flex-col gap-3">
+                <div class="flex gap-2">
+                    <button onclick="ulangiFoto()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/10 transition-all">🔄 Ulangi</button>
+                    <button onclick="simpanKeGaleri()" class="flex-1 py-3.5 bg-emerald-600/80 hover:bg-emerald-600 text-white rounded-2xl text-sm font-bold transition-all shadow-lg">⬇️ Simpan Galeri</button>
+                </div>
+                <button onclick="gunakanFoto()" class="w-full py-4 btn-primary rounded-2xl text-sm font-bold shadow-lg flex items-center justify-center gap-2">✅ Gunakan Foto Ini</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-2xl rounded-3xl flex flex-col overflow-hidden max-h-[90vh]">
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
@@ -261,7 +279,6 @@
         </div>
     </div>
 
-    <!-- Konten Utama -->
     <div class="max-w-6xl mx-auto px-4 md:px-8 relative pt-6 md:pt-0">
         <div class="hero-section no-print">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
@@ -280,7 +297,6 @@
         </div>
 
         <div class="relative min-h-[500px]">
-            <!-- Tab Input -->
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in animate-delay-3">
                     <div class="flex items-center gap-4 mb-8">
@@ -300,8 +316,11 @@
                             <textarea id="inputUraian" class="glass-input w-full rounded-2xl p-4 text-sm" rows="3" placeholder="Contoh: Mendesain denah tata letak..."></textarea>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Upload Foto Bukti</label>
-                            <input type="file" id="inputFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
+                            <label class="block text-xs font-semibold mb-2 text-slate-400">Upload / Ambil Foto Bukti</label>
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <input type="file" id="inputFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
+                                <button type="button" onclick="bukaKamera('input')" class="glass-panel hover:bg-white/10 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg">📷 Buka Kamera</button>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-8 flex justify-end">
@@ -310,7 +329,6 @@
                 </div>
             </div>
 
-            <!-- Tab Edit -->
             <div id="tabEdit" class="tab-content pb-10">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in">
                     <div class="flex items-center gap-4 mb-8">
@@ -337,8 +355,11 @@
                             <textarea id="editUraian" class="glass-input w-full rounded-2xl p-4 text-sm" rows="3"></textarea>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Ganti Foto Bukti (Opsional)</label>
-                            <input type="file" id="editFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
+                            <label class="block text-xs font-semibold mb-2 text-slate-400">Ganti / Ambil Foto Bukti (Opsional)</label>
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <input type="file" id="editFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
+                                <button type="button" onclick="bukaKamera('edit')" class="glass-panel hover:bg-white/10 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg">📷 Buka Kamera</button>
+                            </div>
                             <p class="text-xs text-slate-500 mt-2">*Kosongkan jika foto tidak ingin diubah.</p>
                         </div>
                         <div class="lg:col-span-4 flex flex-wrap gap-3 justify-end pt-4">
@@ -349,7 +370,6 @@
                 </div>
             </div>
 
-            <!-- Tab Laporan -->
             <div id="tabLaporan" class="tab-content">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
                     <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-1">
@@ -372,7 +392,6 @@
 
                 <div class="glass-panel rounded-3xl p-5 md:p-6 mb-8 space-y-5 no-print relative z-10 animate-fade-in">
                     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                        <!-- Tombol Export PDF dan Word -->
                         <div class="flex flex-wrap gap-2">
                             <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-6 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export PDF</span></button>
                             <button onclick="bukaOspiExportWord()" id="btnDownloadWord" class="py-3.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap transition-all"><span>📄 Export Word</span></button>
@@ -425,7 +444,6 @@
         </div>
     </div>
 
-    <!-- Navigasi Bawah -->
     <nav class="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div class="glass-panel p-2 rounded-3xl flex gap-1 shadow-2xl shadow-black/50">
             <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
@@ -443,7 +461,6 @@
         </div>
     </nav>
 
-    <!-- Script aplikasi (urutan pemanggilan) -->
     <script src="js/particles.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
@@ -453,6 +470,7 @@
     <script src="js/backup.js"></script>
     <script src="js/pdf.js"></script>
     <script src="js/word.js"></script>
+    <script src="js/kamera.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
