@@ -4,14 +4,26 @@
 
 function initAuth() {
     if (supabaseClient) {
+        // FIX LUPA PASSWORD: Paksa buka modal jika terdeteksi link recovery
+        if (window.location.hash && window.location.hash.includes('type=recovery')) {
+            setTimeout(() => {
+                bukaModalResetPassword();
+                // Bersihkan URL agar pop-up tidak muncul terus-terusan
+                window.history.replaceState(null, null, window.location.pathname);
+            }, 800);
+        }
+
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             currentUser = session?.user || null;
             updateAuthUI();
         });
+
         supabaseClient.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             updateAuthUI();
-            if (event === 'PASSWORD_RECOVERY') bukaModalResetPassword();
+            if (event === 'PASSWORD_RECOVERY') {
+                bukaModalResetPassword();
+            }
         });
     } else {
         updateAuthUI();
@@ -128,27 +140,21 @@ async function simpanKeCloud() {
     showToast("⏳ Sedang mengunggah file ke Storage... (Harap bersabar)");
 
     try {
-        // Hapus data lama di tabel database untuk di-refresh
         await supabaseClient.from('laporan_pkl').delete().eq('user_id', currentUser.id);
-
         const rowsToInsert = [];
 
-        // Loop semua data laporan untuk mengecek gambar
         for (let i = 0; i < dataLaporan.length; i++) {
             let item = dataLaporan[i];
             let fotoUrl = item.foto;
 
-            // Jika foto berupa Base64 (ditandai dengan 'data:image'), kita upload ke Storage
             if (fotoUrl && fotoUrl.startsWith('data:image')) {
                 showToast(`📤 Upload foto ${i + 1} dari ${dataLaporan.length}...`);
                 
                 const mimeType = fotoUrl.match(/data:(.*?);/)[1];
                 const fileBlob = base64ToBlob(fotoUrl, mimeType);
                 const fileExt = mimeType.split('/')[1];
-                // Nama file unik: id_user/timestamp_index.ext
                 const fileName = `${currentUser.id}/${Date.now()}_${i}.${fileExt}`;
 
-                // Upload ke bucket 'foto_pkl'
                 const { data: uploadData, error: uploadError } = await supabaseClient
                     .storage
                     .from('foto_pkl')
@@ -156,35 +162,29 @@ async function simpanKeCloud() {
 
                 if (uploadError) throw uploadError;
 
-                // Ambil Public URL dari file yang baru diupload
                 const { data: publicUrlData } = supabaseClient
                     .storage
                     .from('foto_pkl')
                     .getPublicUrl(fileName);
 
                 fotoUrl = publicUrlData.publicUrl;
-                
-                // Ganti data base64 lokal dengan URL public agar selamanya ringan
                 dataLaporan[i].foto = fotoUrl; 
             }
 
-            // Siapkan data teks yang sudah sangat ringan untuk database
             rowsToInsert.push({
                 user_id: currentUser.id,
                 hari: item.hari,
                 tanggal: item.tanggal,
                 uraian: item.uraian,
-                foto: fotoUrl, // Isinya sekarang hanya "https://..."
+                foto: fotoUrl, 
                 bulan_label: item.bulanLabel
             });
         }
 
-        // Simpan update URL ke penyimpanan lokal perangkat
         await localforage.setItem('laporanPKL', dataLaporan);
-
-        // Upload data teks ke database tabel 'laporan_pkl'
+        
         showToast("⏳ Menyimpan data teks ke database...");
-        const chunkSize = 50; // Karena isi cuma teks pendek, kirim 50 sekaligus sangat aman
+        const chunkSize = 50; 
         for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
             const chunk = rowsToInsert.slice(i, i + chunkSize);
             const { error } = await supabaseClient.from('laporan_pkl').insert(chunk);
