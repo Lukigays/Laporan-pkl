@@ -39,7 +39,7 @@ async function tambahBaris() {
     if (fotoInput.files && fotoInput.files[0]) {
         showToast('⏳ Memproses kompresi foto...');
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 300, 0.6);
+            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
             await simpanDataBaru(NAMA_HARI[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
         } catch (err) {
             console.error('Error upload foto:', err);
@@ -98,7 +98,7 @@ async function simpanLaporanEdited() {
     if (fotoInput.files && fotoInput.files[0]) {
         showToast('⏳ Memproses kompresi foto...');
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 300, 0.6);
+            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
             await finalizeEdit(idx, NAMA_HARI[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
         } catch (err) {
             console.error('Error ganti foto:', err);
@@ -154,6 +154,7 @@ function renderSemuaData() {
     if (dataLaporan.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
         updateStatistik([]);
+        if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
         return;
     }
     const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
@@ -179,6 +180,7 @@ function renderSemuaData() {
     updateStatistik(dataFiltered);
     if (dataFiltered.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Tidak ada data yang sesuai filter.</p>';
+        if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
         return;
     }
     const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
@@ -191,14 +193,14 @@ function renderSemuaData() {
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                 </div>
                 <div class="table-wrapper">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; min-width: 600px;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
                         <thead>
                             <tr>
                                 <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
                                 <th style="border: 1px solid black; padding: 6px; width: 80px;">Hari</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 95px;">Tanggal</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 90px;">Tanggal</th>
                                 <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 130px; text-align: center;">Foto</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 90px; text-align: center;">Foto</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -208,10 +210,10 @@ function renderSemuaData() {
                             <tr>
                                 <td style="border: 1px solid black; padding: 5px; text-align: center; width: 40px;">${idxTampil}</td>
                                 <td style="border: 1px solid black; padding: 5px; width: 80px;">${item.hari}</td>
-                                <td style="border: 1px solid black; padding: 5px; width: 95px;">${item.tanggal}</td>
+                                <td style="border: 1px solid black; padding: 5px; width: 90px;">${item.tanggal}</td>
                                 <td style="border: 1px solid black; padding: 5px; width: auto;">${item.uraian}</td>
-                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 130px;">
-                                    ${item.foto ? `<img src="${item.foto}" style="max-height: 120px; max-width: 120px; object-fit: contain; display: block; margin: 0 auto;" class="border border-gray-300">` : '-'}
+                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 90px;">
+                                    ${item.foto ? `<img src="${item.foto}" style="max-height: 70px; max-width: 80px; object-fit: contain; display: block; margin: 0 auto;" class="border border-gray-300">` : '-'}
                                 </td>
                             </tr>`;
         });
@@ -222,4 +224,8 @@ function renderSemuaData() {
             </div>`;
         wadahTabel.innerHTML += htmlTabel;
     });
+
+    if (typeof hitungDanRenderBadge === 'function') {
+        hitungDanRenderBadge();
+    }
 }
