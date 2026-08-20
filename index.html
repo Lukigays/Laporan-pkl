@@ -308,8 +308,12 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
-                            <input type="date" id="inputTanggal" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-semibold text-slate-400">Tanggal Pelaksanaan</label>
+                                <button type="button" onclick="setTanggalHariKerjaBerikutnya()" class="text-[10px] text-accent-light hover:underline font-bold transition-all">+ Hari Kerja</button>
+                            </div>
+                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput()" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <p id="pesanHariKerja" class="text-[11px] text-amber-400 mt-1.5 hidden font-medium"></p>
                         </div>
                         <div class="lg:col-span-3">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Uraian Kegiatan</label>
@@ -371,6 +375,13 @@
             </div>
 
             <div id="tabLaporan" class="tab-content">
+                <div class="glass-panel rounded-3xl p-5 mb-6 no-print animate-fade-in">
+                    <h3 class="text-sm font-display font-bold text-accent-light mb-3 flex items-center gap-2">
+                        <span>🎖️</span> Achievement & Pencapaian PKL
+                    </h3>
+                    <div id="wadahBadgeAchievement" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
+                </div>
+
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
                     <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-1">
                         <div class="stat-icon p-3 rounded-xl text-xl">📅</div>
@@ -471,6 +482,8 @@
     <script src="js/pdf.js"></script>
     <script src="js/word.js"></script>
     <script src="js/kamera.js"></script>
+    <script src="js/badge.js"></script>
+    <script src="js/harikerja.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
