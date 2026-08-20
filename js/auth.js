@@ -4,26 +4,14 @@
 
 function initAuth() {
     if (supabaseClient) {
-        // FIX LUPA PASSWORD: Paksa buka modal jika terdeteksi link recovery
-        if (window.location.hash && window.location.hash.includes('type=recovery')) {
-            setTimeout(() => {
-                bukaModalResetPassword();
-                // Bersihkan URL agar pop-up tidak muncul terus-terusan
-                window.history.replaceState(null, null, window.location.pathname);
-            }, 800);
-        }
-
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             currentUser = session?.user || null;
             updateAuthUI();
         });
-
         supabaseClient.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             updateAuthUI();
-            if (event === 'PASSWORD_RECOVERY') {
-                bukaModalResetPassword();
-            }
+            if (event === 'PASSWORD_RECOVERY') bukaModalResetPassword();
         });
     } else {
         updateAuthUI();
@@ -33,6 +21,7 @@ function initAuth() {
 // ---------- Reset Password ----------
 function bukaModalResetPassword() {
     const modal = document.getElementById('modalResetPassword');
+    if (!modal) return;
     modal.classList.remove('hidden');
     setTimeout(() => modal.classList.remove('opacity-0'), 10);
 }
@@ -56,6 +45,8 @@ function updateAuthUI() {
     const label = document.getElementById('labelStatusAuth');
     const btnIn = document.getElementById('wrapperTombolAuth');
     const btnSync = document.getElementById('wrapperTombolSync');
+    if (!label || !btnIn || !btnSync) return;
+
     if (currentUser) {
         label.innerText = `Status: Masuk sebagai (${currentUser.email})`;
         btnIn.classList.add('hidden');
@@ -70,12 +61,14 @@ function updateAuthUI() {
 // ---------- Modal Auth ----------
 function bukaModalAuth() {
     const modal = document.getElementById('modalAuth');
+    if (!modal) return;
     modal.classList.remove('hidden');
     setTimeout(() => modal.classList.remove('opacity-0'), 10);
 }
 
 function tutupModalAuth() {
     const modal = document.getElementById('modalAuth');
+    if (!modal) return;
     modal.classList.add('opacity-0');
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
@@ -86,9 +79,34 @@ async function prosesLoginAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
     if (!email || !password) { showToast('⚠️ Isi email dan password!'); return; }
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) { showToast("❌ " + error.message); }
-    else { tutupModalAuth(); showToast("Berhasil Masuk! 🔓"); tarikDariCloud(); }
+
+    showToast("⏳ Memproses masuk...");
+    
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+        console.error("Auth Login Error:", error);
+        if (error.message.includes("Email not confirmed")) {
+            showToast("❌ Email belum dikonfirmasi! Cek kotak masuk/spam email Anda.");
+        } else if (error.message.includes("Invalid login credentials")) {
+            showToast("❌ Email atau password salah!");
+        } else {
+            showToast("❌ Gagal login: " + error.message);
+        }
+    } else {
+        // Set user aktif langsung dari respon login
+        currentUser = data.user;
+        updateAuthUI();
+        tutupModalAuth();
+        showToast("Berhasil Masuk! 🔓");
+
+        // Konfirmasi sebelum menarik data agar data lokal tidak tertimpa tanpa sengaja
+        setTimeout(() => {
+            if (confirm("Apakah Anda ingin menarik & mengganti data laporan lokal dengan data dari Cloud?")) {
+                tarikDariCloud();
+            }
+        }, 500);
+    }
 }
 
 async function prosesRegisterAuth() {
@@ -96,9 +114,20 @@ async function prosesRegisterAuth() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
     if (!email || !password) { showToast('⚠️ Isi email dan password!'); return; }
-    const { error } = await supabaseClient.auth.signUp({ email, password });
-    if (error) { showToast("❌ " + error.message); }
-    else { tutupModalAuth(); showToast("Akun berhasil dibuat! Silakan login. 🎉"); }
+    
+    showToast("⏳ Mendaftarkan akun...");
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    
+    if (error) {
+        showToast("❌ " + error.message);
+    } else {
+        tutupModalAuth();
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+            showToast("⚠️ Email ini sudah terdaftar! Silakan langsung login.");
+        } else {
+            showToast("Akun berhasil dibuat! Silakan cek email/langsung login. 🎉");
+        }
+    }
 }
 
 async function prosesLupaPassword() {
@@ -115,88 +144,36 @@ async function logoutAuth() {
     if (!supabaseClient) return;
     try {
         await supabaseClient.auth.signOut();
+        currentUser = null;
+        updateAuthUI();
         showToast("Keluar akun berhasil.");
     } catch (e) { console.error(e); }
 }
 
-// ---------- Fungsi Bantuan Base64 ke Blob ----------
-function base64ToBlob(base64, mime) {
-    const byteCharacters = atob(base64.split(',')[1]);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mime });
-}
-
-// ---------- Sinkronisasi Cloud (Dengan Storage) ----------
+// ---------- Sinkronisasi Cloud ----------
 async function simpanKeCloud() {
-    if (!supabaseClient || !currentUser) { 
-        showToast('⚠️ Belum login akun cloud!'); 
-        return; 
-    }
-    
-    showToast("⏳ Sedang mengunggah file ke Storage... (Harap bersabar)");
-
+    if (!supabaseClient || !currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
+    showToast("⏳ Sedang menyimpan data ke Cloud...");
     try {
         await supabaseClient.from('laporan_pkl').delete().eq('user_id', currentUser.id);
-        const rowsToInsert = [];
-
-        for (let i = 0; i < dataLaporan.length; i++) {
-            let item = dataLaporan[i];
-            let fotoUrl = item.foto;
-
-            if (fotoUrl && fotoUrl.startsWith('data:image')) {
-                showToast(`📤 Upload foto ${i + 1} dari ${dataLaporan.length}...`);
-                
-                const mimeType = fotoUrl.match(/data:(.*?);/)[1];
-                const fileBlob = base64ToBlob(fotoUrl, mimeType);
-                const fileExt = mimeType.split('/')[1];
-                const fileName = `${currentUser.id}/${Date.now()}_${i}.${fileExt}`;
-
-                const { data: uploadData, error: uploadError } = await supabaseClient
-                    .storage
-                    .from('foto_pkl')
-                    .upload(fileName, fileBlob, { upsert: true });
-
-                if (uploadError) throw uploadError;
-
-                const { data: publicUrlData } = supabaseClient
-                    .storage
-                    .from('foto_pkl')
-                    .getPublicUrl(fileName);
-
-                fotoUrl = publicUrlData.publicUrl;
-                dataLaporan[i].foto = fotoUrl; 
-            }
-
-            rowsToInsert.push({
-                user_id: currentUser.id,
-                hari: item.hari,
-                tanggal: item.tanggal,
-                uraian: item.uraian,
-                foto: fotoUrl, 
-                bulan_label: item.bulanLabel
-            });
-        }
-
-        await localforage.setItem('laporanPKL', dataLaporan);
-        
-        showToast("⏳ Menyimpan data teks ke database...");
-        const chunkSize = 50; 
+        const rowsToInsert = dataLaporan.map(item => ({
+            user_id: currentUser.id,
+            hari: item.hari,
+            tanggal: item.tanggal,
+            uraian: item.uraian,
+            foto: item.foto,
+            bulan_label: item.bulanLabel
+        }));
+        const chunkSize = 50;
         for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
             const chunk = rowsToInsert.slice(i, i + chunkSize);
             const { error } = await supabaseClient.from('laporan_pkl').insert(chunk);
             if (error) throw error;
         }
-
         dataTelahBerubah = false;
-        showToast("✅ Sinkronisasi Cloud sukses 100%!");
-        
+        showToast("✅ Data berhasil disimpan ke Cloud!");
     } catch (err) {
-        console.error("Error upload:", err);
-        showToast("❌ Gagal: " + err.message);
+        showToast("❌ Gagal sinkronisasi: " + err.message);
     }
 }
 
@@ -205,7 +182,10 @@ async function autoSyncKeCloud() {
 }
 
 async function tarikDariCloud() {
-    if (!supabaseClient || !currentUser) return;
+    if (!supabaseClient || !currentUser) {
+        showToast('⚠️ Belum login akun cloud!');
+        return;
+    }
     showToast("⏳ Mengambil data dari Cloud...");
     try {
         const { data, error } = await supabaseClient
@@ -226,9 +206,10 @@ async function tarikDariCloud() {
             renderSemuaData();
             showToast("✅ Data berhasil ditarik dari Cloud!");
         } else {
-            showToast("⚠️ Belum ada data di cloud.");
+            showToast("⚠️ Belum ada data tersimpan di akun cloud Anda.");
         }
     } catch (err) {
+        console.error("Gagal tarik cloud:", err);
         showToast("❌ Gagal mengambil data dari cloud.");
     }
 }
