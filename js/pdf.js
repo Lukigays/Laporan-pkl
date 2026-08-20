@@ -25,21 +25,22 @@ function prosesEksekusiPDF() {
     downloadPDF(opsi);
 }
 
-// ---------- Helper Kompresi Gambar Aman dengan Timeout ----------
-function kompresGambarAman(fotoBase64, maxDimensi = 120, kualitas = 0.4) {
+// ---------- Helper Memuat Gambar untuk PDF ----------
+function muatGambarPdf(src, maxDimensi = 150) {
     return new Promise((resolve) => {
-        if (!fotoBase64 || !fotoBase64.startsWith('data:image')) {
+        if (!src || src.trim() === '') {
             resolve(null);
             return;
         }
 
-        // Timeout 2 detik per gambar agar tidak gantung
+        // Timeout 3 detik agar PDF tidak macet
         const timer = setTimeout(() => {
-            console.warn("Kompresi timeout, melewati foto...");
+            console.warn("Timeout memuat gambar:", src.substring(0, 30));
             resolve(null);
-        }, 2000);
+        }, 3000);
 
         const img = new Image();
+        img.crossOrigin = 'Anonymous';
         img.onload = function() {
             clearTimeout(timer);
             try {
@@ -65,17 +66,27 @@ function kompresGambarAman(fotoBase64, maxDimensi = 120, kualitas = 0.4) {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', kualitas));
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
             } catch (e) {
-                console.error("Gagal resize canvas:", e);
-                resolve(null);
+                console.error("Gagal menggambar ke canvas:", e);
+                // Jika canvas gagal tapi ini sudah dataBase64, pakai langsung
+                if (src.startsWith('data:image')) {
+                    resolve(src);
+                } else {
+                    resolve(null);
+                }
             }
         };
         img.onerror = function() {
             clearTimeout(timer);
-            resolve(null);
+            console.warn("Error memuat gambar:", src.substring(0, 30));
+            if (src.startsWith('data:image')) {
+                resolve(src);
+            } else {
+                resolve(null);
+            }
         };
-        img.src = fotoBase64;
+        img.src = src;
     });
 }
 
@@ -105,7 +116,7 @@ function downloadPdfWithFallback(pdfDoc, namaFile) {
 
 // ---------- Generator PDF ----------
 async function downloadPDF(opsiCover) {
-    showToast("⏳ Mengompresi foto & menyusun PDF...");
+    showToast("⏳ Memproses foto & menyusun PDF...");
 
     try {
         const docContent = [];
@@ -121,11 +132,7 @@ async function downloadPDF(opsiCover) {
 
             let logoBase64 = null;
             if (logoRaw !== '') {
-                try {
-                    logoBase64 = await getImageBase64ForPdf(logoRaw, 120, 0.5);
-                } catch (e) {
-                    logoBase64 = null;
-                }
+                logoBase64 = await muatGambarPdf(logoRaw, 150);
             }
 
             const coverStack = [
@@ -205,15 +212,15 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            // Proses kompresi satu per satu agar memori ringan
+            // Pemuatan foto satu per satu
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
                 let fotoCell = { text: '-', alignment: 'center' };
 
                 if (item.foto && item.foto.trim() !== '') {
-                    const fotoKecil = await kompresGambarAman(item.foto, 120, 0.4);
-                    if (fotoKecil) {
-                        fotoCell = { image: fotoKecil, fit: [45, 45], alignment: 'center' };
+                    const hasilFoto = await muatGambarPdf(item.foto, 150);
+                    if (hasilFoto) {
+                        fotoCell = { image: hasilFoto, fit: [50, 50], alignment: 'center' };
                     }
                 }
 
