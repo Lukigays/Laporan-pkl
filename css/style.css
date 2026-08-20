@@ -1,247 +1,104 @@
 /* ============================================================
-   LAPORAN PKL BY LUKYY — Global Styles
+   TOMBOL LOGIN GOOGLE & DIVIDER
    ============================================================ */
 
-:root { --glow-primary: 0 0 40px rgba(192,38,211,0.3); }
-
-* { scrollbar-width: thin; scrollbar-color: rgba(192,38,211,0.3) transparent; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #030308;
-    color: #f1f5f9;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
-
-/* ---------- Background kosmik ---------- */
-.cosmic-bg {
-    position: fixed; inset: 0; z-index: -2;
-    background:
-        radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(192,38,211,0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.05) 0%, transparent 70%),
-        #030308;
-}
-.cosmic-orb {
-    position: fixed; border-radius: 50%; filter: blur(80px);
-    z-index: -1; pointer-events: none;
-    animation: orbFloat 20s ease-in-out infinite;
-}
-.orb-1 { width: 400px; height: 400px; background: rgba(124,58,237,0.2); top: -10%; right: -5%; }
-.orb-2 { width: 300px; height: 300px; background: rgba(192,38,211,0.15); bottom: 10%; left: -5%; animation-delay: -7s; }
-.orb-3 { width: 250px; height: 250px; background: rgba(236,72,153,0.1); top: 40%; left: 30%; animation-delay: -14s; }
-
-@keyframes orbFloat {
-    0%,100% { transform: translate(0,0) scale(1); }
-    33%     { transform: translate(30px,-30px) scale(1.1); }
-    66%     { transform: translate(-20px,20px) scale(0.95); }
-}
-
-#particles-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.6; }
-
-/* ---------- Glassmorphism ---------- */
-.glass-panel {
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-.glass-panel-hover:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(192,38,211,0.3);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(192,38,211,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
-}
-.glass-input {
-    background: rgba(255,255,255,0.03);
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
     color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
-.glass-input:focus {
-    outline: none;
-    border-color: rgba(192,38,211,0.5);
-    box-shadow: 0 0 0 3px rgba(192,38,211,0.1), 0 0 20px rgba(192,38,211,0.1);
-    background: rgba(255,255,255,0.05);
-}
-.glass-input::placeholder { color: rgba(255,255,255,0.3); }
-
-/* ---------- Teks gradien ---------- */
-.gradient-text {
-    background: linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #ec4899 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.gradient-text-hero {
-    background: linear-gradient(135deg, #ffffff 0%, #e9d5ff 30%, #c026d3 60%, #7c3aed 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-
-/* ---------- Tombol ---------- */
-.btn-primary {
-    background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
-    color: white; border: none; position: relative; overflow: hidden;
-    transition: all 0.3s ease;
-}
-.btn-primary::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, #c026d3 0%, #ec4899 100%);
-    opacity: 0; transition: opacity 0.3s ease;
-}
-.btn-primary:hover::before { opacity: 1; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(192,38,211,0.4); }
-.btn-primary:active { transform: translateY(0) scale(0.98); }
-.btn-primary span { position: relative; z-index: 1; }
-
-.btn-secondary {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #f1f5f9; transition: all 0.3s ease;
-}
-.btn-secondary:hover {
+.btn-google:hover {
     background: rgba(255,255,255,0.1);
-    border-color: rgba(192,38,211,0.4);
-    box-shadow: 0 0 20px rgba(192,38,211,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(255,255,255,0.05);
 }
-.btn-glow { box-shadow: 0 0 20px rgba(192,38,211,0.3); }
-
-/* ---------- Navigasi ---------- */
-.nav-item { position: relative; transition: all 0.3s ease; }
-.nav-item.active {
-    background: rgba(192,38,211,0.15);
-    border: 1px solid rgba(192,38,211,0.3);
-    color: #d946ef;
-    box-shadow: 0 0 20px rgba(192,38,211,0.15);
+.btn-google:active {
+    transform: scale(0.98);
 }
-.nav-item.active::after {
-    content: ''; position: absolute; bottom: -4px; left: 50%;
-    transform: translateX(-50%);
-    width: 4px; height: 4px; border-radius: 50%;
-    background: #d946ef; box-shadow: 0 0 10px #d946ef;
+.google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
-/* ---------- Tab ---------- */
-.tab-content {
-    opacity: 0; transform: translateY(20px);
-    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-    position: absolute; width: 100%;
-    pointer-events: none; visibility: hidden;
+.divider-atau {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
 }
-.tab-content.active {
-    opacity: 1; transform: translateY(0);
-    position: relative; pointer-events: auto; visibility: visible;
+.divider-atau::before,
+.divider-atau::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.divider-atau span {
+    padding: 0 12px;
+}
+/* ============================================================
+   TOMBOL LOGIN GOOGLE & DIVIDER
+   ============================================================ */
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-google:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(255,255,255,0.05);
+}
+.btn-google:active {
+    transform: scale(0.98);
+}
+.google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
-/* ---------- Animasi ---------- */
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-.animate-fade-in { animation: fadeInUp 0.6s ease forwards; }
-.animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-.animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-.animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
-.animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
-
-/* ---------- Modal ---------- */
-.modal-overlay { background: rgba(3,3,8,0.8); backdrop-filter: blur(12px); }
-.modal-content {
-    background: linear-gradient(180deg, rgba(18,18,26,0.95), rgba(10,10,18,0.98));
-    border: 1px solid rgba(192,38,211,0.2);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.1);
+.divider-atau {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
 }
-
-/* ---------- Kartu statistik ---------- */
-.stat-card { position: relative; overflow: hidden; }
-.stat-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, #c026d3, #7c3aed, transparent);
-    opacity: 0.5;
+.divider-atau::before,
+.divider-atau::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.stat-card .stat-icon {
-    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,38,211,0.2));
-    border: 1px solid rgba(192,38,211,0.2);
-}
-
-/* ---------- Badge & zona bahaya ---------- */
-.badge-cosmic {
-    background: rgba(192,38,211,0.1);
-    border: 1px solid rgba(192,38,211,0.2);
-    color: #d946ef; font-size: 0.75rem;
-    padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;
-}
-.danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
-
-/* ---------- Area kertas (preview cetak) ---------- */
-.area-kertas {
-    font-family: "Times New Roman", Times, serif;
-    background-color: white !important; color: black !important;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-}
-.area-kertas table {
-    border-collapse: collapse !important;
-    font-size: 11px !important;
-    width: 100% !important;
-    min-width: 600px !important; /* Diperbarui agar tabel punya batas lebar minimal */
-    table-layout: auto !important; /* Diperbarui agar lebar kolom menyesuaikan isi */
-}
-.area-kertas th, .area-kertas td {
-    border: 1px solid black !important;
-    padding: 6px 8px !important;
-    vertical-align: top; color: black !important;
-    word-break: break-word;
-}
-.area-kertas td img { 
-    display: block; 
-    margin: 0 auto; 
-    max-height: 150px; /* Diperbesar agar foto terlihat jelas */
-    max-width: 100%; 
-    object-fit: contain; 
-}
-.area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
-
-.header-print {
-    font-family: "Times New Roman", Times, serif;
-    text-align: center; color: black; width: 100%;
-    min-height: 1000px;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 20px 0; box-sizing: border-box;
-}
-.header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
-
-.watermark {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800;
-    white-space: nowrap; pointer-events: none; z-index: 1;
-    user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em;
-}
-
-.logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 35px 0; }
-.logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
-
-/* ---------- Scrollbar ---------- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(192,38,211,0.5); }
-
-/* ---------- Tabel & select ---------- */
-.table-wrapper { 
-    width: 100%; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
-}
-select.glass-input {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
-}
-
-/* ---------- Hero ---------- */
-.hero-section { position: relative; padding: 3rem 0 2rem; }
-
-@media (max-width: 768px) {
-    .hero-section { padding: 2rem 0 1rem; }
-    .orb-1, .orb-2, .orb-3 { display: none; }
+.divider-atau span {
+    padding: 0 12px;
 }
