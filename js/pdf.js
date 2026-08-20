@@ -26,14 +26,13 @@ function prosesEksekusiPDF() {
 }
 
 // ---------- Helper Memuat Gambar untuk PDF ----------
-function muatGambarPdf(src, maxDimensi = 150) {
+function muatGambarPdf(src, maxDimensi = 350) {
     return new Promise((resolve) => {
         if (!src || src.trim() === '') {
             resolve(null);
             return;
         }
 
-        // Timeout 3 detik agar PDF tidak macet
         const timer = setTimeout(() => {
             console.warn("Timeout memuat gambar:", src.substring(0, 30));
             resolve(null);
@@ -66,10 +65,9 @@ function muatGambarPdf(src, maxDimensi = 150) {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
             } catch (e) {
                 console.error("Gagal menggambar ke canvas:", e);
-                // Jika canvas gagal tapi ini sudah dataBase64, pakai langsung
                 if (src.startsWith('data:image')) {
                     resolve(src);
                 } else {
@@ -132,7 +130,7 @@ async function downloadPDF(opsiCover) {
 
             let logoBase64 = null;
             if (logoRaw !== '') {
-                logoBase64 = await muatGambarPdf(logoRaw, 150);
+                logoBase64 = await muatGambarPdf(logoRaw, 250);
             }
 
             const coverStack = [
@@ -143,7 +141,7 @@ async function downloadPDF(opsiCover) {
             ];
 
             if (logoBase64) {
-                coverStack.push({ image: logoBase64, fit: [100, 100], alignment: 'center', margin: [0, 0, 0, 65] });
+                coverStack.push({ image: logoBase64, fit: [120, 120], alignment: 'center', margin: [0, 0, 0, 65] });
             } else {
                 coverStack.push({ text: '', margin: [0, 0, 0, 120] });
             }
@@ -212,23 +210,24 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            // Pemuatan foto satu per satu
+            // Pemuatan foto satu per satu dengan ukuran jumbo
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
-                let fotoCell = { text: '-', alignment: 'center' };
+                let fotoCell = { text: '-', alignment: 'center', margin: [0, 40, 0, 0] };
 
                 if (item.foto && item.foto.trim() !== '') {
-                    const hasilFoto = await muatGambarPdf(item.foto, 150);
+                    const hasilFoto = await muatGambarPdf(item.foto, 350);
                     if (hasilFoto) {
-                        fotoCell = { image: hasilFoto, fit: [50, 50], alignment: 'center' };
+                        // Ukuran fisik foto diperbesar menjadi 120x120
+                        fotoCell = { image: hasilFoto, fit: [120, 120], alignment: 'center' };
                     }
                 }
 
                 tableBody.push([
-                    { text: idx + 1, alignment: 'center', fontSize: 9 },
-                    { text: item.hari, fontSize: 9 },
-                    { text: item.tanggal, fontSize: 9 },
-                    { text: item.uraian, fontSize: 9 },
+                    { text: idx + 1, alignment: 'center', fontSize: 10 },
+                    { text: item.hari, fontSize: 10 },
+                    { text: item.tanggal, fontSize: 10 },
+                    { text: item.uraian, fontSize: 10 },
                     fotoCell
                 ]);
             }
@@ -236,7 +235,8 @@ async function downloadPDF(opsiCover) {
             blockElement.stack.push({
                 table: {
                     headerRows: 1,
-                    widths: [25, 45, 60, '*', 65],
+                    // Kolom Foto diperbesar menjadi 140 (maksimal lebar yang pas di A4)
+                    widths: [25, 45, 60, '*', 140],
                     dontBreakRows: true,
                     body: tableBody
                 },
@@ -251,14 +251,14 @@ async function downloadPDF(opsiCover) {
 
         const docDefinition = {
             pageSize: 'A4',
-            pageMargins: [40, 40, 40, 40],
+            pageMargins: [25, 25, 25, 25], // Margin kertas diperkecil agar area tabel maksimal
             content: docContent,
             styles: {
                 headerTitle: { fontSize: 14, bold: true, alignment: 'center' },
                 headerSub: { fontSize: 12, bold: true, alignment: 'center' },
                 headerAddress: { fontSize: 11, alignment: 'center' },
                 headerSchool: { fontSize: 12, bold: true, alignment: 'center' },
-                tableHeader: { bold: true, fontSize: 9, color: 'black' }
+                tableHeader: { bold: true, fontSize: 10, color: 'black' }
             }
         };
 
