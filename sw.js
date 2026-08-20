@@ -2,11 +2,12 @@
 // SERVICE WORKER — CACHING & OFFLINE MODE
 // ============================================================
 
-const CACHE_NAME = 'laporan-pkl-v1';
+const CACHE_NAME = 'laporan-pkl-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './css/style.css',
+  './manifest.json',
   './js/config.js',
   './js/particles.js',
   './js/utils.js',
@@ -16,14 +17,13 @@ const ASSETS_TO_CACHE = [
   './js/laporan.js',
   './js/backup.js',
   './js/pdf.js',
-  './js/word.js',
   './js/kamera.js',
   './js/badge.js',
   './js/hariKerja.js',
+  './js/pwa.js',
   './js/main.js'
 ];
 
-// Instansi Service Worker & Simpan Cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -33,7 +33,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Aktivasi & Pembersihan Cache Lama
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -49,7 +48,6 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Strategi Fetch: Cache First, Fallback ke Network
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
