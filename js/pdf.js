@@ -2,14 +2,10 @@
 // EKSPOR PDF (pdfMake) — Cover + Tabel per Bulan
 // ============================================================
 
-// ---------- Modal Opsi Ekspor ----------
+// ---------- Modal Ospi Ekspor ----------
 function bukaOspiExport() {
     const modal = document.getElementById('modalExportOspi');
-    if (!modal) {
-        // Safe-guard jika modal tidak ditemukan di HTML
-        downloadPDF('dengan');
-        return;
-    }
+    if (!modal) return;
     modal.classList.remove('hidden');
     setTimeout(() => modal.classList.remove('opacity-0'), 10);
 }
@@ -29,6 +25,28 @@ function prosesEksekusiPDF() {
     downloadPDF(opsi);
 }
 
+// ---------- Helper Khusus Download Android/PWA ----------
+function downloadPdfWithFallback(pdfDoc, namaFile) {
+    pdfDoc.getBlob((blob) => {
+        try {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = namaFile;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+            showToast("PDF berhasil diunduh! 📥");
+        } catch (err) {
+            console.warn("Fallback link gagal, mencoba open tab baru...", err);
+            pdfDoc.open();
+            showToast("PDF dibuka di tab baru! 📄");
+        }
+    });
+}
+
 // ---------- Generator PDF ----------
 async function downloadPDF(opsiCover) {
     showToast("⏳ Mengompresi & Membuat PDF...");
@@ -46,25 +64,22 @@ async function downloadPDF(opsiCover) {
 
             let logoBase64 = null;
             if (logoRaw !== '') {
-                logoBase64 = await getImageBase64ForPdf(logoRaw, 250, 0.7);
+                logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
             }
 
             const coverStack = [
-                // Header Judul Atas
                 { text: 'LAPORAN', style: 'headerTitle', margin: [0, 15, 0, 2] },
                 { text: 'PRAKTEK KERJA LAPANGAN (PKL)', style: 'headerTitle', margin: [0, 0, 0, 15] },
                 { text: 'DI', style: 'headerSub', margin: [0, 0, 0, 6] },
                 { text: dataProfil.alamat || 'Alamat Tempat PKL', style: 'headerAddress', margin: [0, 0, 0, 45] }
             ];
 
-            // Logo Sekolah
             if (logoBase64) {
                 coverStack.push({ image: logoBase64, fit: [110, 110], alignment: 'center', margin: [0, 0, 0, 65] });
             } else {
                 coverStack.push({ text: '', margin: [0, 0, 0, 120] });
             }
 
-            // Identitas Siswa & Sekolah
             coverStack.push(
                 { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                 {
@@ -128,10 +143,9 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            // 1. Resolusi kompresi dinaikkan ke 300px agar foto jernih
             const fotoPromises = dataBulanIni.map(item => {
                 if (item.foto && item.foto.trim() !== '') {
-                    return kompresGambarRingan(item.foto, 300, 0.6).catch(err => null);
+                    return kompresGambarRingan(item.foto, 150, 0.5).catch(err => null);
                 }
                 return Promise.resolve(null);
             });
@@ -141,9 +155,8 @@ async function downloadPDF(opsiCover) {
                 const item = dataBulanIni[idx];
                 let fotoCell = { text: '-', alignment: 'center' };
 
-                // 2. Dimensi batas foto diperbesar ke 100x100
                 if (fotoHasil[idx]) {
-                    fotoCell = { image: fotoHasil[idx], fit: [100, 100], alignment: 'center' };
+                    fotoCell = { image: fotoHasil[idx], fit: [50, 50], alignment: 'center' };
                 }
 
                 tableBody.push([
@@ -155,11 +168,10 @@ async function downloadPDF(opsiCover) {
                 ]);
             }
 
-            // 3. Lebar kolom foto diperbesar menjadi 110
             blockElement.stack.push({
                 table: {
                     headerRows: 1,
-                    widths: [20, 40, 55, '*', 110],
+                    widths: [25, 45, 60, '*', 65],
                     dontBreakRows: true,
                     body: tableBody
                 },
@@ -185,8 +197,11 @@ async function downloadPDF(opsiCover) {
             }
         };
 
-        pdfMake.createPdf(docDefinition).download(`Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`);
-        showToast("PDF berhasil diunduh! 📥");
+        const pdfDoc = pdfMake.createPdf(docDefinition);
+        const namaFile = `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`;
+
+        // Panggil helper fallback download
+        downloadPdfWithFallback(pdfDoc, namaFile);
 
     } catch (err) {
         console.error(err);
