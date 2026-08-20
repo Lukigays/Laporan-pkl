@@ -25,7 +25,61 @@ function prosesEksekusiPDF() {
     downloadPDF(opsi);
 }
 
-// ---------- Helper Khusus Download Android/PWA ----------
+// ---------- Helper Kompresi Gambar Aman dengan Timeout ----------
+function kompresGambarAman(fotoBase64, maxDimensi = 120, kualitas = 0.4) {
+    return new Promise((resolve) => {
+        if (!fotoBase64 || !fotoBase64.startsWith('data:image')) {
+            resolve(null);
+            return;
+        }
+
+        // Timeout 2 detik per gambar agar tidak gantung
+        const timer = setTimeout(() => {
+            console.warn("Kompresi timeout, melewati foto...");
+            resolve(null);
+        }, 2000);
+
+        const img = new Image();
+        img.onload = function() {
+            clearTimeout(timer);
+            try {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxDimensi) {
+                        height = Math.round(height * (maxDimensi / width));
+                        width = maxDimensi;
+                    }
+                } else {
+                    if (height > maxDimensi) {
+                        width = Math.round(width * (maxDimensi / height));
+                        height = maxDimensi;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', kualitas));
+            } catch (e) {
+                console.error("Gagal resize canvas:", e);
+                resolve(null);
+            }
+        };
+        img.onerror = function() {
+            clearTimeout(timer);
+            resolve(null);
+        };
+        img.src = fotoBase64;
+    });
+}
+
+// ---------- Helper Download PDF untuk Android / Chrome PWA ----------
 function downloadPdfWithFallback(pdfDoc, namaFile) {
     pdfDoc.getBlob((blob) => {
         try {
@@ -33,27 +87,30 @@ function downloadPdfWithFallback(pdfDoc, namaFile) {
             const a = document.createElement('a');
             a.href = url;
             a.download = namaFile;
+            a.target = '_blank';
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            
-            setTimeout(() => URL.revokeObjectURL(url), 10000);
-            showToast("PDF berhasil diunduh! 📥");
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 5000);
+            showToast("✅ PDF berhasil diunduh!");
         } catch (err) {
             console.warn("Fallback link gagal, mencoba open tab baru...", err);
             pdfDoc.open();
-            showToast("PDF dibuka di tab baru! 📄");
+            showToast("📄 PDF dibuka di tab baru!");
         }
     });
 }
 
 // ---------- Generator PDF ----------
 async function downloadPDF(opsiCover) {
-    showToast("⏳ Mengompresi & Membuat PDF...");
+    showToast("⏳ Mengompresi foto & menyusun PDF...");
 
     try {
         const docContent = [];
 
+        // --- Halaman Kover ---
         if (opsiCover === 'dengan') {
             let logoRaw = '';
             if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
@@ -64,7 +121,11 @@ async function downloadPDF(opsiCover) {
 
             let logoBase64 = null;
             if (logoRaw !== '') {
-                logoBase64 = await getImageBase64ForPdf(logoRaw, 180, 0.6);
+                try {
+                    logoBase64 = await getImageBase64ForPdf(logoRaw, 120, 0.5);
+                } catch (e) {
+                    logoBase64 = null;
+                }
             }
 
             const coverStack = [
@@ -75,7 +136,7 @@ async function downloadPDF(opsiCover) {
             ];
 
             if (logoBase64) {
-                coverStack.push({ image: logoBase64, fit: [110, 110], alignment: 'center', margin: [0, 0, 0, 65] });
+                coverStack.push({ image: logoBase64, fit: [100, 100], alignment: 'center', margin: [0, 0, 0, 65] });
             } else {
                 coverStack.push({ text: '', margin: [0, 0, 0, 120] });
             }
@@ -115,6 +176,7 @@ async function downloadPDF(opsiCover) {
             docContent.push(...coverStack);
         }
 
+        // --- Tabel Laporan per Bulan ---
         const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
 
         for (let bIdx = 0; bIdx < unikBulan.length; bIdx++) {
@@ -143,20 +205,16 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            const fotoPromises = dataBulanIni.map(item => {
-                if (item.foto && item.foto.trim() !== '') {
-                    return kompresGambarRingan(item.foto, 150, 0.5).catch(err => null);
-                }
-                return Promise.resolve(null);
-            });
-            const fotoHasil = await Promise.all(fotoPromises);
-
+            // Proses kompresi satu per satu agar memori ringan
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
                 let fotoCell = { text: '-', alignment: 'center' };
 
-                if (fotoHasil[idx]) {
-                    fotoCell = { image: fotoHasil[idx], fit: [50, 50], alignment: 'center' };
+                if (item.foto && item.foto.trim() !== '') {
+                    const fotoKecil = await kompresGambarAman(item.foto, 120, 0.4);
+                    if (fotoKecil) {
+                        fotoCell = { image: fotoKecil, fit: [45, 45], alignment: 'center' };
+                    }
                 }
 
                 tableBody.push([
@@ -200,11 +258,10 @@ async function downloadPDF(opsiCover) {
         const pdfDoc = pdfMake.createPdf(docDefinition);
         const namaFile = `Laporan_PKL_${dataProfil.nama || 'LUKYY'}.pdf`;
 
-        // Panggil helper fallback download
         downloadPdfWithFallback(pdfDoc, namaFile);
 
     } catch (err) {
-        console.error(err);
-        showToast("❌ Error PDF: " + err.message);
+        console.error("PDF Generation Error:", err);
+        showToast("❌ Gagal membuat PDF: " + err.message);
     }
 }
