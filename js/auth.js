@@ -18,6 +18,30 @@ function initAuth() {
     }
 }
 
+// ---------- Login dengan Google (OAuth) ----------
+async function prosesLoginGoogle() {
+    if (!supabaseClient) {
+        showToast("⚠️ Koneksi cloud belum tersedia!");
+        return;
+    }
+
+    showToast("⏳ Membuka login Google...");
+
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin + window.location.pathname
+        }
+    });
+
+    if (error) {
+        console.error("Google Login Error:", error);
+        showToast("❌ Gagal login Google: " + error.message);
+    }
+    // Jika sukses, browser akan redirect ke halaman Google login,
+    // lalu kembali ke aplikasi. initAuth() akan otomatis menangani session.
+}
+
 // ---------- Reset Password ----------
 function bukaModalResetPassword() {
     const modal = document.getElementById('modalResetPassword');

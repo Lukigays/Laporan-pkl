@@ -1,8 +1,8 @@
 // ============================================================
-// EKSPOR PDF (pdfMake) — Cover + Tabel per Bulan
+// EKSPOR PDF (pdfMake) — Cover + Tabel per Bulan (REVISI BESAR)
 // ============================================================
 
-// ---------- Modal Ospi Ekspor ----------
+// ---------- Modal Opsi Ekspor ----------
 function bukaOspiExport() {
     const modal = document.getElementById('modalExportOspi');
     if (!modal) return;
@@ -26,7 +26,7 @@ function prosesEksekusiPDF() {
 }
 
 // ---------- Helper Memuat Gambar untuk PDF ----------
-function muatGambarPdf(src, maxDimensi = 350) {
+function muatGambarPdf(src, maxDimensi = 500) {  // ← dinaikkan ke 500
     return new Promise((resolve) => {
         if (!src || src.trim() === '') {
             resolve(null);
@@ -65,7 +65,7 @@ function muatGambarPdf(src, maxDimensi = 350) {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, width, height);
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                resolve(canvas.toDataURL('image/jpeg', 0.92)); // ← kualitas dinaikkan
             } catch (e) {
                 console.error("Gagal menggambar ke canvas:", e);
                 if (src.startsWith('data:image')) {
@@ -119,7 +119,7 @@ async function downloadPDF(opsiCover) {
     try {
         const docContent = [];
 
-        // --- Halaman Kover ---
+        // --- Halaman Cover ---
         if (opsiCover === 'dengan') {
             let logoRaw = '';
             if (dataProfil.logoCatboxUrl && dataProfil.logoCatboxUrl.trim() !== '') {
@@ -210,16 +210,22 @@ async function downloadPDF(opsiCover) {
                 ]
             ];
 
-            // Pemuatan foto satu per satu dengan ukuran jumbo
+            // Pemuatan foto satu per satu dengan ukuran BESAR
             for (let idx = 0; idx < dataBulanIni.length; idx++) {
                 const item = dataBulanIni[idx];
-                let fotoCell = { text: '-', alignment: 'center', margin: [0, 40, 0, 0] };
+                // Placeholder lebih tinggi agar baris tidak terlalu pendek jika foto gagal
+                let fotoCell = { text: '-', alignment: 'center', margin: [0, 60, 0, 60] };
 
                 if (item.foto && item.foto.trim() !== '') {
-                    const hasilFoto = await muatGambarPdf(item.foto, 350);
+                    const hasilFoto = await muatGambarPdf(item.foto, 500); // ← maxDimensi naik ke 500
                     if (hasilFoto) {
-                        // Ukuran fisik foto diperbesar menjadi 120x120
-                        fotoCell = { image: hasilFoto, fit: [120, 120], alignment: 'center' };
+                        // UKURAN FOTO DIPERBESAR JADI 160 x 160
+                        fotoCell = { 
+                            image: hasilFoto, 
+                            fit: [160, 160],   // ← DARI 120 JADI 160
+                            alignment: 'center',
+                            margin: [2, 4, 2, 4] // ← padding kecil biar rapi
+                        };
                     }
                 }
 
@@ -235,13 +241,18 @@ async function downloadPDF(opsiCover) {
             blockElement.stack.push({
                 table: {
                     headerRows: 1,
-                    // Kolom Foto diperbesar menjadi 140 (maksimal lebar yang pas di A4)
-                    widths: [25, 45, 60, '*', 140],
+                    // KOLOM FOTO DIPERBESAR JADI 180, kolom lain dikurangi sedikit
+                    widths: [22, 40, 55, '*', 180],  // ← DARI [25,45,60,*,140]
                     dontBreakRows: true,
                     body: tableBody
                 },
                 layout: {
-                    fillColor: function (rowIndex) { return (rowIndex === 0) ? '#f0f0f0' : null; }
+                    fillColor: function (rowIndex) { return (rowIndex === 0) ? '#f0f0f0' : null; },
+                    // Tambah padding cell biar foto nggak nempel
+                    paddingLeft: function() { return 3; },
+                    paddingRight: function() { return 3; },
+                    paddingTop: function() { return 4; },
+                    paddingBottom: function() { return 4; }
                 },
                 margin: [0, 0, 0, 15]
             });
@@ -251,7 +262,7 @@ async function downloadPDF(opsiCover) {
 
         const docDefinition = {
             pageSize: 'A4',
-            pageMargins: [25, 25, 25, 25], // Margin kertas diperkecil agar area tabel maksimal
+            pageMargins: [18, 18, 18, 18], // ← MARGIN DIPERKECIL DARI 25 JADI 18
             content: docContent,
             styles: {
                 headerTitle: { fontSize: 14, bold: true, alignment: 'center' },
