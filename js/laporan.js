@@ -151,6 +151,11 @@ function updateStatistik(dataAktif) {
 function renderSemuaData() {
     const wadahTabel = document.getElementById('wadahTabelBulan');
     wadahTabel.innerHTML = '';
+    
+    // Memastikan wadah utama bisa di-scroll horizontal di HP
+    wadahTabel.style.overflowX = 'auto';
+    wadahTabel.style.webkitOverflowScrolling = 'touch';
+
     if (dataLaporan.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
         updateStatistik([]);
@@ -189,12 +194,12 @@ function renderSemuaData() {
         if (dataBulanIni.length === 0) return;
         
         let htmlTabel = `
-            <div class="block-bulan">
-                <div class="mb-3 text-base font-bold text-black pt-2">
+            <div class="block-bulan" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div class="mb-3 text-base font-bold text-black pt-2" style="min-width: 720px;">
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                 </div>
-                <div class="table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; min-width: 720px;">
+                <div class="table-wrapper" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; min-width: 720px;">
                         <thead>
                             <tr>
                                 <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
@@ -209,7 +214,7 @@ function renderSemuaData() {
             const idxTampil = idx + 1;
             const namaFileFoto = `PKL_${item.tanggal.replace(/\//g,'-')}_${idxTampil}.jpg`;
             
-            // ⬇️ TAMBAHAN: LINK DOWNLOAD FOTO ⬇️
+            // LINK DOWNLOAD FOTO
             const fotoHtml = item.foto 
                 ? `<div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
                      <img src="${item.foto}" style="max-height: 65px; max-width: 75px; object-fit: contain; display: block;" class="border border-gray-300">
