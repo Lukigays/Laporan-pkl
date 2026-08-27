@@ -147,15 +147,11 @@ function updateStatistik(dataAktif) {
     document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
 }
 
-// ---------- Render Tabel Laporan — BISA DI-SWIPE + DOWNLOAD FOTO ----------
+// ---------- Render Tabel Laporan ----------
 function renderSemuaData() {
     const wadahTabel = document.getElementById('wadahTabelBulan');
     wadahTabel.innerHTML = '';
     
-    // Memastikan wadah utama bisa di-scroll horizontal di HP
-    wadahTabel.style.overflowX = 'auto';
-    wadahTabel.style.webkitOverflowScrolling = 'touch';
-
     if (dataLaporan.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
         updateStatistik([]);
@@ -193,13 +189,14 @@ function renderSemuaData() {
         const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
         if (dataBulanIni.length === 0) return;
         
+        // HAPUS overflow & style dari blok tabel agar ukuran 100% mengikuti kertas (780px)
         let htmlTabel = `
-            <div class="block-bulan" style="width: 100%; min-width: 720px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <div class="block-bulan" style="width: 100%;">
                 <div class="mb-3 text-base font-bold text-black pt-2">
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                 </div>
-                <div class="table-wrapper" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; min-width: 720px; table-layout: fixed;">
+                <div class="table-wrapper" style="width: 100%;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; table-layout: fixed;">
                         <thead>
                             <tr>
                                 <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
