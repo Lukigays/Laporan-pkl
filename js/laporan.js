@@ -194,12 +194,12 @@ function renderSemuaData() {
         if (dataBulanIni.length === 0) return;
         
         let htmlTabel = `
-            <div class="block-bulan" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                <div class="mb-3 text-base font-bold text-black pt-2" style="min-width: 720px;">
+            <div class="block-bulan" style="width: 100%; min-width: 720px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <div class="mb-3 text-base font-bold text-black pt-2">
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                 </div>
                 <div class="table-wrapper" style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; min-width: 720px;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; min-width: 720px; table-layout: fixed;">
                         <thead>
                             <tr>
                                 <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
