@@ -169,31 +169,62 @@ body {
 }
 .danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
 
-/* ---------- Area kertas (preview cetak) ---------- */
+/* ---------- Area kertas (preview cetak) — BISA DI-SWIPE ---------- */
 .area-kertas {
     font-family: "Times New Roman", Times, serif;
-    background-color: white !important; color: black !important;
+    background-color: white !important; 
+    color: black !important;
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+    display: block;
+    max-width: 100%;
+    touch-action: pan-x pan-y;
 }
 .area-kertas .konten-tabel {
-    min-width: 720px;
+    min-width: 780px;
+    background: white !important;
 }
 .area-kertas table {
     border-collapse: collapse !important;
     font-size: 11px !important;
-    width: 100% !important; min-width: 0 !important;
+    width: 100% !important; 
     table-layout: fixed;
 }
 .area-kertas th, .area-kertas td {
     border: 1px solid black !important;
     padding: 6px 8px !important;
-    vertical-align: top; color: black !important;
+    vertical-align: top; 
+    color: black !important;
     word-break: break-word;
 }
-.area-kertas td img { display: block; margin: 0 auto; max-height: 75px; max-width: 100%; object-fit: contain; }
-.area-kertas th { background-color: #f8f9fa !important; font-weight: bold; text-align: center; }
+.area-kertas td img { 
+    display: block; 
+    margin: 0 auto; 
+    max-height: 75px; 
+    max-width: 100%; 
+    object-fit: contain; 
+}
+.area-kertas th { 
+    background-color: #f8f9fa !important; 
+    font-weight: bold; 
+    text-align: center; 
+}
+
+/* Scrollbar horizontal di area kertas (mobile) */
+.area-kertas::-webkit-scrollbar {
+    height: 6px;
+}
+.area-kertas::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.area-kertas::-webkit-scrollbar-thumb {
+    background: #c026d3;
+    border-radius: 10px;
+}
 
 .header-print {
     font-family: "Times New Roman", Times, serif;
