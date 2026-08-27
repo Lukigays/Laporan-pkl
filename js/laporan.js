@@ -147,7 +147,7 @@ function updateStatistik(dataAktif) {
     document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
 }
 
-// ---------- Render Tabel Laporan ----------
+// ---------- Render Tabel Laporan — BISA DI-SWIPE + DOWNLOAD FOTO ----------
 function renderSemuaData() {
     const wadahTabel = document.getElementById('wadahTabelBulan');
     wadahTabel.innerHTML = '';
@@ -187,33 +187,48 @@ function renderSemuaData() {
     unikBulanFiltered.forEach((bulan) => {
         const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
         if (dataBulanIni.length === 0) return;
+        
         let htmlTabel = `
             <div class="block-bulan">
                 <div class="mb-3 text-base font-bold text-black pt-2">
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
                 </div>
-                <div class="table-wrapper">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%;">
+                <div class="table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; min-width: 720px;">
                         <thead>
                             <tr>
                                 <th style="border: 1px solid black; padding: 6px; width: 40px; text-align: center;">No</th>
                                 <th style="border: 1px solid black; padding: 6px; width: 80px;">Hari</th>
                                 <th style="border: 1px solid black; padding: 6px; width: 90px;">Tanggal</th>
                                 <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 90px; text-align: center;">Foto</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 100px; text-align: center;">Foto</th>
                             </tr>
                         </thead>
                         <tbody>`;
         dataBulanIni.forEach((item, idx) => {
             const idxTampil = idx + 1;
+            const namaFileFoto = `PKL_${item.tanggal.replace(/\//g,'-')}_${idxTampil}.jpg`;
+            
+            // ⬇️ TAMBAHAN: LINK DOWNLOAD FOTO ⬇️
+            const fotoHtml = item.foto 
+                ? `<div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                     <img src="${item.foto}" style="max-height: 65px; max-width: 75px; object-fit: contain; display: block;" class="border border-gray-300">
+                     <a href="${item.foto}" download="${namaFileFoto}" 
+                        style="font-size: 9px; color: #7c3aed; text-decoration: none; font-weight: bold; 
+                               background: #f3e8ff; padding: 2px 6px; border-radius: 4px; display: inline-block; white-space: nowrap;">
+                        ⬇️ Unduh
+                     </a>
+                   </div>`
+                : '-';
+            
             htmlTabel += `
                             <tr>
                                 <td style="border: 1px solid black; padding: 5px; text-align: center; width: 40px;">${idxTampil}</td>
                                 <td style="border: 1px solid black; padding: 5px; width: 80px;">${item.hari}</td>
                                 <td style="border: 1px solid black; padding: 5px; width: 90px;">${item.tanggal}</td>
                                 <td style="border: 1px solid black; padding: 5px; width: auto;">${item.uraian}</td>
-                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 90px;">
-                                    ${item.foto ? `<img src="${item.foto}" style="max-height: 70px; max-width: 80px; object-fit: contain; display: block; margin: 0 auto;" class="border border-gray-300">` : '-'}
+                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 100px;">
+                                    ${fotoHtml}
                                 </td>
                             </tr>`;
         });
