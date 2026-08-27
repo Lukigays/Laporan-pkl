@@ -288,7 +288,7 @@
             </div>
         </div>
 
-        <div class="relative min-h-[500px]">
+        <div class="relative min-h-[500px] w-full">
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in animate-delay-3">
                     <div class="flex items-center gap-4 mb-8">
@@ -366,7 +366,7 @@
                 </div>
             </div>
 
-            <div id="tabLaporan" class="tab-content">
+            <div id="tabLaporan" class="tab-content w-full">
                 <div class="glass-panel rounded-3xl p-5 mb-6 no-print animate-fade-in">
                     <h3 class="text-sm font-display font-bold text-accent-light mb-3 flex items-center gap-2">
                         <span>🎖️</span> Achievement & Pencapaian PKL
@@ -411,37 +411,41 @@
                     </div>
                 </div>
 
-                <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak">
-                    <div class="watermark">LAPORAN PKL BY LUKYY</div>
-                    <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important;">
-                        <div class="header-print" id="koverPrintSection">
-                            <div>
-                                <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
-                                <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
-                                <p style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold;">DI</p>
-                                <h3 style="font-size: 16px; font-weight: normal;" id="coverAlamat">Alamat Tempat PKL</h3>
-                                <div class="logo-kover-container">
-                                    <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
+                <!-- WRAPPER SCROLL HP UNTUK KERTAS LAPORAN -->
+                <div class="w-full overflow-x-auto -webkit-overflow-scrolling-touch mb-10 pb-4">
+                    <div class="area-kertas rounded-xl relative overflow-hidden block" id="areaCetak" style="min-width: 780px;">
+                        <div class="watermark">LAPORAN PKL BY LUKYY</div>
+                        <div class="konten-tabel p-6 md:p-10 bg-white" style="background: white !important; color: black !important; min-width: 780px;">
+                            <div class="header-print" id="koverPrintSection">
+                                <div>
+                                    <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
+                                    <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                                    <p style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold;">DI</p>
+                                    <h3 style="font-size: 16px; font-weight: normal;" id="coverAlamat">Alamat Tempat PKL</h3>
+                                    <div class="logo-kover-container">
+                                        <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
+                                    </div>
+                                    <p style="font-size: 16px; margin-bottom: 12px;">Disusun Oleh:</p>
+                                    <table style="border: none !important; margin: 0 auto; width: 320px; font-size: 15px;">
+                                        <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important;">Kelas</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverKelas">XII</span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
+                                    </table>
                                 </div>
-                                <p style="font-size: 16px; margin-bottom: 12px;">Disusun Oleh:</p>
-                                <table style="border: none !important; margin: 0 auto; width: 320px; font-size: 15px;">
-                                    <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
-                                    <tr><td style="border: none !important; text-align: left; padding: 2px !important;">Kelas</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverKelas">XII</span></td></tr>
-                                    <tr><td style="border: none !important; text-align: left; padding: 2px !important;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
-                                </table>
+                                <div>
+                                    <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                                    <table style="border: none !important; margin: 0 auto 20px auto; width: 440px; font-size: 14px;">
+                                        <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 230px; padding: 2px !important;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverProgKeahlian"></span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
+                                    </table>
+                                    <h4 style="font-size: 16px; font-weight: bold; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
+                                </div>
                             </div>
-                            <div>
-                                <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
-                                <table style="border: none !important; margin: 0 auto 20px auto; width: 440px; font-size: 14px;">
-                                    <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 230px; padding: 2px !important;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverProgKeahlian"></span></td></tr>
-                                    <tr><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
-                                </table>
-                                <h4 style="font-size: 16px; font-weight: bold; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
-                            </div>
+                            <div id="wadahTabelBulan" class="w-full"></div>
                         </div>
-                        <div id="wadahTabelBulan"></div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
