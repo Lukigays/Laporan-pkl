@@ -1,5 +1,5 @@
 // ============================================================
-// AUTENTIKASI & SINKRONISASI CLOUD (Supabase) + ANIMATED LOGIN
+// AUTENTIKASI & SINKRONISASI CLOUD (Supabase) — FIXED
 // ============================================================
 
 function initAuth() {
@@ -37,86 +37,101 @@ function bersihkanUrlOAuth() {
     }
 }
 
-// ---------- Helper: Loading Animation ----------
-function setLoading(button, isLoading, originalText) {
-    if (!button) return;
+// ---------- Loading State Helper (ROBUST) ----------
+const authLoadingState = {
+    btnLogin: null,
+    btnRegister: null,
+    btnGoogle: null,
+    btnLupa: null
+};
+
+function setBtnLoading(btnKey, isLoading, customHTML) {
+    const btn = authLoadingState[btnKey];
+    if (!btn) return;
     
     if (isLoading) {
-        button.disabled = true;
-        button.dataset.originalText = originalText || button.innerHTML;
-        button.innerHTML = `
+        if (!btn.dataset.originalHtml) {
+            btn.dataset.originalHtml = btn.innerHTML;
+        }
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+        btn.innerHTML = customHTML || `
             <span class="flex items-center justify-center gap-2">
-                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg class="animate-spin" style="width:18px;height:18px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span>Memproses...</span>
-            </span>
-        `;
-        button.style.opacity = '0.8';
-        button.style.cursor = 'wait';
+            </span>`;
     } else {
-        button.disabled = false;
-        button.innerHTML = button.dataset.originalText || originalText;
-        button.style.opacity = '1';
-        button.style.cursor = 'pointer';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+        btn.innerHTML = btn.dataset.originalHtml || btn.innerHTML;
+        delete btn.dataset.originalHtml;
     }
 }
 
-// ---------- Helper: Shake Animation untuk Input Error ----------
+function resetAllAuthButtons() {
+    ['btnLogin', 'btnRegister', 'btnGoogle', 'btnLupa'].forEach(key => {
+        setBtnLoading(key, false);
+    });
+    const inputs = document.querySelectorAll('#modalAuth input');
+    inputs.forEach(el => el.disabled = false);
+}
+
+// ---------- Shake Input ----------
 function shakeInput(element) {
     if (!element) return;
+    element.classList.remove('animate-shake');
+    void element.offsetWidth; // trigger reflow
     element.classList.add('animate-shake');
-    element.style.borderColor = 'rgba(239,68,68,0.6)';
+    element.style.borderColor = 'rgba(239,68,68,0.8)';
     setTimeout(() => {
         element.classList.remove('animate-shake');
         element.style.borderColor = '';
     }, 500);
 }
 
-// ---------- Helper: Disable/Enable semua input di modal ----------
-function setModalInputsDisabled(disabled) {
-    const inputs = document.querySelectorAll('#modalAuth input, #modalAuth button:not(.hover\\:text-accent-light)');
-    inputs.forEach(el => {
-        if (!el.classList.contains('btn-google') || disabled) {
-            el.disabled = disabled;
-            if (disabled) el.style.opacity = '0.6';
-            else el.style.opacity = '1';
-        }
-    });
-}
-
-// ---------- Login dengan Google (OAuth) ----------
+// ---------- Login dengan Google ----------
 async function prosesLoginGoogle() {
     if (!supabaseClient) {
         showToast("⚠️ Koneksi cloud belum tersedia!");
         return;
     }
 
-    const btn = document.querySelector('.btn-google');
-    setLoading(btn, true, btn.innerHTML);
-    setModalInputsDisabled(true);
+    const btn = document.querySelector('#modalAuth .btn-google');
+    authLoadingState.btnGoogle = btn;
+    
+    setBtnLoading('btnGoogle', true, `
+        <span class="flex items-center justify-center gap-2">
+            <svg class="animate-spin" style="width:18px;height:18px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Membuka Google...</span>
+        </span>`);
 
-    showToast("⏳ Membuka login Google...");
-
-    const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: window.location.origin,
-            queryParams: {
-                access_type: 'offline',
-                prompt: 'consent',
+    try {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                }
             }
-        }
-    });
+        });
 
-    if (error) {
+        if (error) throw error;
+        // Jika sukses, browser akan redirect. Tidak perlu reset loading.
+    } catch (error) {
         console.error("Google Login Error:", error);
         showToast("❌ Gagal login Google: " + error.message);
-        setLoading(btn, false);
-        setModalInputsDisabled(false);
+        setBtnLoading('btnGoogle', false);
     }
-    // Jika sukses, browser akan redirect
 }
 
 // ---------- Reset Password ----------
@@ -128,28 +143,34 @@ function bukaModalResetPassword() {
 }
 
 async function simpanPasswordBaru() {
-    const pass = document.getElementById('newPasswordInput').value;
-    const btn = document.querySelector('#modalResetPassword button');
+    const passInput = document.getElementById('newPasswordInput');
+    const pass = passInput.value;
+    const btn = document.querySelector('#modalResetPassword button[onclick="simpanPasswordBaru()"]');
     
     if (!pass || pass.length < 6) { 
-        shakeInput(document.getElementById('newPasswordInput'));
+        shakeInput(passInput);
         showToast('⚠️ Password minimal 6 karakter!'); 
         return; 
     }
     
-    setLoading(btn, true, btn.innerHTML);
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="flex items-center justify-center gap-2"><svg class="animate-spin" style="width:16px;height:16px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Menyimpan...</span></span>`;
+    
     showToast("⏳ Memperbarui password...");
     
-    const { error } = await supabaseClient.auth.updateUser({ password: pass });
-    
-    setLoading(btn, false);
-    
-    if (error) {
-        showToast("❌ " + error.message);
-    } else {
+    try {
+        const { error } = await supabaseClient.auth.updateUser({ password: pass });
+        if (error) throw error;
+        
         document.getElementById('modalResetPassword').classList.add('opacity-0');
         setTimeout(() => document.getElementById('modalResetPassword').classList.add('hidden'), 300);
         showToast("🎉 Password berhasil diperbarui!");
+    } catch (error) {
+        showToast("❌ " + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
     }
 }
 
@@ -186,13 +207,20 @@ function tutupModalAuth() {
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
-// ---------- Login ----------
+// ---------- Login Email ----------
 async function prosesLoginAuth() {
     if (!supabaseClient) { showToast("⚠️ Koneksi cloud belum tersedia!"); return; }
     
     const emailInput = document.getElementById('authEmail');
     const passInput = document.getElementById('authPassword');
-    const btn = document.querySelector('#modalAuth .btn-primary');
+    
+    // Cari tombol spesifik lewat onclick attribute
+    const allBtns = document.querySelectorAll('#modalAuth button');
+    let btn = null;
+    allBtns.forEach(b => {
+        if (b.getAttribute('onclick') === 'prosesLoginAuth()') btn = b;
+    });
+    authLoadingState.btnLogin = btn;
     
     const email = emailInput.value.trim();
     const password = passInput.value;
@@ -204,27 +232,32 @@ async function prosesLoginAuth() {
         return; 
     }
 
-    setLoading(btn, true, btn.innerHTML);
-    setModalInputsDisabled(true);
+    setBtnLoading('btnLogin', true);
+    if (authLoadingState.btnRegister) setBtnLoading('btnRegister', true);
+    if (authLoadingState.btnGoogle) setBtnLoading('btnGoogle', true);
+    
+    // Disable inputs
+    emailInput.disabled = true;
+    passInput.disabled = true;
+    
     showToast("⏳ Memproses masuk...");
     
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    
-    setLoading(btn, false);
-    setModalInputsDisabled(false);
-    
-    if (error) {
-        console.error("Auth Login Error:", error);
-        if (error.message.includes("Email not confirmed")) {
-            showToast("❌ Email belum dikonfirmasi! Cek kotak masuk/spam email Anda.");
-        } else if (error.message.includes("Invalid login credentials")) {
-            shakeInput(emailInput);
-            shakeInput(passInput);
-            showToast("❌ Email atau password salah!");
-        } else {
-            showToast("❌ Gagal login: " + error.message);
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
+        if (error) {
+            if (error.message.includes("Email not confirmed")) {
+                showToast("❌ Email belum dikonfirmasi! Cek kotak masuk/spam email Anda.");
+            } else if (error.message.includes("Invalid login credentials")) {
+                shakeInput(emailInput);
+                shakeInput(passInput);
+                showToast("❌ Email atau password salah!");
+            } else {
+                showToast("❌ Gagal login: " + error.message);
+            }
+            return;
         }
-    } else {
+        
         currentUser = data.user;
         updateAuthUI();
         tutupModalAuth();
@@ -235,6 +268,13 @@ async function prosesLoginAuth() {
                 tarikDariCloud();
             }
         }, 500);
+        
+    } catch (err) {
+        showToast("❌ Terjadi kesalahan: " + err.message);
+    } finally {
+        resetAllAuthButtons();
+        emailInput.disabled = false;
+        passInput.disabled = false;
     }
 }
 
@@ -244,7 +284,13 @@ async function prosesRegisterAuth() {
     
     const emailInput = document.getElementById('authEmail');
     const passInput = document.getElementById('authPassword');
-    const btn = document.querySelector('#modalAuth .btn-secondary');
+    
+    const allBtns = document.querySelectorAll('#modalAuth button');
+    let btn = null;
+    allBtns.forEach(b => {
+        if (b.getAttribute('onclick') === 'prosesRegisterAuth()') btn = b;
+    });
+    authLoadingState.btnRegister = btn;
     
     const email = emailInput.value.trim();
     const password = passInput.value;
@@ -256,24 +302,31 @@ async function prosesRegisterAuth() {
         return; 
     }
     
-    setLoading(btn, true, btn.innerHTML);
-    setModalInputsDisabled(true);
+    setBtnLoading('btnRegister', true);
+    if (authLoadingState.btnLogin) setBtnLoading('btnLogin', true);
+    
+    emailInput.disabled = true;
+    passInput.disabled = true;
+    
     showToast("⏳ Mendaftarkan akun...");
     
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
-    
-    setLoading(btn, false);
-    setModalInputsDisabled(false);
-    
-    if (error) {
-        showToast("❌ " + error.message);
-    } else {
+    try {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        
+        if (error) throw error;
+        
         tutupModalAuth();
         if (data.user && data.user.identities && data.user.identities.length === 0) {
             showToast("⚠️ Email ini sudah terdaftar! Silakan langsung login.");
         } else {
             showToast("Akun berhasil dibuat! Silakan cek email/langsung login. 🎉");
         }
+    } catch (error) {
+        showToast("❌ " + error.message);
+    } finally {
+        resetAllAuthButtons();
+        emailInput.disabled = false;
+        passInput.disabled = false;
     }
 }
 
@@ -284,25 +337,34 @@ async function prosesLupaPassword() {
     const emailInput = document.getElementById('authEmail');
     const email = emailInput.value.trim();
     
+    const allBtns = document.querySelectorAll('#modalAuth button');
+    let btn = null;
+    allBtns.forEach(b => {
+        if (b.getAttribute('onclick') === 'prosesLupaPassword()') btn = b;
+    });
+    authLoadingState.btnLupa = btn;
+    
     if (!email) { 
         shakeInput(emailInput);
         showToast('⚠️ Isi alamat email terlebih dahulu!'); 
         return; 
     }
     
-    const btn = document.querySelector('#modalAuth button[onclick="prosesLupaPassword()"]');
-    const originalText = btn.innerHTML;
+    const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<span class="text-accent-light animate-pulse">⏳ Mengirim...</span>`;
     
-    showToast("⏳ Mengirim link reset password...");
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-    
-    btn.disabled = false;
-    btn.innerHTML = originalText;
-    
-    if (error) { showToast("❌ " + error.message); }
-    else { showToast("✅ Link reset password telah dikirim!"); }
+    try {
+        showToast("⏳ Mengirim link reset password...");
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+        if (error) throw error;
+        showToast("✅ Link reset password telah dikirim!");
+    } catch (error) {
+        showToast("❌ " + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    }
 }
 
 // ---------- Logout ----------
