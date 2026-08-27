@@ -37,9 +37,10 @@ async function tambahBaris() {
     const labelBulan = labelBulanIndo(dateObj);
     let fotoBase64 = '';
     if (fotoInput.files && fotoInput.files[0]) {
-        showToast('⏳ Memproses kompresi foto...');
+        showToast('⏳ Memproses foto HD...');
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
+            // Resolusi HD 1500px & Kualitas Tinggi 0.9
+            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 1500, 0.9);
             await simpanDataBaru(NAMA_HARI[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
         } catch (err) {
             console.error('Error upload foto:', err);
@@ -96,9 +97,10 @@ async function simpanLaporanEdited() {
     const labelBulan = labelBulanIndo(dateObj);
     let fotoBase64 = dataLaporan[idx].foto;
     if (fotoInput.files && fotoInput.files[0]) {
-        showToast('⏳ Memproses kompresi foto...');
+        showToast('⏳ Memproses foto HD...');
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 200, 0.6);
+            // Resolusi HD 1500px & Kualitas Tinggi 0.9
+            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 1500, 0.9);
             await finalizeEdit(idx, NAMA_HARI[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
         } catch (err) {
             console.error('Error ganti foto:', err);
@@ -189,7 +191,6 @@ function renderSemuaData() {
         const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
         if (dataBulanIni.length === 0) return;
         
-        // HAPUS overflow & style dari blok tabel agar ukuran 100% mengikuti kertas (780px)
         let htmlTabel = `
             <div class="block-bulan" style="width: 100%;">
                 <div class="mb-3 text-base font-bold text-black pt-2">
