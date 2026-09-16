@@ -19,6 +19,17 @@ function renderProfil() {
     document.getElementById('coverProgKeahlian').textContent = dataProfil.progKeahlian || '';
     document.getElementById('coverKonsKeahlian').textContent = dataProfil.konsKeahlian || '';
     document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
+
+    // Periode PKL: "Bulan Juli 2026 s/d September 2026"
+    const elPeriode = document.getElementById('coverPeriode');
+    if (elPeriode) {
+        const teksBulan = (typeof labelPeriodeBulan === 'function') ? labelPeriodeBulan() : '';
+        const teksTgl = (typeof labelPeriodeTanggal === 'function') ? labelPeriodeTanggal() : '';
+        elPeriode.textContent = teksBulan
+            ? `BULAN ${teksBulan.toUpperCase()}${teksTgl ? ' (' + teksTgl + ')' : ''}`
+            : '........................';
+    }
+    if (typeof renderPanelTarget === 'function') renderPanelTarget();
     const logoEl = document.getElementById('coverLogoSekolah');
     if (logoEl) {
         let logoSrc = '';
@@ -53,6 +64,16 @@ function bukaSettings() {
     document.getElementById('setTahun').value = dataProfil.tahun || '';
     document.getElementById('inputUrlLogoCatbox').value = dataProfil.logoCatboxUrl || '';
     document.getElementById('inputLogoSekolah').value = '';
+    const elMulai = document.getElementById('setPklMulai');
+    if (elMulai) {
+        elMulai.value = dataProfil.pklMulai || '';
+        document.getElementById('setPklSelesai').value = dataProfil.pklSelesai || '';
+        document.getElementById('setTargetHari').value = dataProfil.targetHariKerja || '';
+        document.getElementById('setAutoLibur').checked = !!dataProfil.autoLiburRentang;
+        document.getElementById('setLiburTanggal').value = '';
+        document.getElementById('setLiburNama').value = '';
+        if (typeof renderDaftarLiburTambahan === 'function') renderDaftarLiburTambahan();
+    }
     renderLogoPreview();
     const modal = document.getElementById('modalSettings');
     modal.classList.remove('hidden');
@@ -74,6 +95,38 @@ async function simpanSettings() {
     dataProfil.konsKeahlian = document.getElementById('setKonsKeahlian').value.trim();
     dataProfil.tahun = document.getElementById('setTahun').value.trim() || '2026...';
     dataProfil.logoCatboxUrl = document.getElementById('inputUrlLogoCatbox').value.trim();
+
+    // ---- Periode & target PKL ----
+    const elMulai = document.getElementById('setPklMulai');
+    if (elMulai) {
+        const mulai = elMulai.value;
+        const selesai = document.getElementById('setPklSelesai').value;
+        if (mulai && selesai && dateDariKunci(selesai) < dateDariKunci(mulai)) {
+            showToast('⚠️ Tanggal selesai tidak boleh sebelum tanggal mulai.');
+            return;
+        }
+        dataProfil.pklMulai = mulai;
+        dataProfil.pklSelesai = selesai;
+        const t = document.getElementById('setTargetHari').value;
+        dataProfil.targetHariKerja = t ? String(parseInt(t, 10) || '') : '';
+        const autoLama = !!dataProfil.autoLiburRentang;
+        dataProfil.autoLiburRentang = document.getElementById('setAutoLibur').checked;
+
+        await localforage.setItem('profilPKL', dataProfil);
+        dataTelahBerubah = true;
+        renderProfil();
+        tutupSettings();
+
+        // Kalau opsi auto-isi baru dinyalakan -> isi libur Minggu sepanjang rentang
+        if (dataProfil.autoLiburRentang && !autoLama && typeof isiLiburOtomatisRentang === 'function' && rentangPKL()) {
+            await isiLiburOtomatisRentang();
+            return;
+        }
+        showToast('Profil & periode PKL berhasil diperbarui! ✅');
+        if (typeof refreshTanggalDanTarget === 'function') refreshTanggalDanTarget();
+        return;
+    }
+
     await localforage.setItem('profilPKL', dataProfil);
     dataTelahBerubah = true;
     renderProfil();

@@ -32,7 +32,11 @@ function hitungDanRenderBadge() {
         }
     }
 
+    // Progres target periode PKL (kalau periode sudah diatur)
+    const progres = (typeof hitungProgresPKL === 'function') ? hitungProgresPKL() : null;
+
     const daftarBadge = [
+        { id: 'target', icon: '🎯', nama: 'Target PKL', desc: (progres && progres.adaRentang) ? `${progres.terisi}/${progres.target} hari kerja (${progres.persen}%)` : 'Atur periode PKL di Setting', aktif: !!(progres && progres.adaRentang && progres.persen >= 100) },
         { id: 'pemula', icon: '🌱', nama: 'Langkah Pertama', desc: 'Isi 1 laporan kegiatan', aktif: totalLaporan >= 1 },
         { id: 'rajin_5', icon: '🔥', nama: 'Konsisten 5', desc: '5 hari laporan berturut-turut', aktif: maxStreak >= 5 },
         { id: 'dokumentator', icon: '📸', nama: 'Fotografer PKL', desc: 'Unggah minimal 10 foto kegiatan', aktif: totalFoto >= 10 },

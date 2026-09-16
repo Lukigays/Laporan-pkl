@@ -41,7 +41,14 @@ let dataProfil = {
     konsKeahlian: '',
     tahun: '2026...',
     logoSekolah: '',
-    logoCatboxUrl: ''
+    logoCatboxUrl: '',
+
+    // ---------- Periode PKL (dipakai kalender, target hari & PDF) ----------
+    pklMulai: '',            // format YYYY-MM-DD
+    pklSelesai: '',          // format YYYY-MM-DD
+    targetHariKerja: '',     // kosong = dihitung otomatis dari rentang
+    autoLiburRentang: false, // true = Minggu sepanjang rentang otomatis dicatat "Libur"
+    liburTambahan: []        // [{ tanggal: 'YYYY-MM-DD', nama: 'Libur Nasional' }]
 };
 
 let supabaseClient = null;

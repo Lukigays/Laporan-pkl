@@ -173,7 +173,7 @@ function renderSemuaData() {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
         updateStatistik([]);
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
-        if (typeof renderKalender === 'function') renderKalender();
+        if (typeof refreshTanggalDanTarget === 'function') refreshTanggalDanTarget();
         return;
     }
     const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
@@ -200,18 +200,24 @@ function renderSemuaData() {
     if (dataFiltered.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Tidak ada data yang sesuai filter.</p>';
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
-        if (typeof renderKalender === 'function') renderKalender();
+        if (typeof refreshTanggalDanTarget === 'function') refreshTanggalDanTarget();
         return;
     }
     const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
-    unikBulanFiltered.forEach((bulan) => {
+    unikBulanFiltered.forEach((bulan, idxBulanTampil) => {
         const dataBulanIni = dataFiltered.filter(i => i.bulanLabel === bulan);
         if (dataBulanIni.length === 0) return;
-        
+
+        // Baris periode (bulan dari apa sampai bulan apa) di blok bulan pertama
+        const barisPeriode = (idxBulanTampil === 0 && typeof labelPeriodeBulan === 'function' && labelPeriodeBulan())
+            ? `<p style="font-size: 12px; font-style: italic;">Periode PKL: Bulan ${labelPeriodeBulan()}${typeof labelPeriodeTanggal === 'function' && labelPeriodeTanggal() ? ' (' + labelPeriodeTanggal() + ')' : ''}</p>`
+            : '';
+
         let htmlTabel = `
             <div class="block-bulan" style="width: 100%;">
                 <div class="mb-3 text-base font-bold text-black pt-2">
                     <p>1. Laporan Kegiatan Harian</p><p>b. Bulan <span class="uppercase">${bulan}</span></p>
+                    ${barisPeriode}
                 </div>
                 <div class="table-wrapper" style="width: 100%;">
                     <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; table-layout: fixed;">
@@ -263,7 +269,9 @@ function renderSemuaData() {
     if (typeof hitungDanRenderBadge === 'function') {
         hitungDanRenderBadge();
     }
-    if (typeof renderKalender === 'function') {
+    if (typeof refreshTanggalDanTarget === 'function') {
+        refreshTanggalDanTarget();
+    } else if (typeof renderKalender === 'function') {
         renderKalender();
     }
 }

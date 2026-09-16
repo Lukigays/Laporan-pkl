@@ -145,6 +145,16 @@ function bacaDanKompresFile(file, maxDimensi = 200, kualitas = 0.6) {
     });
 }
 
+// ---------- Escape HTML (dipakai untuk nama libur & teks dari pengguna) ----------
+function escapeHtml(teks) {
+    return String(teks == null ? '' : teks)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // ---------- Helper tanggal ----------
 const NAMA_HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];

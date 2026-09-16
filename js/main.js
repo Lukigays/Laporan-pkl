@@ -18,8 +18,13 @@ window.onload = async function() {
     // Kalender mini pemilih tanggal (hijau = sudah diisi, merah = belum)
     if (typeof initKalender === 'function') initKalender();
 
-    // Hari Minggu otomatis dicatat "Libur" (kalau hari ini Minggu & belum ada catatan)
+    // Hari Minggu / libur tambahan otomatis dicatat "Libur" (hari ini)
     if (typeof pastikanLiburHariIni === 'function') await pastikanLiburHariIni();
+
+    // Kalau opsi "isi otomatis libur sepanjang rentang" aktif, lengkapi tanggal libur yang belum tercatat
+    if (dataProfil.autoLiburRentang && typeof isiLiburOtomatisRentang === 'function' && typeof rentangPKL === 'function' && rentangPKL()) {
+        await isiLiburOtomatisRentang({ tanpaKonfirmasi: true, silent: true });
+    }
 
     cekDanJalankanTour();
     setInterval(autoSyncKeCloud, 300000);
