@@ -391,14 +391,17 @@ select.glass-input {
 }
 .kalender-hari.k-kosong:hover { background: rgba(239,68,68,0.4); }
 
-/* ⚪ libur (Minggu) */
+/* ⚪ libur (Minggu) & tanggal merah */
 .kalender-hari.k-libur {
     background: rgba(148,163,184,0.14);
     border-color: rgba(148,163,184,0.35);
     color: #cbd5e1;
+}
+/* angka tanggal Minggu tetap dicoret, chip nama liburnya tidak */
+.kalender-hari.k-libur > .k-tanggal {
     text-decoration: line-through;
     text-decoration-thickness: 1px;
-    text-decoration-color: rgba(203,213,225,0.6);
+    text-decoration-color: rgba(203,213,225,0.55);
 }
 
 /* tanggal yang sedang dipilih di input */
@@ -407,11 +410,9 @@ select.glass-input {
     z-index: 1;
 }
 
-/* penanda hari ini */
-.kalender-hari.k-hari-ini::after {
-    content: ''; position: absolute; bottom: 3px;
-    width: 4px; height: 4px; border-radius: 50%;
-    background: #ffffff; opacity: .85;
+/* penanda hari ini: garis tipis di dalam sel (tidak tabrakan dengan chip libur) */
+.kalender-hari.k-hari-ini {
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.45);
 }
 
 /* sel libur disembunyikan (toggle "Tampilkan hari libur") */
@@ -432,7 +433,9 @@ select.glass-input {
 .kalender-legenda .k-dot.k-libur { background: rgba(148,163,184,0.35); border-color: rgba(148,163,184,0.6); }
 
 @media (max-width: 768px) {
-    .kalender-hari { height: 32px; font-size: 12px; }
+    .kalender-hari { height: auto; min-height: 50px; font-size: 12px; }
+    .kalender-hari .k-tanggal { font-size: 12px; }
+    .kalender-kosong { height: 50px; }
 }
 
 
@@ -453,15 +456,50 @@ select.glass-input {
     transition: width .5s cubic-bezier(.4,0,.2,1);
 }
 
-/* Titik bulat merah kecil: penanda TANGGAL MERAH di kalender */
-.kalender-hari .k-dot-merah {
-    position: absolute; top: 3px; right: 3px;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #ef4444;
-    box-shadow: 0 0 6px rgba(239,68,68,0.9), 0 0 0 1px rgba(3,3,8,0.6);
-    pointer-events: none;
+/* ============================================================
+   KETERANGAN NAMA HARI LIBUR DI KALENDER (seperti kalender HP)
+   ============================================================ */
+
+/* sel kalender jadi 2 baris: angka tanggal + chip nama libur */
+.kalender-kosong { height: 50px; }
+
+.kalender-hari {
+    height: auto; min-height: 50px;
+    flex-direction: column; gap: 2px;
+    padding: 4px 2px;
+    justify-content: flex-start;
 }
-.kalender-legenda .k-dot-merah {
-    position: static; width: 9px; height: 9px; border-radius: 50%;
-    box-shadow: 0 0 6px rgba(239,68,68,0.8);
+.kalender-hari .k-tanggal { font-size: 11px; font-weight: 700; line-height: 1.1; }
+
+/* chip nama libur */
+.k-chip {
+    display: block; width: 100%;
+    font-size: 7.5px; font-weight: 700; line-height: 1.15;
+    font-style: normal; text-align: center;
+    padding: 1px 2px; border-radius: 4px;
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    word-break: break-word; hyphens: auto;
+    max-height: 2.4em;
+}
+.k-chip-nasional {
+    background: rgba(20,184,166,0.28);
+    border: 1px solid rgba(45,212,191,0.55);
+    color: #ccfbf1;
+}
+.k-chip-cuti {
+    background: rgba(139,92,246,0.24);
+    border: 1px dashed rgba(167,139,250,0.6);
+    color: #ede9fe;
+}
+.k-chip-libur {
+    background: rgba(148,163,184,0.16);
+    border: 1px solid rgba(148,163,184,0.28);
+    color: #cbd5e1;
+    font-weight: 600;
+}
+/* chip di legenda tampil sebaris */
+.kalender-legenda .k-chip {
+    display: inline-block; width: auto; -webkit-line-clamp: 1;
+    font-size: 9px; padding: 2px 6px; margin-right: 2px;
 }
