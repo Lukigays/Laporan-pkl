@@ -146,17 +146,6 @@ async function downloadPDF(opsiCover) {
                 coverStack.push({ text: '', margin: [0, 0, 0, 120] });
             }
 
-            if (typeof labelPeriodeBulan === 'function' && labelPeriodeBulan()) {
-                coverStack.push({
-                    text: 'PERIODE PKL: BULAN ' + labelPeriodeBulan().toUpperCase() + (labelPeriodeTanggal() ? ' (' + labelPeriodeTanggal() + ')' : ''),
-                    style: 'headerSub',
-                    margin: [0, 0, 0, 0],
-                    pageBreak: 'after'
-                });
-            } else {
-                coverStack.push({ text: '', margin: [0, 0, 0, 0], pageBreak: 'after' });
-            }
-
             coverStack.push(
                 { text: 'Disusun Oleh:', alignment: 'center', fontSize: 11, margin: [0, 0, 0, 10] },
                 {
@@ -186,7 +175,7 @@ async function downloadPDF(opsiCover) {
                     fontSize: 10,
                     margin: [0, 0, 0, 25]
                 },
-                { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 0, 0, 6] },
+                { text: 'TAHUN ' + (dataProfil.tahun || '2026...'), style: 'headerSub', margin: [0, 0, 0, 0], pageBreak: 'after' }
             );
 
             docContent.push(...coverStack);
@@ -200,15 +189,10 @@ async function downloadPDF(opsiCover) {
             const dataBulanIni = dataLaporan.filter(i => i.bulanLabel === bulan);
             if (dataBulanIni.length === 0) continue;
 
-            const infoPeriode = (bIdx === 0 && typeof labelPeriodeBulan === 'function' && labelPeriodeBulan())
-                ? [{ text: 'Periode PKL: Bulan ' + labelPeriodeBulan() + (labelPeriodeTanggal() ? ' (' + labelPeriodeTanggal() + ')' : ''), fontSize: 9, italics: true, margin: [0, 0, 0, 6] }]
-                : [];
-
             const blockElement = {
                 stack: [
                     { text: '1. Laporan Kegiatan Harian', fontSize: 11, bold: true, margin: [0, 0, 0, 2] },
-                    { text: 'b. Bulan ' + bulan.toUpperCase(), fontSize: 11, bold: true, margin: [0, 0, 0, 8] },
-                    ...infoPeriode
+                    { text: 'b. Bulan ' + bulan.toUpperCase(), fontSize: 11, bold: true, margin: [0, 0, 0, 8] }
                 ]
             };
 

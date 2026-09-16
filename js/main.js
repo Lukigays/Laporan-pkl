@@ -18,7 +18,10 @@ window.onload = async function() {
     // Kalender mini pemilih tanggal (hijau = sudah diisi, merah = belum)
     if (typeof initKalender === 'function') initKalender();
 
-    // Hari Minggu / libur tambahan otomatis dicatat "Libur" (hari ini)
+    // Bersihkan data lama "libur tambahan" -> jadi penanda tanggal merah
+    if (typeof migrasiKeTanggalMerah === 'function') await migrasiKeTanggalMerah();
+
+    // Hari Minggu otomatis dicatat "Libur" (kalau hari ini Minggu & belum ada catatan)
     if (typeof pastikanLiburHariIni === 'function') await pastikanLiburHariIni();
 
     // Kalau opsi "isi otomatis libur sepanjang rentang" aktif, lengkapi tanggal libur yang belum tercatat

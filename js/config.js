@@ -48,7 +48,7 @@ let dataProfil = {
     pklSelesai: '',          // format YYYY-MM-DD
     targetHariKerja: '',     // kosong = dihitung otomatis dari rentang
     autoLiburRentang: false, // true = Minggu sepanjang rentang otomatis dicatat "Libur"
-    liburTambahan: []        // [{ tanggal: 'YYYY-MM-DD', nama: 'Libur Nasional' }]
+    tanggalMerah: []         // daftar 'YYYY-MM-DD' -> ditandai titik bulat merah di kalender
 };
 
 let supabaseClient = null;

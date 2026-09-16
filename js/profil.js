@@ -19,16 +19,6 @@ function renderProfil() {
     document.getElementById('coverProgKeahlian').textContent = dataProfil.progKeahlian || '';
     document.getElementById('coverKonsKeahlian').textContent = dataProfil.konsKeahlian || '';
     document.getElementById('coverTahun').textContent = dataProfil.tahun || '2026...';
-
-    // Periode PKL: "Bulan Juli 2026 s/d September 2026"
-    const elPeriode = document.getElementById('coverPeriode');
-    if (elPeriode) {
-        const teksBulan = (typeof labelPeriodeBulan === 'function') ? labelPeriodeBulan() : '';
-        const teksTgl = (typeof labelPeriodeTanggal === 'function') ? labelPeriodeTanggal() : '';
-        elPeriode.textContent = teksBulan
-            ? `BULAN ${teksBulan.toUpperCase()}${teksTgl ? ' (' + teksTgl + ')' : ''}`
-            : '........................';
-    }
     if (typeof renderPanelTarget === 'function') renderPanelTarget();
     const logoEl = document.getElementById('coverLogoSekolah');
     if (logoEl) {
@@ -70,9 +60,6 @@ function bukaSettings() {
         document.getElementById('setPklSelesai').value = dataProfil.pklSelesai || '';
         document.getElementById('setTargetHari').value = dataProfil.targetHariKerja || '';
         document.getElementById('setAutoLibur').checked = !!dataProfil.autoLiburRentang;
-        document.getElementById('setLiburTanggal').value = '';
-        document.getElementById('setLiburNama').value = '';
-        if (typeof renderDaftarLiburTambahan === 'function') renderDaftarLiburTambahan();
     }
     renderLogoPreview();
     const modal = document.getElementById('modalSettings');
