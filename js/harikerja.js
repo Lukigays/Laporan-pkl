@@ -4,8 +4,9 @@
 // Aturan aplikasi:
 //   • Hari MINGGU = LIBUR  -> kalau hari ini Minggu dan belum ada
 //     catatan, aplikasi otomatis membuat catatan "Libur".
-//   • Tanggal merah (libur nasional / cuti bersama) ditandai manual:
-//     muncul titik bulat merah kecil di kalender (tanpa catatan otomatis).
+//   • Tanggal merah (libur nasional & cuti bersama) otomatis dikenali dari
+//     data SKB 3 Menteri (js/liburnasional.js) dan tampil di kalender
+//     lengkap dengan keterangan namanya, seperti kalender HP.
 //   • Sabtu tetap hari kerja (harus diisi laporan).
 //   • Kalender diberi warna:
 //       🟢 HIJAU  = tanggal sudah ada laporan
@@ -113,13 +114,15 @@ function cekHariKerjaInput(namaId = 'inputTanggal', infoId = 'infoTanggalInput')
     const hari = NAMA_HARI[dateObj.getDay()];
     const idx = cariIndexLaporanByKunci(kunci);
     const sudahAda = idx !== -1;
-    const tglMerah = adalahTanggalMerah(kunci);
-    const libur = dateObj.getDay() === 0 || tglMerah || (sudahAda && laporanLibur(dataLaporan[idx]));
+    const infoLib = (typeof infoLibur === 'function') ? infoLibur(kunci) : null;
+    const libur = dateObj.getDay() === 0 || !!infoLib || (sudahAda && laporanLibur(dataLaporan[idx]));
 
     let warna, teks;
     if (libur) {
         warna = 'text-slate-400';
-        const sebab = dateObj.getDay() === 0 ? 'Minggu' : (tglMerah ? 'tanggal merah' : 'Libur');
+        const sebab = infoLib
+            ? (infoLib.jenis === 'cuti' ? 'Cuti Bersama' : 'Libur Nasional') + ': ' + infoLib.nama
+            : 'Minggu';
         teks = `⚪ ${hari} • LIBUR (${sebab})${sudahAda ? ' • catatan libur sudah ada' : ''}`;
     } else if (sudahAda) {
         warna = 'text-emerald-400';
@@ -132,8 +135,6 @@ function cekHariKerjaInput(namaId = 'inputTanggal', infoId = 'infoTanggalInput')
     info.className = `text-[11px] mt-1.5 font-semibold ${warna}`;
     info.classList.remove('hidden');
     info.innerText = teks;
-
-    if (typeof updateTombolTanggalMerah === 'function') updateTombolTanggalMerah();
 }
 
 function setTanggalInput(kunci, namaId = 'inputTanggal', infoId = 'infoTanggalInput') {
@@ -227,8 +228,8 @@ function renderKalender() {
         const kunci = kunciTanggalDariDate(dateObj);
         const idx = cariIndexLaporanByKunci(kunci);
         const sudahAda = idx !== -1;
-        const tglMerah = adalahTanggalMerah(kunci);
-        const libur = dateObj.getDay() === 0 || tglMerah || (sudahAda && laporanLibur(dataLaporan[idx]));
+        const infoLib = (typeof infoLibur === 'function') ? infoLibur(kunci) : null;
+        const libur = dateObj.getDay() === 0 || !!infoLib || (sudahAda && laporanLibur(dataLaporan[idx]));
 
         const kelas = ['kalender-hari'];
         if (libur) kelas.push('k-libur');
@@ -240,13 +241,21 @@ function renderKalender() {
         if (libur && !sudahAda && !kalenderTampilLibur) kelas.push('k-sembunyi');
 
         const judul = libur
-            ? (tglMerah ? '🔴 Tanggal merah' : 'Libur (Minggu)') + (sudahAda ? ' — catatan sudah ada' : '')
+            ? (infoLib ? tooltipLibur(kunci) : 'Libur (Minggu)') + (sudahAda ? ' — catatan sudah ada' : '')
             : (sudahAda ? 'Sudah ada laporan' : 'Belum ada laporan — klik untuk memilih');
 
-        // titik bulat merah kecil = penanda tanggal merah
-        const titikMerah = tglMerah ? '<i class="k-dot-merah"></i>' : '';
-        html += `<button type="button" class="${kelas.join(' ')}" title="${judul}"
-                    onclick="pilihTanggal(${tahun}, ${bulan}, ${tgl})">${tgl}${titikMerah}</button>`;
+        // Keterangan hari libur (seperti kalender HP): kotak kecil berisi nama liburnya
+        let chip = '';
+        if (infoLib) {
+            chip = `<i class="k-chip ${infoLib.jenis === 'cuti' ? 'k-chip-cuti' : 'k-chip-nasional'}">${escapeHtml(infoLib.singkat)}</i>`;
+        } else if (dateObj.getDay() === 0) {
+            chip = '<i class="k-chip k-chip-libur">Libur</i>';
+        }
+
+        html += `<button type="button" class="${kelas.join(' ')}" title="${escapeHtml(judul)}"
+                    onclick="pilihTanggal(${tahun}, ${bulan}, ${tgl})">
+                    <span class="k-tanggal">${tgl}</span>${chip}
+                 </button>`;
     }
 
     html += `
@@ -255,7 +264,8 @@ function renderKalender() {
             <span class="kl"><i class="k-dot k-isi"></i> Sudah diisi</span>
             <span class="kl"><i class="k-dot k-kosong"></i> Belum diisi</span>
             <span class="kl"><i class="k-dot k-libur"></i> Libur (Minggu)</span>
-            <span class="kl"><i class="k-dot-merah k-dot-merah-legenda"></i> Tanggal merah (ditandai)</span>
+            <span class="kl"><i class="k-chip k-chip-nasional k-chip-legenda">Proklamasi RI</i> Libur Nasional</span>
+            <span class="kl"><i class="k-chip k-chip-cuti k-chip-legenda">Cuti: Idul Fitri</i> Cuti Bersama</span>
             <label class="kl cursor-pointer select-none">
                 <input type="checkbox" ${kalenderTampilLibur ? 'checked' : ''}
                        onchange="toggleLiburDiKalender(this)" class="w-3.5 h-3.5 accent-accent">
@@ -304,93 +314,49 @@ function labelPeriodeTanggal() {
     return `${formatTanggalIndo(r.mulai)} s/d ${formatTanggalIndo(r.selesai)}`;
 }
 
-// ---------- Tanggal merah (ditandai manual -> titik bulat merah di kalender) ----------
-function daftarTanggalMerah() {
-    if (!Array.isArray(dataProfil.tanggalMerah)) dataProfil.tanggalMerah = [];
-    return dataProfil.tanggalMerah;
-}
+// ---------- Libur nasional & cuti bersama (data otomatis, js/liburnasional.js) ----------
+// Tidak ada penandaan manual: tanggal merah dikenali otomatis dari data SKB 3 Menteri
+// dan tampil di kalender dengan keterangan namanya.
 
-function adalahTanggalMerah(kunci) {
-    return daftarTanggalMerah().includes(kunci);
-}
-
-// Tandai / batalkan tanda tanggal merah. Tidak membuat catatan "Libur" otomatis:
-// hanya memberi titik bulat merah di kalender & tanggal itu tidak dihitung
-// sebagai hari kerja yang belum diisi.
-async function toggleTanggalMerah(kunci) {
-    if (!kunci) { showToast('⚠️ Pilih tanggalnya dulu di kolom Tanggal Pelaksanaan.'); return false; }
-    daftarTanggalMerah();
-    const sudah = adalahTanggalMerah(kunci);
-    if (sudah) {
-        dataProfil.tanggalMerah = dataProfil.tanggalMerah.filter(t => t !== kunci);
-    } else {
-        dataProfil.tanggalMerah.push(kunci);
-        dataProfil.tanggalMerah.sort();
-    }
-    await simpanProfilPKL();
-    dataTelahBerubah = true;
-
-    const d = dateDariKunci(kunci);
-    refreshTanggalDanTarget();
-    showToast(sudah
-        ? `↩️ Tanda tanggal merah ${formatTanggalIndo(d)} dibatalkan.`
-        : `🔴 ${formatTanggalIndo(d)} ditandai sebagai tanggal merah.`);
-    return true;
-}
-
-// Dipanggil tombol di bawah kolom tanggal (tab Input)
-async function toggleTanggalMerahInput() {
-    const el = document.getElementById('inputTanggal');
-    if (!el || !el.value) { showToast('⚠️ Pilih tanggal di kolom Tanggal Pelaksanaan dulu.'); return; }
-    await toggleTanggalMerah(el.value.slice(0, 10));
-}
-
-function updateTombolTanggalMerah() {
-    const btn = document.getElementById('btnTandaiTanggalMerah');
-    if (!btn) return;
-    const el = document.getElementById('inputTanggal');
-    const kunci = (el && el.value) ? el.value.slice(0, 10) : '';
-    if (!kunci) { btn.classList.add('hidden'); return; }
-    btn.classList.remove('hidden');
-    if (adalahTanggalMerah(kunci)) {
-        btn.innerHTML = '↩️ Batalkan Tanda Tanggal Merah';
-        btn.className = 'w-full mt-2 py-2 px-3 rounded-xl text-[11px] font-bold border transition-all border-white/15 bg-white/5 hover:bg-white/10 text-slate-300';
-    } else {
-        btn.innerHTML = '🔴 Tandai Tanggal Merah';
-        btn.className = 'w-full mt-2 py-2 px-3 rounded-xl text-[11px] font-bold border transition-all border-red-500/30 bg-red-500/10 hover:bg-red-500/25 text-red-300';
-    }
-}
-
-// Migrasi data lama: "libur tambahan" -> penanda tanggal merah
-async function migrasiKeTanggalMerah() {
+// Bersihkan sisa data penandaan lama (kalau ada) dari profil
+async function bersihkanPenandaLama() {
     let berubah = false;
-
-    if (Array.isArray(dataProfil.liburTambahan) && dataProfil.liburTambahan.length > 0) {
-        if (!Array.isArray(dataProfil.tanggalMerah)) dataProfil.tanggalMerah = [];
-        dataProfil.liburTambahan.forEach(item => {
-            if (item && item.tanggal && !dataProfil.tanggalMerah.includes(item.tanggal)) {
-                dataProfil.tanggalMerah.push(item.tanggal);
-            }
-        });
-        dataProfil.tanggalMerah.sort();
-        dataProfil.liburTambahan = [];
-        berubah = true;
-    }
-
-    // hapus catatan "Libur - NAMA" yang dulu dibuat otomatis untuk tanggal merah
-    const sebelum = dataLaporan.length;
-    dataLaporan = dataLaporan.filter(item => !item.ket && !/^Libur\s*[-–]\s*/.test((item.uraian || '').trim()));
-    if (dataLaporan.length !== sebelum) {
-        try { await localforage.setItem('laporanPKL', dataLaporan); } catch (e) { }
-        berubah = true;
-    }
-
-    if (berubah) {
-        await simpanProfilPKL();
-        renderSemuaData();
-        showToast('ℹ️ Libur tambahan diganti jadi penanda tanggal merah (titik merah di kalender).');
-    }
+    if (dataProfil.tanggalMerah && dataProfil.tanggalMerah.length) { dataProfil.tanggalMerah = []; berubah = true; }
+    if (dataProfil.liburTambahan && dataProfil.liburTambahan.length) { dataProfil.liburTambahan = []; berubah = true; }
+    if (berubah) { try { await simpanProfilPKL(); } catch (e) { } }
     return berubah;
+}
+
+// Daftar libur nasional/cuti bersama yang masuk periode PKL (tampil di pengaturan)
+function renderDaftarLiburPeriode() {
+    const wadah = document.getElementById('daftarLiburPeriode');
+    if (!wadah) return;
+    const r = rentangPKL();
+    if (!r) {
+        wadah.innerHTML = '<p class="text-[11px] text-slate-500 italic">Isi tanggal mulai & selesai PKL di atas untuk melihat daftar libur nasional pada periode tersebut.</p>';
+        return;
+    }
+    const daftar = daftarLiburRentang(r.mulai, r.selesai);
+    if (daftar.length === 0) {
+        wadah.innerHTML = '<p class="text-[11px] text-slate-500 italic">Tidak ada libur nasional pada periode PKL ini.</p>';
+        return;
+    }
+    wadah.innerHTML = daftar.map(item => `
+        <div class="chip-libur">
+            <span class="chip-libur-teks">
+                <b>${formatTanggalIndo(item.tanggal)}</b> (${NAMA_HARI[item.tanggal.getDay()]}) — ${escapeHtml(item.nama)}
+                <span class="tag-jenis ${item.jenis === 'cuti' ? 'tag-cuti' : 'tag-nasional'}">${item.jenis === 'cuti' ? 'Cuti Bersama' : 'Libur Nasional'}</span>
+            </span>
+        </div>`).join('');
+}
+
+// Info jumlah data yang terpasang
+function renderInfoLibur() {
+    const el = document.getElementById('infoJumlahLibur');
+    if (!el) return;
+    const daftarTahun = (typeof TAHUN_LIBUR_TERSEDIA !== 'undefined') ? TAHUN_LIBUR_TERSEDIA : [];
+    el.innerHTML = `Kalender libur nasional otomatis aktif untuk tahun <b class="text-slate-200">${daftarTahun.join(', ')}</b> `
+        + `(sumber: SKB 3 Menteri) — total <b class="text-slate-200">${Object.keys(LIBUR_NASIONAL).length}</b> tanggal.`;
 }
 
 // Buatkan catatan "Libur" untuk satu tanggal tertentu (dipakai isi otomatis hari Minggu)
@@ -448,7 +414,7 @@ function hitungHariLiburRentang(mulai, selesai) {
     let minggu = 0, kustom = 0;
     for (let d = new Date(mulai); d <= selesai; d.setDate(d.getDate() + 1)) {
         if (d.getDay() === 0) minggu++;
-        else if (adalahTanggalMerah(kunciTanggalDariDate(d))) kustom++;   // kustom = tanggal merah
+        else if (adalahLiburNasional(kunciTanggalDariDate(d))) kustom++;   // kustom = tanggal merah (libur nasional/cuti bersama)
     }
     return { minggu, kustom, total: minggu + kustom };
 }
@@ -460,17 +426,25 @@ function hitungProgresPKL() {
         adaRentang: !!r,
         target: 0, targetManual: false,
         terisi: 0, belumSampaiHariIni: 0, sisa: 0, persen: 0,
-        liburTercatat: 0, hariKerjaDalamRentang: 0, teksPeriode: labelPeriodeBulan(), teksTanggal: labelPeriodeTanggal()
+        liburTercatat: 0, hariKerjaDalamRentang: 0,
+        tanggalMerah: 0, tanggalMerahDalamRentang: 0,   // libur nasional + cuti bersama
+        teksPeriode: labelPeriodeBulan(), teksTanggal: labelPeriodeTanggal()
     };
+
+    hasil.tanggalMerah = (typeof Object.keys === 'function' && typeof LIBUR_NASIONAL !== 'undefined') ? Object.keys(LIBUR_NASIONAL).length : 0;
 
     const rEfektif = rentangEfektif();
     if (!rEfektif) return hasil;
+
+    // berapa tanggal merah (libur nasional/cuti bersama) di dalam rentang
+    hasil.tanggalMerahDalamRentang = (typeof daftarLiburRentang === 'function')
+        ? daftarLiburRentang(rEfektif.mulai, rEfektif.selesai).length : 0;
 
     // jumlah hari kerja (Minggu libur, Sabtu tetap kerja) sepanjang rentang
     let hariKerja = 0;
     for (let d = new Date(rEfektif.mulai); d <= rEfektif.selesai; d.setDate(d.getDate() + 1)) {
         if (d.getDay() === 0) continue;
-        if (adalahTanggalMerah(kunciTanggalDariDate(d))) continue;
+        if (adalahLiburNasional(kunciTanggalDariDate(d))) continue;
         hariKerja++;
     }
     hasil.hariKerjaDalamRentang = hariKerja;
@@ -494,7 +468,7 @@ function hitungProgresPKL() {
     let belum = 0;
     for (let d = new Date(rEfektif.mulai); d <= batas; d.setDate(d.getDate() + 1)) {
         if (d.getDay() === 0) continue;
-        if (adalahTanggalMerah(kunciTanggalDariDate(d))) continue;
+        if (adalahLiburNasional(kunciTanggalDariDate(d))) continue;
         if (cariIndexLaporanByKunci(kunciTanggalDariDate(d)) === -1) belum++;
     }
     hasil.belumSampaiHariIni = belum;
@@ -543,7 +517,7 @@ function renderPanelTarget() {
                 ${p.belumSampaiHariIni > 0
                     ? `<b class="text-red-400">${p.belumSampaiHariIni} hari kerja belum diisi</b>`
                     : '<b class="text-emerald-400">Semua hari kerja terisi ✓</b>'}
-                • ${p.liburTercatat} catatan libur • ${daftarTanggalMerah().length} tanggal merah • sisa ${p.sisa} hari kerja
+                • ${p.liburTercatat} catatan libur • ${p.tanggalMerahDalamRentang} tanggal merah dalam periode • sisa ${p.sisa} hari kerja
             </span>
         </div>`;
 }
@@ -556,7 +530,7 @@ function cariTanggalBelumDiisi() {
     const batas = hariIni < r.selesai ? hariIni : r.selesai;
     for (let d = new Date(r.mulai); d <= batas; d.setDate(d.getDate() + 1)) {
         if (d.getDay() === 0) continue;
-        if (adalahTanggalMerah(kunciTanggalDariDate(d))) continue;
+        if (adalahLiburNasional(kunciTanggalDariDate(d))) continue;
         if (cariIndexLaporanByKunci(kunciTanggalDariDate(d)) === -1) {
             kalenderBulanAktif = new Date(d.getFullYear(), d.getMonth(), 1);
             pilihTanggal(d.getFullYear(), d.getMonth(), d.getDate());
@@ -607,6 +581,7 @@ async function simpanPeriodeDariSettings() {
 function refreshTanggalDanTarget() {
     if (typeof renderKalender === 'function') renderKalender();
     if (typeof renderPanelTarget === 'function') renderPanelTarget();
-    if (typeof updateTombolTanggalMerah === 'function') updateTombolTanggalMerah();
+    if (typeof renderDaftarLiburPeriode === 'function') renderDaftarLiburPeriode();
+    if (typeof renderInfoLibur === 'function') renderInfoLibur();
 }
 

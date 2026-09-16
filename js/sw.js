@@ -2,7 +2,7 @@
 // SERVICE WORKER — CACHING & OFFLINE MODE
 // ============================================================
 
-const CACHE_NAME = 'laporan-pkl-v6';
+const CACHE_NAME = 'laporan-pkl-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
   './js/pdf.js',
   './js/kamera.js',
   './js/badge.js',
+  './js/liburnasional.js',
   './js/harikerja.js',
   './js/pwa.js',
   './js/main.js'

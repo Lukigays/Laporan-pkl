@@ -61,6 +61,8 @@ function bukaSettings() {
         document.getElementById('setTargetHari').value = dataProfil.targetHariKerja || '';
         document.getElementById('setAutoLibur').checked = !!dataProfil.autoLiburRentang;
     }
+    if (typeof renderInfoLibur === 'function') renderInfoLibur();
+    if (typeof renderDaftarLiburPeriode === 'function') renderDaftarLiburPeriode();
     renderLogoPreview();
     const modal = document.getElementById('modalSettings');
     modal.classList.remove('hidden');

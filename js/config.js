@@ -47,8 +47,9 @@ let dataProfil = {
     pklMulai: '',            // format YYYY-MM-DD
     pklSelesai: '',          // format YYYY-MM-DD
     targetHariKerja: '',     // kosong = dihitung otomatis dari rentang
-    autoLiburRentang: false, // true = Minggu sepanjang rentang otomatis dicatat "Libur"
-    tanggalMerah: []         // daftar 'YYYY-MM-DD' -> ditandai titik bulat merah di kalender
+    autoLiburRentang: false  // true = Minggu sepanjang rentang otomatis dicatat "Libur"
+    // Catatan: tanggal merah (libur nasional & cuti bersama) TIDAK disimpan di profil —
+    // otomatis dikenali dari data SKB 3 Menteri di js/liburnasional.js
 };
 
 let supabaseClient = null;
