@@ -278,14 +278,14 @@
 
                     <div class="h-px bg-white/5 my-5"></div>
 
-                    <h4 class="font-display font-bold text-xs text-accent-light mb-2 flex items-center gap-2"><span>🔴</span> Daftar Libur Tambahan (Tanggal Merah)</h4>
-                    <p class="text-[11px] text-slate-400 mb-3">Contoh: 17 Agustus (HUT RI), cuti bersama, libur sekolah. Tanggal ini jadi abu-abu di kalender dan otomatis dicatat "Libur".</p>
-                    <div class="flex flex-col md:flex-row gap-3 mb-3">
-                        <input type="date" id="setLiburTanggal" class="glass-input rounded-xl p-3 text-xs md:w-48">
-                        <input type="text" id="setLiburNama" class="glass-input rounded-xl p-3 text-xs flex-1" placeholder="Nama libur (contoh: HUT RI ke-81)">
-                        <button type="button" onclick="tambahLiburDariSettings()" class="py-3 px-5 btn-primary rounded-xl text-xs font-bold whitespace-nowrap">➕ Tambah Libur</button>
-                    </div>
-                    <div id="daftarLiburTambahan" class="space-y-2"></div>
+                    <h4 class="font-display font-bold text-xs text-accent-light mb-2 flex items-center gap-2"><span>🔴</span> Tanggal Merah di Kalender</h4>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        Tandai tanggal merah (17 Agustus, cuti bersama, libur sekolah) <b class="text-slate-200">langsung dari kalender</b>:
+                        pilih tanggalnya di tab <b class="text-slate-200">📝 Input</b>, lalu tekan tombol
+                        <b class="text-slate-200">🔴 Tandai Tanggal Merah</b> di bawah kolom tanggal.
+                        Tanggal yang ditandai akan muncul <b class="text-slate-200">titik bulat merah</b> kecil di kalender,
+                        warnanya jadi abu-abu (libur), dan tidak dihitung sebagai hari yang belum diisi.
+                    </p>
                 </div>
 
                 <div class="h-px bg-white/5"></div>
@@ -344,6 +344,7 @@
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
                             <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="glass-input w-full rounded-2xl p-4 text-sm">
                             <p id="infoTanggalInput" class="text-[11px] mt-1.5 hidden font-semibold"></p>
+                            <button type="button" id="btnTandaiTanggalMerah" onclick="toggleTanggalMerahInput()" class="hidden w-full mt-2 py-2 px-3 rounded-xl text-[11px] font-bold border transition-all border-red-500/30 bg-red-500/10 hover:bg-red-500/25 text-red-300">🔴 Tandai Tanggal Merah</button>
                             <!-- KALENDER MINI: hijau = sudah diisi, merah = belum diisi, abu = libur -->
                             <div id="kalenderHariKerja" class="kalender-box mt-3"></div>
                         </div>
@@ -482,7 +483,6 @@
                                         <tr><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
                                     </table>
                                     <h4 style="font-size: 16px; font-weight: bold; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
-                                    <p style="font-size: 14px; font-weight: bold; margin-top: 8px;">PERIODE PKL: <span id="coverPeriode">........................</span></p>
                                 </div>
                             </div>
                             <div id="wadahTabelBulan" class="w-full"></div>
