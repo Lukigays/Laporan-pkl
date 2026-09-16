@@ -323,3 +323,114 @@ select.glass-input {
 .divider-atau { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 12px; font-weight: 500; }
 .divider-atau::before, .divider-atau::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .divider-atau span { padding: 0 12px; }
+
+
+/* ============================================================
+   KALENDER MINI PEMILIH TANGGAL
+   🟢 hijau = sudah ada laporan  |  🔴 merah = belum diisi  |  ⚪ abu = libur (Minggu)
+   ============================================================ */
+
+.kalender-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 12px;
+}
+
+.kalender-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 8px;
+}
+.kalender-judul { font-size: 12px; font-weight: 700; color: #e9d5ff; letter-spacing: .01em; }
+
+.kalender-nav, .kalender-today {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #f1f5f9; border-radius: 10px; font-weight: 700;
+    transition: all .2s ease; cursor: pointer;
+}
+.kalender-nav { width: 26px; height: 26px; font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.kalender-today { font-size: 10px; padding: 5px 9px; }
+.kalender-nav:hover, .kalender-today:hover {
+    background: rgba(192,38,211,0.25);
+    border-color: rgba(192,38,211,0.45);
+}
+
+.kalender-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.kalender-nama-hari > div {
+    text-align: center; font-size: 10px; font-weight: 700;
+    color: #94a3b8; padding-bottom: 2px;
+}
+.kalender-nama-hari > div.libur { color: #f87171; }
+.kalender-kosong { height: 30px; }
+
+.kalender-hari {
+    position: relative; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #e2e8f0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 9px; cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.kalender-hari:hover { transform: translateY(-1px); }
+
+/* 🟢 sudah ada laporan */
+.kalender-hari.k-isi {
+    background: rgba(16,185,129,0.28);
+    border-color: rgba(16,185,129,0.65);
+    color: #d1fae5;
+}
+.kalender-hari.k-isi:hover { background: rgba(16,185,129,0.45); }
+
+/* 🔴 belum diisi (wajib diisi) */
+.kalender-hari.k-kosong {
+    background: rgba(239,68,68,0.24);
+    border-color: rgba(239,68,68,0.6);
+    color: #fee2e2;
+}
+.kalender-hari.k-kosong:hover { background: rgba(239,68,68,0.4); }
+
+/* ⚪ libur (Minggu) */
+.kalender-hari.k-libur {
+    background: rgba(148,163,184,0.14);
+    border-color: rgba(148,163,184,0.35);
+    color: #cbd5e1;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(203,213,225,0.6);
+}
+
+/* tanggal yang sedang dipilih di input */
+.kalender-hari.k-terpilih {
+    box-shadow: 0 0 0 2px #d946ef, 0 0 14px rgba(217,70,239,0.5);
+    z-index: 1;
+}
+
+/* penanda hari ini */
+.kalender-hari.k-hari-ini::after {
+    content: ''; position: absolute; bottom: 3px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #ffffff; opacity: .85;
+}
+
+/* sel libur disembunyikan (toggle "Tampilkan hari libur") */
+.kalender-hari.k-sembunyi { visibility: hidden; }
+
+/* legenda */
+.kalender-legenda {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 10px; font-size: 10px; font-weight: 600; color: #94a3b8;
+}
+.kalender-legenda .kl { display: flex; align-items: center; gap: 5px; }
+.kalender-legenda .k-dot {
+    width: 10px; height: 10px; border-radius: 4px;
+    display: inline-block; border: 1px solid rgba(255,255,255,0.15);
+}
+.kalender-legenda .k-dot.k-isi { background: rgba(16,185,129,0.6); border-color: rgba(16,185,129,0.85); }
+.kalender-legenda .k-dot.k-kosong { background: rgba(239,68,68,0.6); border-color: rgba(239,68,68,0.85); }
+.kalender-legenda .k-dot.k-libur { background: rgba(148,163,184,0.35); border-color: rgba(148,163,184,0.6); }
+
+@media (max-width: 768px) {
+    .kalender-hari { height: 32px; font-size: 12px; }
+}
