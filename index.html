@@ -300,12 +300,11 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="block text-xs font-semibold text-slate-400">Tanggal Pelaksanaan</label>
-                                <button type="button" onclick="setTanggalHariKerjaBerikutnya()" class="text-[10px] text-accent-light hover:underline font-bold transition-all">+ Hari Kerja</button>
-                            </div>
-                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput()" class="glass-input w-full rounded-2xl p-4 text-sm">
-                            <p id="pesanHariKerja" class="text-[11px] text-amber-400 mt-1.5 hidden font-medium"></p>
+                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
+                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <p id="infoTanggalInput" class="text-[11px] mt-1.5 hidden font-semibold"></p>
+                            <!-- KALENDER MINI: hijau = sudah diisi, merah = belum diisi, abu = libur -->
+                            <div id="kalenderHariKerja" class="kalender-box mt-3"></div>
                         </div>
                         <div class="lg:col-span-3">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Uraian Kegiatan</label>
@@ -344,7 +343,8 @@
                         <input type="hidden" id="editIndexHidden">
                         <div class="lg:col-span-1">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
-                            <input type="date" id="editTanggal" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <p id="infoTanggalEdit" class="text-[11px] mt-1.5 hidden font-semibold"></p>
                         </div>
                         <div class="lg:col-span-3">
                             <label class="block text-xs font-semibold mb-2 text-slate-400">Uraian Kegiatan</label>
