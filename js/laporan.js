@@ -123,8 +123,23 @@ async function finalizeEdit(idx, hari, tanggal, uraian, foto, bulanLabel) {
 
 async function hapusLaporanSelected() {
     const idx = document.getElementById('editIndexHidden').value;
-    if (confirm(`Hapus permanen laporan tanggal ${dataLaporan[idx].tanggal}?`)) {
+    if (idx === '' || !dataLaporan[idx]) { showToast('⚠️ Pilih laporan yang ingin dihapus dulu.'); return; }
+    const item = dataLaporan[idx];
+    if (confirm(`Hapus permanen laporan tanggal ${item.tanggal}?`)) {
+        // Kalau yang dihapus adalah catatan "Libur" otomatis hari Minggu,
+        // simpan daftar penolakan supaya tidak dibuat ulang otomatis.
+        const kunci = typeof kunciTanggalDariString === 'function' ? kunciTanggalDariString(item.tanggal) : '';
+        const autoLibur = typeof laporanLibur === 'function' && laporanLibur(item);
         dataLaporan.splice(idx, 1);
+        if (autoLibur && kunci) {
+            try {
+                const ditolak = (await localforage.getItem('liburDitolak')) || [];
+                if (!ditolak.includes(kunci)) {
+                    ditolak.push(kunci);
+                    await localforage.setItem('liburDitolak', ditolak);
+                }
+            } catch (e) { }
+        }
         await localforage.setItem('laporanPKL', dataLaporan);
         dataTelahBerubah = true;
         renderSemuaData();
@@ -158,6 +173,7 @@ function renderSemuaData() {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
         updateStatistik([]);
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
+        if (typeof renderKalender === 'function') renderKalender();
         return;
     }
     const unikBulan = [...new Set(dataLaporan.map(i => i.bulanLabel))];
@@ -184,6 +200,7 @@ function renderSemuaData() {
     if (dataFiltered.length === 0) {
         wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Tidak ada data yang sesuai filter.</p>';
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
+        if (typeof renderKalender === 'function') renderKalender();
         return;
     }
     const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
@@ -245,5 +262,8 @@ function renderSemuaData() {
 
     if (typeof hitungDanRenderBadge === 'function') {
         hitungDanRenderBadge();
+    }
+    if (typeof renderKalender === 'function') {
+        renderKalender();
     }
 }
