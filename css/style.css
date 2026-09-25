@@ -503,3 +503,21 @@ select.glass-input {
     display: inline-block; width: auto; -webkit-line-clamp: 1;
     font-size: 9px; padding: 2px 6px; margin-right: 2px;
 }
+
+/* ============================================================
+   TOMBOL AKSI DI DALAM TABEL LAPORAN (Edit di samping foto)
+   ============================================================ */
+.btn-edit-foto {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.btn-edit-foto:hover {
+    background: #bfdbfe !important;
+    transform: translateY(-1px);
+}
+.btn-edit-foto:active { transform: translateY(0); }
+
+/* Tombol aksi & elemen berkelas no-print tidak ikut tercetak / masuk print */
+@media print {
+    .btn-edit-foto, .no-print { display: none !important; }
+}
