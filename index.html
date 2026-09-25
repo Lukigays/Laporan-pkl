@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0a0a0f">
-    <title>LAPORAN PKL BY LUKYY</title>
+    <meta name="theme-color" content="#FFDE59">
+    <title>LAPORAN PKL BY LUKYY — NEOBRUTALISM</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
@@ -18,472 +17,525 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
 
     <script src="js/config.js"></script>
     <script>initTailwindConfig();</script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="antialiased min-h-screen pb-40 md:pb-32">
-    <div class="cosmic-bg"></div>
-    <div class="cosmic-orb orb-1"></div>
-    <div class="cosmic-orb orb-2"></div>
-    <div class="cosmic-orb orb-3"></div>
-    <canvas id="particles-canvas"></canvas>
 
+    <!-- TOAST BRUTAL -->
     <div id="toast-container" class="fixed top-6 right-6 z-[110] transform translate-x-full opacity-0 pointer-events-none transition-all duration-300">
-        <div id="toast-box" class="glass-panel px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl border-l-4 border-l-accent">
-            <span id="toast-icon" class="text-xl">✨</span>
-            <p id="toast-message" class="text-sm font-semibold">Pesan...</p>
+        <div id="toast-box" class="px-6 py-4 flex items-center gap-3">
+            <span id="toast-icon" class="text-xl">⚡</span>
+            <p id="toast-message" class="text-sm font-black uppercase">Pesan...</p>
         </div>
     </div>
 
+    <!-- MODAL RESET PASSWORD - BRUTAL -->
     <div id="modalResetPassword" class="fixed inset-0 z-[130] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-md rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
-            <div class="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent pointer-events-none"></div>
-            <div class="text-5xl mb-4 relative">🔐</div>
-            <h3 class="font-display font-bold text-2xl mb-2 gradient-text">Buat Password Baru</h3>
-            <p class="text-sm text-slate-400 mb-6">Masukkan password baru untuk akun laporan PKL Anda.</p>
-            <input type="password" id="newPasswordInput" class="glass-input w-full rounded-2xl p-4 text-sm mb-6" placeholder="Password baru (min. 6 karakter)">
-            <button onclick="simpanPasswordBaru()" class="btn-primary w-full py-4 rounded-2xl text-sm font-bold shadow-lg"><span>Simpan Password Baru</span></button>
+        <div class="modal-content w-full max-w-md p-8 text-center relative transform scale-95 transition-transform">
+            <div class="absolute -top-4 -right-4 bg-[#FFDE59] border-[3px] border-black px-3 py-1 font-black text-xs uppercase rotate-3 shadow-[3px_3px_0px_0px_#000]">NEW!</div>
+            <div class="w-16 h-16 mx-auto mb-4 bg-black text-[#FFDE59] flex items-center justify-center text-3xl font-black border-[3px] border-black shadow-[4px_4px_0px_0px_#000] rounded-[14px]">🔐</div>
+            <h3 class="font-black text-2xl mb-2 uppercase tracking-tight">BUAT PASSWORD BARU</h3>
+            <p class="text-sm font-bold mb-6 border-l-[4px] border-black pl-3 text-left bg-[#FFF8C6] py-2">Masukkan password baru untuk akun laporan PKL Anda.</p>
+            <input type="password" id="newPasswordInput" class="brutal-input w-full mb-6" placeholder="PASSWORD BARU (MIN. 6 KARAKTER)">
+            <button onclick="simpanPasswordBaru()" class="brutal-btn brutal-btn-yellow w-full py-4 text-sm"><span>💾 SIMPAN PASSWORD BARU</span></button>
         </div>
     </div>
 
+    <!-- MODAL TOUR - BRUTAL -->
     <div id="modalTour" class="fixed inset-0 z-[120] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-lg rounded-3xl p-8 text-center relative overflow-hidden transform scale-95 transition-transform">
-            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cosmic-purple via-accent to-cosmic-pink"></div>
-            <div id="tourIcon" class="text-6xl mb-4 animate-bounce">🚀</div>
-            <h3 id="tourTitle" class="font-display font-bold text-2xl mb-3 gradient-text">Selamat Datang</h3>
-            <p id="tourDesc" class="text-sm text-slate-400 mb-8 leading-relaxed">Aplikasi praktis untuk mencatat kegiatan PKL harian Anda dengan tampilan futuristik.</p>
+        <div class="modal-content w-full max-w-lg p-8 text-center relative transform scale-95 transition-transform">
+            <div class="absolute top-0 left-0 right-0 h-[8px] bg-black"></div>
+            <div class="absolute -top-6 left-6 bg-[#7DF9FF] border-[3px] border-black px-4 py-1 font-black text-xs uppercase -rotate-2 shadow-[3px_3px_0px_0px_#000]">PANDUAN #1</div>
+            <div id="tourIcon" class="w-20 h-20 mx-auto mb-4 bg-[#FFDE59] border-[4px] border-black flex items-center justify-center text-4xl shadow-[6px_6px_0px_0px_#000] rounded-[16px]">🚀</div>
+            <h3 id="tourTitle" class="font-black text-2xl mb-3 uppercase tracking-tight">SELAMAT DATANG</h3>
+            <p id="tourDesc" class="text-sm font-semibold mb-8 leading-relaxed border-[3px] border-black p-4 bg-white rounded-[12px]">Aplikasi praktis untuk mencatat kegiatan PKL harian Anda dengan tampilan neobrutalism yang brutal!</p>
             <div class="flex items-center justify-between">
-                <button onclick="lewatiTour()" class="text-xs text-slate-500 hover:text-accent-light font-semibold px-4 py-2 transition-colors">Lewati Panduan</button>
+                <button onclick="lewatiTour()" class="brutal-btn brutal-btn-white text-[11px] px-4 py-2">LEWATI</button>
                 <div class="flex gap-3 items-center">
                     <div class="flex gap-1.5">
-                        <div id="dot-0" class="w-2 h-2 rounded-full bg-accent"></div>
-                        <div id="dot-1" class="w-2 h-2 rounded-full bg-white/20"></div>
-                        <div id="dot-2" class="w-2 h-2 rounded-full bg-white/20"></div>
-                        <div id="dot-3" class="w-2 h-2 rounded-full bg-white/20"></div>
+                        <div id="dot-0" class="w-3 h-3 border-[2px] border-black bg-[#FFDE59]"></div>
+                        <div id="dot-1" class="w-3 h-3 border-[2px] border-black bg-white"></div>
+                        <div id="dot-2" class="w-3 h-3 border-[2px] border-black bg-white"></div>
+                        <div id="dot-3" class="w-3 h-3 border-[2px] border-black bg-white"></div>
                     </div>
-                    <button onclick="lanjutTour()" class="btn-primary py-3 px-8 rounded-2xl text-sm font-bold shadow-lg"><span>Lanjut →</span></button>
+                    <button onclick="lanjutTour()" class="brutal-btn brutal-btn-black py-3 px-8 text-sm"><span>LANJUT →</span></button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL AUTH - BRUTAL -->
     <div id="modalAuth" class="fixed inset-0 z-[105] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
+        <div class="modal-content w-full max-w-md flex flex-col overflow-hidden">
+            <div class="p-6 border-b-[4px] border-black flex justify-between items-center bg-[#FFDE59]">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-purple to-accent flex items-center justify-center text-lg">☁️</div>
-                    <h3 class="font-display font-bold text-lg">Sinkronisasi Cloud</h3>
+                    <div class="w-10 h-10 bg-black text-white flex items-center justify-center text-lg font-black border-[3px] border-black rounded-[10px]">☁️</div>
+                    <h3 class="font-black text-lg uppercase">Sinkronisasi Cloud</h3>
                 </div>
-                <button onclick="tutupModalAuth()" class="hover:text-accent-light text-2xl font-light transition-colors">&times;</button>
+                <button onclick="tutupModalAuth()" class="w-10 h-10 bg-white border-[3px] border-black font-black text-xl flex items-center justify-center hover:bg-black hover:text-white transition-colors rounded-[10px] shadow-[3px_3px_0px_0px_#000]">&times;</button>
             </div>
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-400">Masuk atau Daftar akun untuk menyimpan dan mengambil laporan Anda secara aman di server cloud.</p>
+            <div class="p-6 space-y-4 bg-white">
+                <p class="text-xs font-bold uppercase border-[3px] border-black p-3 bg-[#E0F7FF] rounded-[10px]">Masuk atau Daftar akun untuk menyimpan laporan Anda di cloud.</p>
                 
-                <!-- Tombol Login Google -->
-                <button onclick="prosesLoginGoogle()" class="btn-google">
-                    <svg class="google-icon" viewBox="0 0 24 24">
+                <button onclick="prosesLoginGoogle()" class="btn-google w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm">
+                    <svg class="google-icon" width="20" height="20" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                         <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                         <path fill="#34A853" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    <span>Login dengan Google</span>
+                    <span>LOGIN DENGAN GOOGLE</span>
                 </button>
 
-                <!-- Divider -->
-                <div class="divider-atau">
-                    <span>atau login dengan email</span>
+                <div class="divider-atau flex items-center gap-3 py-2">
+                    <div class="h-[3px] bg-black flex-1"></div>
+                    <span class="bg-black text-white px-3 py-1 font-black text-[10px]">ATAU EMAIL</span>
+                    <div class="h-[3px] bg-black flex-1"></div>
                 </div>
 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold mb-2 text-slate-400">Email</label>
-                        <input type="email" id="authEmail" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="nama@email.com">
+                        <label class="brutal-label">📧 EMAIL</label>
+                        <input type="email" id="authEmail" class="brutal-input" placeholder="NAMA@EMAIL.COM">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-2 text-slate-400">Password</label>
-                        <input type="password" id="authPassword" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Minimal 6 karakter">
+                        <label class="brutal-label">🔑 PASSWORD</label>
+                        <input type="password" id="authPassword" class="brutal-input" placeholder="MINIMAL 6 KARAKTER">
                     </div>
                 </div>
                 <div class="flex flex-col gap-3 pt-2">
-                    <button onclick="prosesLoginAuth()" class="btn-primary w-full py-4 rounded-2xl text-sm font-bold shadow-lg"><span>🔑 Masuk (Login)</span></button>
-                    <button onclick="prosesRegisterAuth()" class="btn-secondary w-full py-4 rounded-2xl text-sm font-bold">✨ Daftar Akun Baru</button>
-                    <button onclick="prosesLupaPassword()" class="w-full py-2 text-accent-light font-semibold rounded-xl text-xs hover:underline">Lupa Password?</button>
+                    <button onclick="prosesLoginAuth()" class="brutal-btn brutal-btn-yellow w-full py-4 text-sm"><span>🔑 MASUK (LOGIN)</span></button>
+                    <button onclick="prosesRegisterAuth()" class="brutal-btn brutal-btn-white w-full py-4 text-sm">✨ DAFTAR AKUN BARU</button>
+                    <button onclick="prosesLupaPassword()" class="w-full py-3 bg-black text-white font-black rounded-[12px] text-xs uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] transition-all">LUPA PASSWORD?</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL EXPORT - BRUTAL -->
     <div id="modalExportOspi" class="fixed inset-0 z-[97] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-8 text-center">
-            <div class="text-4xl mb-3">📑</div>
-            <h3 class="font-display font-bold text-xl mb-2 gradient-text">Opsi Ekspor PDF</h3>
-            <p class="text-sm text-slate-400 mb-8">Pilih format dokumen PDF yang ingin Anda unduh:</p>
+        <div class="modal-content w-full max-w-md flex flex-col overflow-hidden p-8 text-center bg-white">
+            <div class="w-16 h-16 mx-auto mb-3 bg-[#FF90E8] border-[4px] border-black flex items-center justify-center text-3xl shadow-[5px_5px_0px_0px_#000] rounded-[14px]">📑</div>
+            <h3 class="font-black text-xl mb-2 uppercase tracking-tight">OPSI EKSPOR PDF</h3>
+            <p class="text-sm font-bold mb-8 bg-black text-white inline-block px-3 py-1 uppercase text-xs">Pilih format dokumen PDF yang ingin diunduh:</p>
             <div class="space-y-3 mb-8 text-left">
-                <label class="flex items-center gap-4 p-4 rounded-2xl glass-panel cursor-pointer hover:border-accent/30 transition-all group">
-                    <input type="radio" name="opsiCover" value="dengan" checked class="w-5 h-5 accent-accent">
+                <label class="flex items-center gap-4 p-4 rounded-[14px] bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_#000] cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] transition-all group">
+                    <input type="radio" name="opsiCover" value="dengan" checked class="w-6 h-6 accent-black border-[3px] border-black">
                     <div>
-                        <p class="font-semibold text-sm group-hover:text-accent-light transition-colors">Dengan Judul & Kover Laporan</p>
-                        <p class="text-xs text-slate-500">Mencetak halaman kover lengkap beserta tabel.</p>
+                        <p class="font-black text-sm uppercase group-hover:bg-[#FFDE59] inline px-1">DENGAN JUDUL & KOVER</p>
+                        <p class="text-xs font-semibold mt-1">Mencetak halaman kover lengkap beserta tabel.</p>
                     </div>
                 </label>
-                <label class="flex items-center gap-4 p-4 rounded-2xl glass-panel cursor-pointer hover:border-accent/30 transition-all group">
-                    <input type="radio" name="opsiCover" value="tanpa" class="w-5 h-5 accent-accent">
+                <label class="flex items-center gap-4 p-4 rounded-[14px] bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_#000] cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] transition-all group">
+                    <input type="radio" name="opsiCover" value="tanpa" class="w-6 h-6 accent-black">
                     <div>
-                        <p class="font-semibold text-sm group-hover:text-accent-light transition-colors">Hanya Tabel Saja</p>
-                        <p class="text-xs text-slate-500">Langsung mencetak halaman data tabel kegiatan harian.</p>
+                        <p class="font-black text-sm uppercase group-hover:bg-[#7DF9FF] inline px-1">HANYA TABEL SAJA</p>
+                        <p class="text-xs font-semibold mt-1">Langsung mencetak halaman data tabel.</p>
                     </div>
                 </label>
             </div>
             <div class="flex gap-3">
-                <button type="button" onclick="tutupOspiExport()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
-                <button type="button" onclick="prosesEksekusiPDF()" class="flex-1 py-3.5 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>Unduh PDF</span></button>
+                <button type="button" onclick="tutupOspiExport()" class="flex-1 brutal-btn brutal-btn-white py-3.5 text-sm">BATAL</button>
+                <button type="button" onclick="prosesEksekusiPDF()" class="flex-1 brutal-btn brutal-btn-yellow py-3.5 text-sm shadow-[5px_5px_0px_0px_#000]"><span>⬇️ UNDUH PDF</span></button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL KAMERA - BRUTAL -->
     <div id="modalKamera" class="fixed inset-0 z-[140] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-md rounded-3xl flex flex-col overflow-hidden p-6 text-center relative">
+        <div class="modal-content w-full max-w-md flex flex-col overflow-hidden p-6 text-center relative bg-white">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-display font-bold text-lg flex items-center gap-2"><span>📷</span> Kamera Web</h3>
-                <button onclick="tutupKamera()" class="text-3xl font-light hover:text-accent-light leading-none">&times;</button>
+                <h3 class="font-black text-lg uppercase flex items-center gap-2"><span class="w-8 h-8 bg-black text-white flex items-center justify-center rounded-[8px] border-[2px] border-black">📷</span> KAMERA WEB</h3>
+                <button onclick="tutupKamera()" class="w-10 h-10 bg-[#FF6B6B] border-[3px] border-black font-black text-xl flex items-center justify-center rounded-[10px] shadow-[3px_3px_0px_0px_#000]">×</button>
             </div>
             
-            <div class="relative w-full bg-black rounded-xl overflow-hidden aspect-[3/4] flex justify-center items-center mb-5 border border-white/10 shadow-inner">
+            <div class="relative w-full bg-black rounded-[16px] overflow-hidden aspect-[3/4] flex justify-center items-center mb-5 border-[4px] border-black shadow-[6px_6px_0px_0px_#000]">
                 <video id="videoKamera" autoplay playsinline class="w-full h-full object-cover"></video>
                 <img id="previewHasilKamera" class="w-full h-full object-cover hidden absolute inset-0 z-10" alt="Hasil Foto" />
+                <div class="absolute bottom-3 left-3 bg-[#FFDE59] border-[3px] border-black px-2 py-1 font-black text-[10px] uppercase">● REC</div>
             </div>
 
             <div id="kontrolKameraAktif" class="flex justify-center w-full">
-                <button onclick="ambilFoto()" class="py-4 px-6 btn-primary rounded-2xl text-sm font-bold shadow-lg w-full flex items-center justify-center gap-2">📸 Jepret Foto</button>
+                <button onclick="ambilFoto()" class="brutal-btn brutal-btn-yellow w-full py-4 text-sm">📸 JEPRET FOTO</button>
             </div>
 
             <div id="kontrolKameraHasil" class="hidden flex-col gap-3">
                 <div class="flex gap-2">
-                    <button onclick="ulangiFoto()" class="flex-1 py-3.5 glass-panel rounded-2xl text-sm font-bold hover:bg-white/10 transition-all">🔄 Ulangi</button>
-                    <button onclick="simpanKeGaleri()" class="flex-1 py-3.5 bg-emerald-600/80 hover:bg-emerald-600 text-white rounded-2xl text-sm font-bold transition-all shadow-lg">⬇️ Simpan Galeri</button>
+                    <button onclick="ulangiFoto()" class="flex-1 brutal-btn brutal-btn-white py-3.5 text-sm">🔄 ULANGI</button>
+                    <button onclick="simpanKeGaleri()" class="flex-1 brutal-btn brutal-btn-lime py-3.5 text-sm">⬇️ SIMPAN GALERI</button>
                 </div>
-                <button onclick="gunakanFoto()" class="w-full py-4 btn-primary rounded-2xl text-sm font-bold shadow-lg flex items-center justify-center gap-2">✅ Gunakan Foto Ini</button>
+                <button onclick="gunakanFoto()" class="w-full brutal-btn brutal-btn-black py-4 text-sm">✅ GUNAKAN FOTO INI</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL SETTINGS - BRUTAL -->
     <div id="modalSettings" class="fixed inset-0 z-[96] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
-        <div class="modal-content w-full max-w-2xl rounded-3xl flex flex-col overflow-hidden max-h-[90vh]">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-cosmic-purple/10 to-transparent">
+        <div class="modal-content w-full max-w-2xl flex flex-col overflow-hidden max-h-[90vh] bg-white">
+            <div class="p-6 border-b-[5px] border-black flex justify-between items-center bg-[#FFDE59]">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-purple to-accent flex items-center justify-center text-lg">⚙️</div>
-                    <h3 class="font-display font-bold text-lg">Pengaturan & Profil</h3>
+                    <div class="w-12 h-12 bg-black text-white flex items-center justify-center text-xl font-black border-[3px] border-black shadow-[3px_3px_0px_0px_#000] rounded-[12px]">⚙️</div>
+                    <h3 class="font-black text-xl uppercase tracking-tight">PENGATURAN & PROFIL</h3>
                 </div>
-                <button onclick="tutupSettings()" class="hover:text-accent-light text-2xl font-light transition-colors">&times;</button>
+                <button onclick="tutupSettings()" class="w-11 h-11 bg-white border-[3px] border-black font-black text-2xl flex items-center justify-center hover:bg-black hover:text-white rounded-[12px] shadow-[4px_4px_0px_0px_#000] transition-colors">×</button>
             </div>
-            <div class="p-6 space-y-6 overflow-y-auto">
-                <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-purple">
-                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2"><span>☁️</span> Sinkronisasi Cloud (Supabase)</h4>
-                    <p id="labelStatusAuth" class="text-xs text-slate-400 mb-4">Status: Belum masuk akun cloud.</p>
+            <div class="p-6 space-y-6 overflow-y-auto bg-[#FFFCE1]">
+                
+                <!-- CLOUD SYNC -->
+                <div class="brutal-card p-5 border-l-[8px] border-l-black bg-[#E0F7FF]">
+                    <h4 class="font-black text-sm uppercase mb-3 flex items-center gap-2"><span class="bg-black text-white px-2 py-1 text-xs">☁️ CLOUD SYNC</span> SINKRONISASI CLOUD</h4>
+                    <p id="labelStatusAuth" class="text-xs font-bold mb-4 bg-white border-[3px] border-black p-2 rounded-[8px] inline-block">Status: Belum masuk akun cloud.</p>
                     <div id="wrapperTombolAuth" class="flex gap-3">
-                        <button onclick="bukaModalAuth()" class="flex-1 py-3 btn-primary rounded-xl text-xs font-bold shadow-lg"><span>Masuk / Daftar</span></button>
+                        <button onclick="bukaModalAuth()" class="flex-1 brutal-btn brutal-btn-yellow py-3 text-xs"><span>MASUK / DAFTAR</span></button>
                     </div>
-                    <div id="wrapperTombolSync" class="hidden flex gap-3">
-                        <button onclick="simpanKeCloud()" class="flex-1 py-3 bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-lg transition-all">⬆️ Simpan ke Cloud</button>
-                        <button onclick="tarikDariCloud()" class="flex-1 py-3 bg-cosmic-purple/80 hover:bg-cosmic-purple text-white font-bold rounded-xl text-xs shadow-lg transition-all">⬇️ Ambil dari Cloud</button>
-                        <button onclick="logoutAuth()" class="py-3 px-4 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">Keluar</button>
+                    <div id="wrapperTombolSync" class="hidden flex gap-3 flex-wrap">
+                        <button onclick="simpanKeCloud()" class="flex-1 brutal-btn brutal-btn-lime py-3 text-xs">⬆️ SIMPAN KE CLOUD</button>
+                        <button onclick="tarikDariCloud()" class="flex-1 brutal-btn brutal-btn-cyan py-3 text-xs">⬇️ AMBIL DARI CLOUD</button>
+                        <button onclick="logoutAuth()" class="py-3 px-4 brutal-btn bg-[#FF6B6B] border-[3px] border-black text-black font-black rounded-[12px] text-xs shadow-[4px_4px_0px_0px_#000]">KELUAR</button>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <h4 class="font-display font-bold text-sm text-accent-light">Edit Profil Pengguna</h4>
+
+                <!-- PROFIL -->
+                <div class="brutal-card p-6">
+                    <h4 class="font-black text-sm uppercase mb-4 bg-black text-white inline-block px-3 py-1 -rotate-1">✏️ EDIT PROFIL PENGGUNA</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Nama Lengkap</label>
-                            <input type="text" id="setNama" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Contoh: LUKYY">
+                            <label class="brutal-label">👤 NAMA LENGKAP</label>
+                            <input type="text" id="setNama" class="brutal-input" placeholder="CONTOH: LUKYY">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Kelas</label>
-                            <input type="text" id="setKelas" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Contoh: XII">
+                            <label class="brutal-label">🏫 KELAS</label>
+                            <input type="text" id="setKelas" class="brutal-input" placeholder="CONTOH: XII">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">NIS / NISN</label>
-                            <input type="text" id="setNis" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Contoh: 1234567890">
+                            <label class="brutal-label">🆔 NIS / NISN</label>
+                            <input type="text" id="setNis" class="brutal-input" placeholder="CONTOH: 1234567890">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Alamat Tempat PKL</label>
-                            <input type="text" id="setAlamat" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Contoh: PT. Teknologi Indonesia">
+                            <label class="brutal-label">📍 ALAMAT TEMPAT PKL</label>
+                            <input type="text" id="setAlamat" class="brutal-input" placeholder="CONTOH: PT. TEKNOLOGI INDONESIA">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Program Keahlian</label>
-                            <input type="text" id="setProgKeahlian" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Teknik Komputer">
+                            <label class="brutal-label">🎓 PROGRAM KEAHLIAN</label>
+                            <input type="text" id="setProgKeahlian" class="brutal-input" placeholder="TEKNIK KOMPUTER">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Konsentrasi Keahlian</label>
-                            <input type="text" id="setKonsKeahlian" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Teknik Jaringan">
+                            <label class="brutal-label">💻 KONSENTRASI KEAHLIAN</label>
+                            <input type="text" id="setKonsKeahlian" class="brutal-input" placeholder="TEKNIK JARINGAN">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tahun Pelajaran</label>
-                            <input type="text" id="setTahun" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Contoh: 2026...">
+                            <label class="brutal-label">📅 TAHUN PELAJARAN</label>
+                            <input type="text" id="setTahun" class="brutal-input" placeholder="CONTOH: 2026...">
                         </div>
                     </div>
                 </div>
-                <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-violet">
-                    <h4 class="font-display font-bold text-sm text-accent-light mb-3 flex items-center gap-2">🏫 Logo Sekolah</h4>
-                    <p class="text-xs text-slate-400 mb-3">Upload foto logo sekolah dari galeri HP atau tempel URL Direct Link PNG.</p>
+
+                <!-- LOGO SEKOLAH -->
+                <div class="brutal-card p-5 bg-[#FFE0F6] border-l-[8px] border-l-black">
+                    <h4 class="font-black text-sm uppercase mb-3 flex items-center gap-2"><span class="bg-[#FF90E8] border-[2px] border-black px-2 py-1 text-xs">🏫 LOGO</span> LOGO SEKOLAH</h4>
+                    <p class="text-xs font-bold mb-3 bg-white border-[2px] border-black p-2 rounded-[8px]">Upload foto logo sekolah dari galeri HP atau tempel URL Direct Link PNG.</p>
                     <div class="space-y-3 mb-4">
                         <div>
-                            <label class="block text-xs font-semibold mb-1 text-slate-400">Direct Link URL (Opsional)</label>
-                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="glass-input w-full rounded-xl p-3 text-xs" placeholder="https://i.postimg.cc/xxxx/logo.png">
+                            <label class="brutal-label">🔗 DIRECT LINK URL (OPSIONAL)</label>
+                            <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="brutal-input text-xs" placeholder="HTTPS://I.POSTIMG.CC/XXXX/LOGO.PNG">
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <div id="previewLogoContainer" class="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden p-1">
+                        <div id="previewLogoContainer" class="w-20 h-20 rounded-[14px] bg-white border-[3px] border-black flex items-center justify-center overflow-hidden p-1 shadow-[4px_4px_0px_0px_#000]">
                             <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
-                            <span id="placeholderLogo" class="text-2xl">🏫</span>
+                            <span id="placeholderLogo" class="text-3xl">🏫</span>
                         </div>
                         <div class="flex-1">
-                            <input type="file" id="inputLogoSekolah" accept="image/*" class="glass-input w-full rounded-2xl p-3 text-xs" onchange="previewLogoUpload(this)">
-                            <p class="text-xs text-slate-500 mt-1">*Pilih file foto dari galeri HP.</p>
+                            <input type="file" id="inputLogoSekolah" accept="image/*" class="brutal-input text-xs" onchange="previewLogoUpload(this)">
+                            <p class="text-[10px] font-bold mt-1 uppercase">*Pilih file foto dari galeri HP.</p>
                         </div>
-                        <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden py-2 px-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold rounded-xl text-xs transition-all">🗑️ Hapus</button>
+                        <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden brutal-btn bg-[#FF6B6B] py-2 px-3 text-xs">🗑️ HAPUS</button>
                     </div>
                 </div>
-                <div class="h-px bg-white/5"></div>
 
-                <!-- ================= PERIODE & TARGET PKL (Paket C) ================= -->
-                <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-emerald-500/60">
-                    <h4 class="font-display font-bold text-sm text-accent-light mb-1 flex items-center gap-2"><span>📆</span> Periode &amp; Target PKL</h4>
-                    <p class="text-xs text-slate-400 mb-4">Dipakai untuk menampilkan <b class="text-slate-200">laporan PKL dari bulan apa sampai bulan apa</b>, menghitung target hari kerja, dan mengisi libur otomatis.</p>
+                <!-- PERIODE PKL -->
+                <div class="brutal-card p-5 bg-[#D6FFD6] border-l-[8px] border-l-black">
+                    <h4 class="font-black text-sm uppercase mb-1 flex items-center gap-2"><span class="bg-[#B8FF9F] border-[2px] border-black px-2 py-1 text-xs">📆 PERIODE</span> PERIODE & TARGET PKL</h4>
+                    <p class="text-xs font-bold mb-4 bg-white border-[2px] border-black p-2 rounded-[8px]">Dipakai untuk menampilkan <b>laporan PKL dari bulan apa sampai bulan apa</b>, menghitung target hari kerja.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Mulai PKL</label>
-                            <input type="date" id="setPklMulai" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <label class="brutal-label">🚀 TANGGAL MULAI PKL</label>
+                            <input type="date" id="setPklMulai" class="brutal-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Selesai PKL</label>
-                            <input type="date" id="setPklSelesai" class="glass-input w-full rounded-2xl p-4 text-sm">
+                            <label class="brutal-label">🏁 TANGGAL SELESAI PKL</label>
+                            <input type="date" id="setPklSelesai" class="brutal-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Target Hari Kerja</label>
-                            <input type="number" id="setTargetHari" min="1" class="glass-input w-full rounded-2xl p-4 text-sm" placeholder="Kosongkan = hitung otomatis">
-                            <p class="text-[10px] text-slate-500 mt-1">Misalnya target dari sekolah 90 hari kerja.</p>
+                            <label class="brutal-label">🎯 TARGET HARI KERJA</label>
+                            <input type="number" id="setTargetHari" min="1" class="brutal-input" placeholder="KOSONGKAN = OTOMATIS">
+                            <p class="text-[10px] font-bold mt-1 uppercase">Misalnya target 90 hari kerja.</p>
                         </div>
                         <div class="flex flex-col justify-center gap-2">
-                            <label class="flex items-center gap-3 cursor-pointer select-none text-xs font-semibold text-slate-300">
-                                <input type="checkbox" id="setAutoLibur" class="w-4 h-4 accent-accent">
-                                Isi otomatis libur Minggu sepanjang rentang
+                            <label class="flex items-center gap-3 cursor-pointer select-none text-xs font-black uppercase bg-white border-[3px] border-black p-3 rounded-[10px] shadow-[3px_3px_0px_0px_#000]">
+                                <input type="checkbox" id="setAutoLibur" class="w-5 h-5 accent-black border-[3px] border-black">
+                                AUTO LIBUR MINGGU
                             </label>
-                            <button type="button" onclick="isiLiburOtomatisRentang()" class="py-2.5 px-4 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 font-bold rounded-xl text-[11px] border border-emerald-500/20 transition-all">⚡ Isi Sekarang (s/d hari ini)</button>
+                            <button type="button" onclick="isiLiburOtomatisRentang()" class="brutal-btn brutal-btn-lime py-2.5 px-4 text-[11px]">⚡ ISI SEKARANG</button>
                         </div>
                     </div>
 
-                    <div class="h-px bg-white/5 my-5"></div>
+                    <div class="h-[4px] bg-black my-5"></div>
 
-                    <h4 class="font-display font-bold text-xs text-accent-light mb-2 flex items-center gap-2"><span>🔴</span> Tanggal Merah (Libur Nasional &amp; Cuti Bersama)</h4>
-                    <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
-                        Sudah <b class="text-slate-200">otomatis</b> — seperti kalender HP. Tanggal merah tampil di kalender
-                        dengan <b class="text-slate-200">keterangan nama liburnya</b> (contoh: &ldquo;Proklamasi RI&rdquo;, &ldquo;Maulid Nabi&rdquo;),
-                        warnanya abu-abu (libur), dan tidak dihitung sebagai hari kerja yang belum diisi.
-                        Tidak perlu menandai manual.
+                    <h4 class="font-black text-xs uppercase mb-2 flex items-center gap-2"><span class="bg-black text-white px-2 py-1">🔴 LIBUR</span> TANGGAL MERAH</h4>
+                    <p class="text-[11px] font-bold leading-relaxed mb-3 bg-white border-[2px] border-black p-3 rounded-[10px]">
+                        Sudah <b>otomatis</b> — seperti kalender HP. Tanggal merah tampil di kalender dengan keterangan nama liburnya.
                     </p>
-                    <p id="infoJumlahLibur" class="text-[10px] text-slate-500 mb-3"></p>
-                    <p class="text-[11px] font-semibold text-slate-300 mb-2">Libur pada periode PKL Anda:</p>
-                    <div id="daftarLiburPeriode" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                    <p id="infoJumlahLibur" class="text-[10px] font-bold mb-3 bg-[#FFDE59] border-[2px] border-black p-2 rounded-[8px] inline-block"></p>
+                    <p class="text-[11px] font-black uppercase mb-2">Libur pada periode PKL Anda:</p>
+                    <div id="daftarLiburPeriode" class="space-y-2 max-h-60 overflow-y-auto pr-1 border-[3px] border-black p-3 rounded-[12px] bg-white shadow-[4px_4px_0px_0px_#000]"></div>
                 </div>
 
-                <div class="h-px bg-white/5"></div>
-                <div class="space-y-3">
-                    <h4 class="font-display font-bold text-sm text-accent-light">Backup & Restore (JSON)</h4>
+                <div class="h-[4px] bg-black"></div>
+
+                <!-- BACKUP -->
+                <div class="brutal-card p-5">
+                    <h4 class="font-black text-sm uppercase mb-3 bg-[#7DF9FF] border-[2px] border-black inline-block px-3 py-1">💾 BACKUP & RESTORE (JSON)</h4>
                     <div class="flex gap-3">
-                        <button onclick="eksporDataJSON()" class="flex-1 py-3 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all border border-emerald-500/20">📤 Ekspor Data</button>
-                        <label class="flex-1 py-3 bg-cosmic-purple/20 hover:bg-cosmic-purple/40 text-cosmic-violet font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all border border-cosmic-purple/20 cursor-pointer">📥 Impor Data<input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden"></label>
+                        <button onclick="eksporDataJSON()" class="flex-1 brutal-btn brutal-btn-lime py-3 text-xs">📤 EKSPOR DATA</button>
+                        <label class="flex-1 brutal-btn brutal-btn-cyan py-3 text-xs cursor-pointer">📥 IMPOR DATA<input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden"></label>
                     </div>
                 </div>
-                <div class="h-px bg-white/5"></div>
-                <div class="danger-zone p-5 rounded-2xl space-y-3">
-                    <h4 class="font-display font-bold text-sm text-red-400">Zona Bahaya: Hapus Semua Data</h4>
-                    <p class="text-xs text-slate-400">Ketik kata <strong class="text-red-400">HAPUS</strong> untuk mengaktifkan tombol:</p>
-                    <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="glass-input w-full rounded-xl p-3 text-xs border-red-500/20 focus:border-red-500/50" placeholder="Ketik HAPUS di sini...">
-                    <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="w-full py-3 bg-white/5 text-slate-500 font-bold rounded-xl text-xs cursor-not-allowed transition-all border border-white/5">🗑️ Hapus Seluruh Laporan</button>
+
+                <!-- ZONA BAHAYA -->
+                <div class="brutal-card p-5 bg-[#FF6B6B]">
+                    <h4 class="font-black text-sm uppercase text-black mb-2 bg-white border-[3px] border-black inline-block px-3 py-1">⚠️ ZONA BAHAYA: HAPUS SEMUA DATA</h4>
+                    <p class="text-xs font-black uppercase mb-3 bg-black text-white inline-block px-2 py-1">Ketik kata <strong class="text-[#FFDE59]">HAPUS</strong> untuk mengaktifkan tombol:</p>
+                    <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="brutal-input w-full text-xs font-black uppercase" placeholder="KETIK HAPUS DI SINI...">
+                    <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="w-full mt-3 py-3 bg-white text-black font-black rounded-[12px] text-xs uppercase border-[3px] border-black shadow-[4px_4px_0px_0px_#000] disabled:opacity-50 disabled:cursor-not-allowed">🗑️ HAPUS SELURUH LAPORAN</button>
                 </div>
             </div>
-            <div class="p-6 flex justify-end gap-3 border-t border-white/5 bg-black/20">
-                <button onclick="tutupSettings()" class="px-6 py-3 glass-panel rounded-xl text-sm font-bold hover:bg-white/5 transition-all">Batal</button>
-                <button onclick="simpanSettings()" class="px-8 py-3 btn-primary rounded-xl text-sm font-bold shadow-lg"><span>💾 Simpan Profil</span></button>
+            <div class="p-6 flex justify-end gap-3 border-t-[4px] border-black bg-[#FFDE59]">
+                <button onclick="tutupSettings()" class="brutal-btn brutal-btn-white px-6 py-3 text-sm">BATAL</button>
+                <button onclick="simpanSettings()" class="brutal-btn brutal-btn-black px-8 py-3 text-sm">💾 SIMPAN PROFIL</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 md:px-8 relative pt-6 md:pt-0">
-        <div class="hero-section no-print">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
-                <div class="animate-fade-in animate-delay-1">
-                    <div class="badge-cosmic mb-4 inline-block">✨ Aplikasi Laporan PKL</div>
-                    <h1 class="text-4xl md:text-6xl font-display font-bold tracking-tight mb-3 leading-tight">
-                        <span class="gradient-text-hero">Laporan PKL</span><br>
-                        <span class="text-white">by <span class="gradient-text">LUKYY</span></span>
+    <!-- HEADER BRUTAL -->
+    <header class="w-full bg-white border-b-[5px] border-black sticky top-0 z-40 shadow-[0px_6px_0px_0px_#000]">
+        <div class="max-w-6xl mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-black text-[#FFDE59] flex items-center justify-center font-black text-2xl border-[4px] border-black shadow-[5px_5px_0px_0px_#000] rounded-[14px] rotate-[-2deg]">L</div>
+                <div>
+                    <h1 class="font-black text-2xl md:text-3xl leading-none tracking-tighter uppercase">
+                        LAPORAN PKL <span class="bg-[#FFDE59] border-[4px] border-black px-2 shadow-[4px_4px_0px_0px_#000] inline-block rotate-[1deg]">BY LUKYY</span>
                     </h1>
-                    <p class="text-slate-400 text-sm md:text-base max-w-md leading-relaxed">Catat, kelola, dan ekspor laporan kegiatan PKL harian Anda dengan antarmuka futuristik yang elegan.</p>
+                    <p class="text-[11px] font-black uppercase tracking-widest mt-2 flex gap-2">
+                        <span class="bg-black text-white px-2 py-0.5">NEOBRUTALISM EDITION</span>
+                        <span class="bg-[#7DF9FF] border-[2px] border-black px-2 py-0.5">CATAT • KELOLA • EXPORT</span>
+                    </p>
                 </div>
-                <div class="flex flex-wrap gap-3 animate-fade-in animate-delay-2">
-                    <button onclick="bukaTourManual()" class="glass-panel glass-panel-hover px-5 py-3 rounded-2xl flex items-center gap-2 text-sm font-semibold transition-all"><span>💡</span> Panduan</button>
-                    <button id="btnInstallPWA" onclick="installPWA()" class="hidden btn-primary px-5 py-3 rounded-2xl flex items-center gap-2 text-sm font-bold shadow-lg"><span>📲</span> Install Aplikasi</button>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="bukaTourManual()" class="brutal-btn brutal-btn-white px-5 py-3 text-xs"><span>💡</span> PANDUAN</button>
+                <button id="btnInstallPWA" onclick="installPWA()" class="hidden brutal-btn brutal-btn-yellow px-5 py-3 text-xs"><span>📲</span> INSTALL APP</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 md:px-8 relative pt-8">
+        <!-- HERO BRUTAL -->
+        <div class="hero-section no-print mb-8">
+            <div class="brutal-card p-6 md:p-8 bg-[#FFDE59] relative overflow-hidden">
+                <div class="absolute top-3 right-6 bg-black text-white font-black text-[10px] uppercase px-3 py-1 rotate-3 border-[2px] border-black">✨ APLIKASI LAPORAN PKL</div>
+                <div class="absolute -bottom-2 -right-2 w-24 h-24 bg-[#FF90E8] border-[4px] border-black rounded-full opacity-60"></div>
+                <div class="absolute top-8 right-20 w-12 h-12 bg-[#7DF9FF] border-[3px] border-black rotate-12"></div>
+                <div class="relative z-10">
+                    <h2 class="font-black text-3xl md:text-5xl uppercase leading-[0.9] tracking-tighter">
+                        CATAT, KELOLA,<br>
+                        <span class="bg-black text-white px-2">DAN EKSPOR</span><br>
+                        LAPORAN PKL<br>
+                        HARIANMU!
+                    </h2>
+                    <p class="mt-4 font-bold text-sm max-w-md border-l-[6px] border-black pl-4 bg-white inline-block p-2">Antarmuka neobrutalism yang chunky, tegas, dan tidak membosankan. Fungsi tetap sama, gaya 100% brutal!</p>
                 </div>
             </div>
         </div>
 
-        <div class="relative min-h-[500px]">
+        <!-- TABS NAV BRUTAL -->
+        <div class="no-print flex gap-3 mb-8 overflow-x-auto pb-2">
+            <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active brutal-btn brutal-btn-yellow min-w-[110px] py-4 px-6 text-xs">
+                <span class="text-lg">📝</span> INPUT
+            </button>
+            <button onclick="switchTab('edit')" id="btnTabEdit" class="nav-item brutal-btn brutal-btn-white min-w-[110px] py-4 px-6 text-xs">
+                <span class="text-lg">✏️</span> EDIT
+            </button>
+            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item brutal-btn brutal-btn-white min-w-[110px] py-4 px-6 text-xs">
+                <span class="text-lg">📋</span> LAPORAN
+            </button>
+            <button onclick="bukaSettings()" class="nav-item brutal-btn brutal-btn-white min-w-[110px] py-4 px-6 text-xs">
+                <span class="text-lg">⚙️</span> SETTING
+            </button>
+        </div>
+
+        <div class="relative min-h-[600px]">
+            <!-- TAB INPUT -->
             <div id="tabInput" class="tab-content active pb-10">
-                <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in animate-delay-3">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cosmic-purple to-accent flex items-center justify-center text-xl shadow-lg shadow-accent/20">➕</div>
+                <div class="brutal-card p-6 md:p-8 relative z-20 no-print">
+                    <div class="absolute -top-3 -left-3 bg-[#FF90E8] border-[3px] border-black px-4 py-1 font-black text-xs uppercase rotate-[-2deg] shadow-[3px_3px_0px_0px_#000]">BARU • NEW • BARU</div>
+                    <div class="flex items-center gap-4 mb-8 mt-2">
+                        <div class="w-14 h-14 bg-[#FFDE59] border-[4px] border-black flex items-center justify-center text-2xl font-black shadow-[5px_5px_0px_0px_#000] rounded-[14px] rotate-[-3deg]">➕</div>
                         <div>
-                            <h2 class="text-xl font-display font-bold">Input Laporan Baru</h2>
-                            <p class="text-xs text-slate-400">Catat kegiatan harian PKL Anda</p>
+                            <h2 class="text-2xl font-black uppercase tracking-tight">INPUT LAPORAN BARU</h2>
+                            <p class="text-xs font-bold uppercase bg-black text-white inline-block px-2 py-1 mt-1">Catat kegiatan harian PKL Anda</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
-                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="glass-input w-full rounded-2xl p-4 text-sm">
-                            <p id="infoTanggalInput" class="text-[11px] mt-1.5 hidden font-semibold"></p>
-                            <!-- KALENDER MINI: hijau = sudah diisi, merah = belum diisi, abu = libur -->
-                            <div id="kalenderHariKerja" class="kalender-box mt-3"></div>
+                            <label class="brutal-label">📅 TANGGAL PELAKSANAAN</label>
+                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="brutal-input">
+                            <p id="infoTanggalInput" class="text-[11px] mt-3 hidden font-black uppercase border-[3px] border-black p-2 rounded-[8px] bg-white"></p>
+                            <div id="kalenderHariKerja" class="kalender-box mt-4"></div>
                         </div>
                         <div class="lg:col-span-3">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Uraian Kegiatan</label>
-                            <textarea id="inputUraian" class="glass-input w-full rounded-2xl p-4 text-sm" rows="3" placeholder="Contoh: Mendesain denah tata letak..."></textarea>
+                            <label class="brutal-label">📝 URAIAN KEGIATAN</label>
+                            <textarea id="inputUraian" class="brutal-input min-h-[140px]" rows="4" placeholder="CONTOH: MENDESAIN DENAH TATA LETAK..."></textarea>
+                            <div class="mt-4 bg-[#B8FF9F] border-[3px] border-black p-3 rounded-[10px] font-bold text-xs uppercase">💡 TIPS: TULIS KEGIATAN SEDETAIL MUNGKIN UNTUK LAPORAN YANG KEREN!</div>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Upload / Ambil Foto Bukti</label>
+                            <label class="brutal-label">📸 UPLOAD / AMBIL FOTO BUKTI</label>
                             <div class="flex flex-col md:flex-row gap-3">
-                                <input type="file" id="inputFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
-                                <button type="button" onclick="bukaKamera('input')" class="glass-panel hover:bg-white/10 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg">📷 Buka Kamera</button>
+                                <input type="file" id="inputFoto" accept="image/*" class="brutal-input md:w-1/2">
+                                <button type="button" onclick="bukaKamera('input')" class="brutal-btn brutal-btn-cyan px-6 py-3 text-sm">📷 BUKA KAMERA</button>
                             </div>
                         </div>
                     </div>
                     <div class="mt-8 flex justify-end">
-                        <button onclick="tambahBaris()" class="btn-primary btn-glow py-4 px-10 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl"><span>💾 Simpan Laporan Baru</span></button>
+                        <button onclick="tambahBaris()" class="brutal-btn brutal-btn-yellow py-5 px-10 text-sm shadow-[8px_8px_0px_0px_#000] text-base"><span>💾 SIMPAN LAPORAN BARU</span></button>
                     </div>
                 </div>
             </div>
 
+            <!-- TAB EDIT -->
             <div id="tabEdit" class="tab-content pb-10">
-                <div class="glass-panel rounded-3xl p-6 md:p-8 relative z-20 no-print animate-fade-in">
+                <div class="brutal-card p-6 md:p-8 relative z-20 no-print">
+                    <div class="absolute -top-3 -right-3 bg-[#7DF9FF] border-[3px] border-black px-4 py-1 font-black text-xs uppercase rotate-[2deg] shadow-[3px_3px_0px_0px_#000]">EDIT MODE</div>
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cosmic-pink to-accent flex items-center justify-center text-xl shadow-lg shadow-accent/20">✏️</div>
+                        <div class="w-14 h-14 bg-[#FF90E8] border-[4px] border-black flex items-center justify-center text-2xl font-black shadow-[5px_5px_0px_0px_#000] rounded-[14px] rotate-[2deg]">✏️</div>
                         <div>
-                            <h2 class="text-xl font-display font-bold">Pengeditan Laporan</h2>
-                            <p class="text-xs text-slate-400">Pilih dan edit catatan yang sudah ada</p>
+                            <h2 class="text-2xl font-black uppercase tracking-tight">PENGEDITAN LAPORAN</h2>
+                            <p class="text-xs font-bold uppercase bg-black text-white inline-block px-2 py-1 mt-1">Pilih dan edit catatan yang sudah ada</p>
                         </div>
                     </div>
-                    <div class="mb-6 glass-panel p-5 rounded-2xl border-l-2 border-l-cosmic-pink">
-                        <label class="block text-xs font-semibold mb-3 text-accent-light">Pilih Laporan yang Ingin Diedit:</label>
-                        <select id="pilihEditDropdown" onchange="pilihTanggalEditDropdown()" class="glass-input w-full rounded-2xl p-4 text-sm font-semibold">
-                            <option value="">-- Pilih Catatan Laporan --</option>
+                    <div class="mb-6 brutal-card p-5 bg-[#FFE0F6] border-l-[8px] border-l-black">
+                        <label class="brutal-label">📋 PILIH LAPORAN YANG INGIN DIEDIT:</label>
+                        <select id="pilihEditDropdown" onchange="pilihTanggalEditDropdown()" class="brutal-input font-black uppercase">
+                            <option value="">-- PILIH CATATAN LAPORAN --</option>
                         </select>
                     </div>
                     <div id="formEditContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
                         <input type="hidden" id="editIndexHidden">
                         <div class="lg:col-span-1">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Tanggal Pelaksanaan</label>
-                            <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="glass-input w-full rounded-2xl p-4 text-sm">
-                            <p id="infoTanggalEdit" class="text-[11px] mt-1.5 hidden font-semibold"></p>
+                            <label class="brutal-label">📅 TANGGAL PELAKSANAAN</label>
+                            <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="brutal-input">
+                            <p id="infoTanggalEdit" class="text-[11px] mt-3 hidden font-black uppercase border-[3px] border-black p-2 rounded-[8px] bg-white"></p>
                         </div>
                         <div class="lg:col-span-3">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Uraian Kegiatan</label>
-                            <textarea id="editUraian" class="glass-input w-full rounded-2xl p-4 text-sm" rows="3"></textarea>
+                            <label class="brutal-label">📝 URAIAN KEGIATAN</label>
+                            <textarea id="editUraian" class="brutal-input min-h-[120px]" rows="3"></textarea>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="block text-xs font-semibold mb-2 text-slate-400">Ganti / Ambil Foto Bukti (Opsional)</label>
+                            <label class="brutal-label">📸 GANTI / AMBIL FOTO BUKTI (OPSIONAL)</label>
                             <div class="flex flex-col md:flex-row gap-3">
-                                <input type="file" id="editFoto" accept="image/*" class="glass-input w-full md:w-1/2 rounded-2xl p-3 text-sm">
-                                <button type="button" onclick="bukaKamera('edit')" class="glass-panel hover:bg-white/10 px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg">📷 Buka Kamera</button>
+                                <input type="file" id="editFoto" accept="image/*" class="brutal-input md:w-1/2">
+                                <button type="button" onclick="bukaKamera('edit')" class="brutal-btn brutal-btn-pink px-6 py-3 text-sm">📷 BUKA KAMERA</button>
                             </div>
-                            <p class="text-xs text-slate-500 mt-2">*Kosongkan jika foto tidak ingin diubah.</p>
+                            <p class="text-xs font-bold uppercase mt-2 bg-[#FFDE59] border-[2px] border-black inline-block px-2 py-1">*KOSONGKAN JIKA FOTO TIDAK INGIN DIUBAH.</p>
                         </div>
                         <div class="lg:col-span-4 flex flex-wrap gap-3 justify-end pt-4">
-                            <button onclick="hapusLaporanSelected()" class="py-3.5 px-6 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold rounded-2xl text-sm transition-all">🗑️ Hapus Laporan</button>
-                            <button onclick="simpanLaporanEdited()" class="py-3.5 px-8 btn-primary rounded-2xl text-sm font-bold shadow-lg"><span>💾 Perbarui Data</span></button>
+                            <button onclick="hapusLaporanSelected()" class="brutal-btn bg-[#FF6B6B] py-3.5 px-6 text-sm">🗑️ HAPUS LAPORAN</button>
+                            <button onclick="simpanLaporanEdited()" class="brutal-btn brutal-btn-yellow py-3.5 px-8 text-sm"><span>💾 PERBARUI DATA</span></button>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- TAB LAPORAN -->
             <div id="tabLaporan" class="tab-content w-full">
-                <div id="panelTargetPKL" class="glass-panel rounded-3xl p-5 md:p-6 mb-6 no-print animate-fade-in"></div>
+                <div id="panelTargetPKL" class="brutal-card p-5 md:p-6 mb-6 no-print bg-[#FFDE59]"></div>
 
-                <div class="glass-panel rounded-3xl p-5 mb-6 no-print animate-fade-in">
-                    <h3 class="text-sm font-display font-bold text-accent-light mb-3 flex items-center gap-2">
-                        <span>🎖️</span> Achievement & Pencapaian PKL
+                <div class="brutal-card p-5 mb-6 no-print bg-white">
+                    <h3 class="text-sm font-black uppercase mb-3 flex items-center gap-2">
+                        <span class="bg-black text-white px-2 py-1 text-xs">🎖️ ACHIEVEMENT</span> PENCAPAIAN PKL
                     </h3>
                     <div id="wadahBadgeAchievement" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
-                    <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-1">
-                        <div class="stat-icon p-3 rounded-xl text-xl">📅</div>
-                        <div><p class="text-xs font-semibold text-slate-400">Total Hari</p><h3 id="statTotalHari" class="text-2xl font-display font-bold text-white">0</h3></div>
+                    <div class="stat-card p-5 flex items-center gap-4">
+                        <div class="stat-icon p-3 text-xl font-black">📅</div>
+                        <div><p class="text-[10px] font-black uppercase">TOTAL HARI</p><h3 id="statTotalHari" class="text-3xl font-black">0</h3></div>
                     </div>
-                    <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-2">
-                        <div class="stat-icon p-3 rounded-xl text-xl">📝</div>
-                        <div><p class="text-xs font-semibold text-slate-400">Total Uraian</p><h3 id="statTotalUraian" class="text-2xl font-display font-bold text-white">0</h3></div>
+                    <div class="stat-card p-5 flex items-center gap-4">
+                        <div class="stat-icon p-3 text-xl font-black">📝</div>
+                        <div><p class="text-[10px] font-black uppercase">TOTAL URAIAN</p><h3 id="statTotalUraian" class="text-3xl font-black">0</h3></div>
                     </div>
-                    <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-3">
-                        <div class="stat-icon p-3 rounded-xl text-xl">🖼️</div>
-                        <div><p class="text-xs font-semibold text-slate-400">Total Foto</p><h3 id="statTotalFoto" class="text-2xl font-display font-bold text-white">0</h3></div>
+                    <div class="stat-card p-5 flex items-center gap-4">
+                        <div class="stat-icon p-3 text-xl font-black">🖼️</div>
+                        <div><p class="text-[10px] font-black uppercase">TOTAL FOTO</p><h3 id="statTotalFoto" class="text-3xl font-black">0</h3></div>
                     </div>
-                    <div class="stat-card glass-panel p-5 rounded-2xl flex items-center gap-4 animate-fade-in animate-delay-4">
-                        <div class="stat-icon p-3 rounded-xl text-xl">📊</div>
-                        <div><p class="text-xs font-semibold text-slate-400">Rata-rata/Bulan</p><h3 id="statRataBulan" class="text-2xl font-display font-bold text-white">0</h3></div>
+                    <div class="stat-card p-5 flex items-center gap-4">
+                        <div class="stat-icon p-3 text-xl font-black">📊</div>
+                        <div><p class="text-[10px] font-black uppercase">RATA-RATA/BULAN</p><h3 id="statRataBulan" class="text-3xl font-black">0</h3></div>
                     </div>
                 </div>
 
-                <div class="glass-panel rounded-3xl p-5 md:p-6 mb-8 space-y-5 no-print relative z-10 animate-fade-in">
+                <div class="brutal-card p-5 md:p-6 mb-8 space-y-5 no-print relative z-10 bg-white">
                     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="bukaOspiExport()" id="btnDownload" class="btn-primary btn-glow py-3.5 px-6 rounded-2xl font-bold flex justify-center items-center gap-2 shadow-xl whitespace-nowrap"><span>📥 Export PDF</span></button>
+                            <button onclick="bukaOspiExport()" id="btnDownload" class="brutal-btn brutal-btn-black py-4 px-6 font-black text-sm shadow-[6px_6px_0px_0px_#000]"><span>📥 EXPORT PDF</span></button>
                         </div>
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <select id="filterBulan" onchange="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold"><option value="SEMUA">Filter: Semua Bulan</option></select>
-                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="glass-input rounded-xl p-3.5 text-sm font-semibold" placeholder="Cari laporan...">
-                            <div class="flex items-center gap-2 rounded-xl p-2 glass-input">
-                                <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-semibold w-full text-slate-300">
-                                <span class="text-xs font-bold text-slate-500">→</span>
-                                <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-xs p-1 font-semibold w-full text-slate-300">
-                                <button onclick="resetFilterTanggal()" class="text-xs px-3 py-1.5 bg-white/5 hover:bg-red-500/20 hover:text-red-400 rounded-lg font-bold transition-all">Reset</button>
+                            <select id="filterBulan" onchange="renderSemuaData()" class="brutal-input text-xs font-black uppercase"><option value="SEMUA">FILTER: SEMUA BULAN</option></select>
+                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="brutal-input text-xs font-black uppercase" placeholder="🔍 CARI LAPORAN...">
+                            <div class="flex items-center gap-2 rounded-[12px] p-2 bg-white border-[3px] border-black shadow-[4px_4px_0px_0px_#000]">
+                                <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-black w-full">
+                                <span class="text-xs font-black">→</span>
+                                <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-black w-full">
+                                <button onclick="resetFilterTanggal()" class="text-[10px] px-3 py-1.5 bg-[#FF6B6B] border-[2px] border-black rounded-[8px] font-black uppercase shadow-[2px_2px_0px_0px_#000]">RESET</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- WRAPPER SCROLL HP UNTUK KERTAS LAPORAN -->
+                <!-- KERTAS LAPORAN -->
                 <div class="cetak-wrapper relative">
-                    <div class="area-kertas rounded-xl relative block" id="areaCetak">
+                    <div class="area-kertas relative block" id="areaCetak">
                         <div class="watermark">LAPORAN PKL BY LUKYY</div>
                         <div class="konten-tabel p-6 md:p-10 bg-white">
                             <div class="header-print" id="koverPrintSection">
                                 <div>
-                                    <h2 style="font-size: 20px; letter-spacing: 1px;">LAPORAN</h2>
-                                    <h2 style="font-size: 20px; letter-spacing: 1px;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
+                                    <h2 style="font-size: 20px; letter-spacing: 1px; font-weight: 900;">LAPORAN</h2>
+                                    <h2 style="font-size: 20px; letter-spacing: 1px; font-weight: 900;">PRAKTEK KERJA LAPANGAN (PKL)</h2>
                                     <p style="margin: 15px 0 5px 0; font-size: 16px; font-weight: bold;">DI</p>
                                     <h3 style="font-size: 16px; font-weight: normal;" id="coverAlamat">Alamat Tempat PKL</h3>
                                     <div class="logo-kover-container">
                                         <img id="coverLogoSekolah" src="" alt="Logo Sekolah">
                                     </div>
-                                    <p style="font-size: 16px; margin-bottom: 12px;">Disusun Oleh:</p>
+                                    <p style="font-size: 16px; margin-bottom: 12px; font-weight: 900;">Disusun Oleh:</p>
                                     <table style="border: none !important; margin: 0 auto; width: 320px; font-size: 15px;">
-                                        <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
-                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important;">Kelas</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverKelas">XII</span></td></tr>
-                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; width: 90px; padding: 2px !important; font-weight: 800;">Nama</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNama">LUKYY</span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important; font-weight: 800;">Kelas</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverKelas">XII</span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; padding: 2px !important; font-weight: 800;">NIS/NISN</td><td style="border: none !important; text-align: left; padding: 2px !important;">: <span id="coverNis">/</span></td></tr>
                                     </table>
                                 </div>
                                 <div>
-                                    <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
+                                    <h3 style="font-size: 16px; font-weight: 900; margin-bottom: 10px; text-transform: uppercase;">SEKOLAH MENENGAH KEJURUAN NEGERI KUDU JOMBANG</h3>
                                     <table style="border: none !important; margin: 0 auto 20px auto; width: 440px; font-size: 14px;">
-                                        <tr><td style="border: none !important; text-align: left; font-weight: bold; width: 230px; padding: 2px !important;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverProgKeahlian"></span></td></tr>
-                                        <tr><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: bold; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; font-weight: 900; width: 230px; padding: 2px !important;">PROGRAM KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: 900; padding: 2px !important;">: <span id="coverProgKeahlian"></span></td></tr>
+                                        <tr><td style="border: none !important; text-align: left; font-weight: 900; padding: 2px !important;">KONSENTRASI KEAHLIAN</td><td style="border: none !important; text-align: left; font-weight: 900; padding: 2px !important;">: <span id="coverKonsKeahlian"></span></td></tr>
                                     </table>
-                                    <h4 style="font-size: 16px; font-weight: bold; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
+                                    <h4 style="font-size: 16px; font-weight: 900; margin-top: 15px;">TAHUN <span id="coverTahun">2026...</span></h4>
                                 </div>
                             </div>
                             <div id="wadahTabelBulan" class="w-full"></div>
@@ -495,22 +547,55 @@
         </div>
     </div>
 
-    <nav class="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div class="glass-panel p-2 rounded-3xl flex gap-1 shadow-2xl shadow-black/50">
-            <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
-                <span class="text-lg">📝</span><span class="text-[10px] font-bold">Input</span>
+    <!-- BOTTOM NAV BRUTAL (MOBILE) -->
+    <nav class="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[400px]">
+        <div class="bg-white border-[4px] border-black p-2 rounded-[20px] flex gap-1 shadow-[8px_8px_0px_0px_#000]">
+            <button onclick="switchTab('input')" id="btnTabInputMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-[12px] font-black uppercase text-[10px] border-[3px] border-transparent">
+                <span class="text-lg">📝</span><span>INPUT</span>
             </button>
-            <button onclick="switchTab('edit')" id="btnTabEdit" class="nav-item flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
-                <span class="text-lg">✏️</span><span class="text-[10px] font-bold">Edit</span>
+            <button onclick="switchTab('edit')" id="btnTabEditMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-[12px] font-black uppercase text-[10px] border-[3px] border-transparent">
+                <span class="text-lg">✏️</span><span>EDIT</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
-                <span class="text-lg">📋</span><span class="text-[10px] font-bold">Laporan</span>
+            <button onclick="switchTab('laporan')" id="btnTabLaporanMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-[12px] font-black uppercase text-[10px] border-[3px] border-transparent">
+                <span class="text-lg">📋</span><span>LAPORAN</span>
             </button>
-            <button onclick="bukaSettings()" class="nav-item flex flex-col items-center justify-center gap-1 py-3 px-5 rounded-2xl transition-all flex-1 min-w-[80px]">
-                <span class="text-lg">⚙️</span><span class="text-[10px] font-bold">Setting</span>
+            <button onclick="bukaSettings()" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-[12px] font-black uppercase text-[10px] border-[3px] border-transparent">
+                <span class="text-lg">⚙️</span><span>SETTING</span>
             </button>
         </div>
     </nav>
+
+    <!-- SYNC MOBILE NAV WITH DESKTOP -->
+    <script>
+        const origSwitchTab = window.switchTab;
+        // Keep original switchTab from laporan.js, but also sync mobile nav styling
+        // We'll override after laporan.js loads via event
+        document.addEventListener('DOMContentLoaded', () => {
+            const syncNav = (tabName) => {
+                document.querySelectorAll('.nav-item-mobile').forEach(el => {
+                    el.classList.remove('bg-[#FFDE59]', 'border-black', 'shadow-[3px_3px_0px_0px_#000]');
+                });
+                const map = { 'input': 'btnTabInputMobile', 'edit': 'btnTabEditMobile', 'laporan': 'btnTabLaporanMobile' };
+                const activeId = map[tabName];
+                if (activeId) {
+                    const activeEl = document.getElementById(activeId);
+                    if (activeEl) activeEl.classList.add('bg-[#FFDE59]', 'border-black', 'shadow-[3px_3px_0px_0px_#000]');
+                }
+            };
+            // Patch switchTab if already defined
+            const checkPatch = setInterval(() => {
+                if (typeof window.switchTab === 'function' && window.switchTab.toString().includes('tabInput')) {
+                    const original = window.switchTab;
+                    window.switchTab = function(tabName) {
+                        original(tabName);
+                        syncNav(tabName);
+                    };
+                    syncNav('input');
+                    clearInterval(checkPatch);
+                }
+            }, 100);
+        });
+    </script>
 
     <script src="js/particles.js"></script>
     <script src="js/utils.js"></script>
