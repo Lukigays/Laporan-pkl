@@ -1,522 +1,527 @@
 /* ============================================================
-   LAPORAN PKL BY LUKYY — Global Styles
+   NEOBRUTALISM THEME - LAPORAN PKL BY LUKYY
    ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap');
 
-:root { --glow-primary: 0 0 40px rgba(192,38,211,0.3); }
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --yellow: #FFDE59;
+  --pink: #FF90E8;
+  --cyan: #7DF9FF;
+  --lime: #B8FF9F;
+  --orange: #FF9F1C;
+  --red: #FF6B6B;
+  --bg: #FFFCE1;
+  --border: 4px;
+  --shadow: 8px 8px 0px 0px #000;
+  --shadow-sm: 4px 4px 0px 0px #000;
+  --shadow-lg: 12px 12px 0px 0px #000;
+}
 
-* { scrollbar-width: thin; scrollbar-color: rgba(192,38,211,0.3) transparent; }
+* {
+  font-family: 'Space Grotesk', sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #000 #FFFCE1;
+}
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #030308;
-    color: #f1f5f9;
-    overflow-x: hidden;
-    min-height: 100vh;
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(#000 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  color: #000;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* ---------- Background kosmik ---------- */
-.cosmic-bg {
-    position: fixed; inset: 0; z-index: -2;
-    background:
-        radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(192,38,211,0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.05) 0%, transparent 70%),
-        #030308;
-}
-.cosmic-orb {
-    position: fixed; border-radius: 50%; filter: blur(80px);
-    z-index: -1; pointer-events: none;
-    animation: orbFloat 20s ease-in-out infinite;
-}
-.orb-1 { width: 400px; height: 400px; background: rgba(124,58,237,0.2); top: -10%; right: -5%; }
-.orb-2 { width: 300px; height: 300px; background: rgba(192,38,211,0.15); bottom: 10%; left: -5%; animation-delay: -7s; }
-.orb-3 { width: 250px; height: 250px; background: rgba(236,72,153,0.1); top: 40%; left: 30%; animation-delay: -14s; }
-
-@keyframes orbFloat {
-    0%,100% { transform: translate(0,0) scale(1); }
-    33%     { transform: translate(30px,-30px) scale(1.1); }
-    66%     { transform: translate(-20px,20px) scale(0.95); }
+/* HIDE OLD COSMIC STUFF */
+.cosmic-bg, .cosmic-orb, #particles-canvas {
+  display: none !important;
 }
 
-#particles-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.6; }
+/* ============================================================
+   BRUTAL CORE CLASSES
+   ============================================================ */
+.brutal-card {
+  background: var(--white);
+  border: 4px solid var(--black);
+  box-shadow: var(--shadow);
+  border-radius: 20px;
+  position: relative;
+}
 
-/* ---------- Glassmorphism ---------- */
+.brutal-card-yellow { background: var(--yellow); }
+.brutal-card-pink { background: var(--pink); }
+.brutal-card-cyan { background: var(--cyan); }
+.brutal-card-lime { background: var(--lime); }
+
+.brutal-btn {
+  border: 3px solid var(--black);
+  box-shadow: 5px 5px 0px 0px var(--black);
+  border-radius: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 20px;
+  font-size: 13px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+}
+.brutal-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px 0px var(--black);
+}
+.brutal-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0px 0px var(--black);
+}
+.brutal-btn-yellow { background: var(--yellow); color: #000; }
+.brutal-btn-pink { background: var(--pink); color: #000; }
+.brutal-btn-cyan { background: var(--cyan); color: #000; }
+.brutal-btn-lime { background: var(--lime); color: #000; }
+.brutal-btn-white { background: var(--white); color: #000; }
+.brutal-btn-black { background: var(--black); color: var(--white); }
+.brutal-btn-black:hover { background: #222; }
+
+.brutal-input {
+  background: var(--white);
+  border: 3px solid var(--black);
+  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+.brutal-input:focus {
+  outline: none;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--black);
+  background: #FFFFE8;
+}
+.brutal-input::placeholder { color: #888; font-weight: 500; }
+
+.brutal-label {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* OVERRIDE OLD GLASS CLASSES TO BRUTAL */
 .glass-panel {
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  background: var(--white) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 4px solid var(--black) !important;
+  box-shadow: var(--shadow) !important;
+  border-radius: 20px !important;
 }
 .glass-panel-hover:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(192,38,211,0.3);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(192,38,211,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0px 0px var(--black) !important;
 }
 .glass-input {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #f1f5f9;
-    transition: all 0.3s ease;
+  background: var(--white) !important;
+  border: 3px solid var(--black) !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: #000 !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
 }
 .glass-input:focus {
-    outline: none;
-    border-color: rgba(192,38,211,0.5);
-    box-shadow: 0 0 0 3px rgba(192,38,211,0.1), 0 0 20px rgba(192,38,211,0.1);
-    background: rgba(255,255,255,0.05);
+  outline: none !important;
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0px 0px #000 !important;
 }
-.glass-input::placeholder { color: rgba(255,255,255,0.3); }
-
-/* ---------- Teks gradien ---------- */
-.gradient-text {
-    background: linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #ec4899 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.gradient-text-hero {
-    background: linear-gradient(135deg, #ffffff 0%, #e9d5ff 30%, #c026d3 60%, #7c3aed 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-
-/* ---------- Tombol ---------- */
 .btn-primary {
-    background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
-    color: white; border: none; position: relative; overflow: hidden;
-    transition: all 0.3s ease;
+  background: var(--yellow) !important;
+  color: #000 !important;
+  border: 3px solid #000 !important;
+  box-shadow: 5px 5px 0px 0px #000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  border-radius: 12px !important;
+  transition: all 0.15s ease !important;
 }
-.btn-primary::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, #c026d3 0%, #ec4899 100%);
-    opacity: 0; transition: opacity 0.3s ease;
+.btn-primary:hover {
+  transform: translate(-2px,-2px) !important;
+  box-shadow: 7px 7px 0px 0px #000 !important;
 }
-.btn-primary:hover::before { opacity: 1; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(192,38,211,0.4); }
-.btn-primary:active { transform: translateY(0) scale(0.98); }
-.btn-primary span { position: relative; z-index: 1; }
-
+.btn-primary:active {
+  transform: translate(2px,2px) !important;
+  box-shadow: 3px 3px 0px 0px #000 !important;
+}
+.btn-primary span { position: relative; z-index: 1; color: #000 !important; }
 .btn-secondary {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #f1f5f9; transition: all 0.3s ease;
+  background: var(--white) !important;
+  border: 3px solid #000 !important;
+  box-shadow: 5px 5px 0px 0px #000 !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
 }
 .btn-secondary:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(192,38,211,0.4);
-    box-shadow: 0 0 20px rgba(192,38,211,0.1);
+  transform: translate(-2px,-2px);
+  box-shadow: 7px 7px 0px 0px #000 !important;
 }
-.btn-glow { box-shadow: 0 0 20px rgba(192,38,211,0.3); }
+.btn-glow { box-shadow: 5px 5px 0px 0px #000 !important; }
+.badge-cosmic {
+  background: var(--yellow) !important;
+  border: 3px solid #000 !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  border-radius: 10px !important;
+  box-shadow: 3px 3px 0px 0px #000 !important;
+}
+.danger-zone {
+  background: #FFD6D6 !important;
+  border: 4px solid #000 !important;
+  box-shadow: 6px 6px 0px 0px #000 !important;
+  border-radius: 16px !important;
+}
 
-/* ---------- Navigasi ---------- */
-.nav-item { position: relative; transition: all 0.3s ease; }
+/* ============================================================
+   TOAST BRUTAL
+   ============================================================ */
+#toast-container {
+  z-index: 200 !important;
+}
+#toast-box {
+  background: var(--white) !important;
+  border: 4px solid #000 !important;
+  box-shadow: 8px 8px 0px 0px #000 !important;
+  border-radius: 14px !important;
+  border-left: 4px solid #000 !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  font-size: 12px !important;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   MODAL BRUTAL
+   ============================================================ */
+.modal-overlay {
+  background: rgba(0,0,0,0.6) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.modal-content {
+  background: var(--white) !important;
+  border: 5px solid #000 !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: 24px !important;
+}
+
+/* ============================================================
+   NAVIGATION BRUTAL
+   ============================================================ */
+.nav-item {
+  border: 3px solid transparent;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 14px;
+  color: #000;
+}
 .nav-item.active {
-    background: rgba(192,38,211,0.15);
-    border: 1px solid rgba(192,38,211,0.3);
-    color: #d946ef;
-    box-shadow: 0 0 20px rgba(192,38,211,0.15);
+  background: var(--yellow) !important;
+  border: 3px solid #000 !important;
+  box-shadow: 4px 4px 0px 0px #000 !important;
+  color: #000 !important;
+  transform: translate(-1px,-1px);
 }
-.nav-item.active::after {
-    content: ''; position: absolute; bottom: -4px; left: 50%;
-    transform: translateX(-50%);
-    width: 4px; height: 4px; border-radius: 50%;
-    background: #d946ef; box-shadow: 0 0 10px #d946ef;
-}
+.nav-item.active::after { display: none; }
 
-/* ---------- Tab ---------- */
+/* TAB ANIMATION KEEP */
 .tab-content {
-    opacity: 0; transform: translateY(20px);
-    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-    position: absolute; width: 100%;
-    pointer-events: none; visibility: hidden;
+  opacity: 0;
+  transform: translateY(20px) rotate(-0.5deg);
+  transition: all 0.35s cubic-bezier(0.68,-0.55,0.265,1.55);
+  position: absolute;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
 }
 .tab-content.active {
-    opacity: 1; transform: translateY(0);
-    position: relative; pointer-events: auto; visibility: visible;
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+  position: relative;
+  pointer-events: auto;
+  visibility: visible;
 }
 
-/* ---------- Animasi ---------- */
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-.animate-fade-in { animation: fadeInUp 0.6s ease forwards; }
-.animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-.animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-.animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
-.animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
-
-/* ---------- Modal ---------- */
-.modal-overlay { background: rgba(3,3,8,0.8); backdrop-filter: blur(12px); }
-.modal-content {
-    background: linear-gradient(180deg, rgba(18,18,26,0.95), rgba(10,10,18,0.98));
-    border: 1px solid rgba(192,38,211,0.2);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.1);
+/* ============================================================
+   STAT CARDS BRUTAL
+   ============================================================ */
+.stat-card {
+  background: var(--white) !important;
+  border: 4px solid #000 !important;
+  box-shadow: 6px 6px 0px 0px #000 !important;
+  border-radius: 18px !important;
 }
-
-/* ---------- Kartu statistik ---------- */
-.stat-card { position: relative; overflow: hidden; }
-.stat-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, #c026d3, #7c3aed, transparent);
-    opacity: 0.5;
-}
+.stat-card::before { display: none; }
 .stat-card .stat-icon {
-    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,38,211,0.2));
-    border: 1px solid rgba(192,38,211,0.2);
+  background: var(--yellow) !important;
+  border: 3px solid #000 !important;
+  box-shadow: 3px 3px 0px 0px #000 !important;
+  border-radius: 12px !important;
+  font-weight: 900;
 }
-
-/* ---------- Badge & zona bahaya ---------- */
-.badge-cosmic {
-    background: rgba(192,38,211,0.1);
-    border: 1px solid rgba(192,38,211,0.2);
-    color: #d946ef; font-size: 0.75rem;
-    padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;
-}
-.danger-zone { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); }
-
+.stat-card:nth-child(1) .stat-icon { background: var(--yellow) !important; }
+.stat-card:nth-child(2) .stat-icon { background: var(--cyan) !important; }
+.stat-card:nth-child(3) .stat-icon { background: var(--pink) !important; }
+.stat-card:nth-child(4) .stat-icon { background: var(--lime) !important; }
 
 /* ============================================================
-   PERBAIKAN GESER LAPORAN & KERTAS (FIX MUTLAK)
+   KALENDER BRUTAL
    ============================================================ */
-
-#tabLaporan {
-    width: 100% !important;
-    max-width: 100vw !important;
-    overflow-x: hidden;
-}
-
-/* Kontainer master yang bisa digeser di HP */
-.cetak-wrapper {
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-x pan-y !important;
-    padding-bottom: 20px;
-}
-
-/* Memaksa kertas hanya memiliki lebar 780px (tidak bisa melar atau mengecil) */
-.area-kertas {
-    font-family: "Times New Roman", Times, serif;
-    background-color: white !important; 
-    color: black !important;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-    position: relative;
-    display: block !important;
-    
-    width: 780px !important;
-    min-width: 780px !important;
-    max-width: 780px !important;
-    
-    margin: 0 auto;
-    overflow: hidden !important; 
-}
-
-/* Menyesuaikan area tabel dalam kertas */
-.konten-tabel {
-    width: 100% !important;
-    background: white !important;
-}
-
-.area-kertas table {
-    border-collapse: collapse !important;
-    font-size: 11px !important;
-    width: 100% !important; 
-    table-layout: fixed !important;
-}
-
-.area-kertas th, .area-kertas td {
-    border: 1px solid black !important;
-    padding: 6px 8px !important;
-    vertical-align: top; 
-    color: black !important;
-    word-break: break-word;
-}
-
-.area-kertas td img { 
-    display: block; 
-    margin: 0 auto; 
-    max-height: 75px; 
-    max-width: 100%; 
-    object-fit: contain; 
-}
-
-.area-kertas th { 
-    background-color: #f8f9fa !important; 
-    font-weight: bold; 
-    text-align: center; 
-}
-
-
-/* ---------- Header Cetak ---------- */
-.header-print {
-    font-family: "Times New Roman", Times, serif;
-    text-align: center; color: black; width: 100%;
-    min-height: 1000px;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 20px 0; box-sizing: border-box;
-}
-.header-print h2, .header-print h3, .header-print h4 { margin: 4px 0; font-weight: bold; }
-
-.watermark {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    font-size: 5rem; color: rgba(0,0,0,0.04); font-weight: 800;
-    white-space: nowrap; pointer-events: none; z-index: 1;
-    user-select: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.1em;
-}
-
-.logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 35px 0; min-height: 160px;}
-.logo-kover-container img { width: auto; height: auto; max-width: 160px; max-height: 160px; object-fit: contain; display: block; }
-
-
-/* ---------- Scrollbar Kustom ---------- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(192,38,211,0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(192,38,211,0.5); }
-
-/* ---------- Select ---------- */
-select.glass-input {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
-}
-
-/* ---------- Hero ---------- */
-.hero-section { position: relative; padding: 3rem 0 2rem; }
-
-@media (max-width: 768px) {
-    .hero-section { padding: 2rem 0 1rem; }
-    .orb-1, .orb-2, .orb-3 { display: none; }
-    .area-kertas { margin: 0; } /* Penting agar area kiri tidak terpotong di HP */
-}
-
-/* ============================================================
-   TOMBOL LOGIN GOOGLE & DIVIDER
-   ============================================================ */
-
-.btn-google {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.05);
-    color: #f1f5f9;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.btn-google:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(255,255,255,0.05);
-}
-.btn-google:active {
-    transform: scale(0.98);
-}
-.google-icon { width: 20px; height: 20px; flex-shrink: 0; }
-
-.divider-atau { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 12px; font-weight: 500; }
-.divider-atau::before, .divider-atau::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.divider-atau span { padding: 0 12px; }
-
-
-/* ============================================================
-   KALENDER MINI PEMILIH TANGGAL
-   🟢 hijau = sudah ada laporan  |  🔴 merah = belum diisi  |  ⚪ abu = libur (Minggu)
-   ============================================================ */
-
 .kalender-box {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 18px;
-    padding: 12px;
+  background: var(--white) !important;
+  border: 4px solid #000 !important;
+  box-shadow: 6px 6px 0px 0px #000 !important;
+  border-radius: 18px !important;
+  padding: 16px !important;
 }
-
-.kalender-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 8px; margin-bottom: 8px;
+.kalender-judul { 
+  font-weight: 900 !important; 
+  text-transform: uppercase;
+  font-size: 13px !important;
+  letter-spacing: 0.5px;
+  color: #000 !important;
 }
-.kalender-judul { font-size: 12px; font-weight: 700; color: #e9d5ff; letter-spacing: .01em; }
-
 .kalender-nav, .kalender-today {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #f1f5f9; border-radius: 10px; font-weight: 700;
-    transition: all .2s ease; cursor: pointer;
+  background: var(--white) !important;
+  border: 3px solid #000 !important;
+  box-shadow: 3px 3px 0px 0px #000 !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  border-radius: 8px !important;
 }
-.kalender-nav { width: 26px; height: 26px; font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.kalender-today { font-size: 10px; padding: 5px 9px; }
 .kalender-nav:hover, .kalender-today:hover {
-    background: rgba(192,38,211,0.25);
-    border-color: rgba(192,38,211,0.45);
+  background: var(--yellow) !important;
+  transform: translate(-1px,-1px);
+  box-shadow: 4px 4px 0px 0px #000 !important;
 }
-
-.kalender-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .kalender-nama-hari > div {
-    text-align: center; font-size: 10px; font-weight: 700;
-    color: #94a3b8; padding-bottom: 2px;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  font-size: 10px !important;
+  color: #000 !important;
 }
-.kalender-nama-hari > div.libur { color: #f87171; }
-.kalender-kosong { height: 30px; }
-
 .kalender-hari {
-    position: relative; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: #e2e8f0;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 9px; cursor: pointer;
-    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  border: 3px solid #000 !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  box-shadow: 3px 3px 0px 0px #000 !important;
+  transition: all 0.1s ease !important;
+  min-height: 56px !important;
+  background: var(--white) !important;
 }
-.kalender-hari:hover { transform: translateY(-1px); }
-
-/* 🟢 sudah ada laporan */
+.kalender-hari:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 5px 5px 0px 0px #000 !important;
+}
 .kalender-hari.k-isi {
-    background: rgba(16,185,129,0.28);
-    border-color: rgba(16,185,129,0.65);
-    color: #d1fae5;
+  background: var(--lime) !important;
+  border-color: #000 !important;
+  color: #000 !important;
 }
-.kalender-hari.k-isi:hover { background: rgba(16,185,129,0.45); }
-
-/* 🔴 belum diisi (wajib diisi) */
 .kalender-hari.k-kosong {
-    background: rgba(239,68,68,0.24);
-    border-color: rgba(239,68,68,0.6);
-    color: #fee2e2;
+  background: var(--red) !important;
+  border-color: #000 !important;
+  color: #000 !important;
 }
-.kalender-hari.k-kosong:hover { background: rgba(239,68,68,0.4); }
-
-/* ⚪ libur (Minggu) & tanggal merah */
 .kalender-hari.k-libur {
-    background: rgba(148,163,184,0.14);
-    border-color: rgba(148,163,184,0.35);
-    color: #cbd5e1;
+  background: #E2E8F0 !important;
+  border-color: #000 !important;
+  color: #000 !important;
 }
-/* angka tanggal Minggu tetap dicoret, chip nama liburnya tidak */
-.kalender-hari.k-libur > .k-tanggal {
-    text-decoration: line-through;
-    text-decoration-thickness: 1px;
-    text-decoration-color: rgba(203,213,225,0.55);
-}
-
-/* tanggal yang sedang dipilih di input */
 .kalender-hari.k-terpilih {
-    box-shadow: 0 0 0 2px #d946ef, 0 0 14px rgba(217,70,239,0.5);
-    z-index: 1;
+  box-shadow: 0 0 0 3px #000, 6px 6px 0px 0px #000 !important;
+  background: var(--yellow) !important;
+  z-index: 2;
 }
-
-/* penanda hari ini: garis tipis di dalam sel (tidak tabrakan dengan chip libur) */
 .kalender-hari.k-hari-ini {
-    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.45);
+  box-shadow: inset 0 0 0 2px #000, 3px 3px 0px 0px #000 !important;
 }
-
-/* sel libur disembunyikan (toggle "Tampilkan hari libur") */
-.kalender-hari.k-sembunyi { visibility: hidden; }
-
-/* legenda */
-.kalender-legenda {
-    display: flex; flex-wrap: wrap; gap: 10px;
-    margin-top: 10px; font-size: 10px; font-weight: 600; color: #94a3b8;
+.k-chip {
+  border: 2px solid #000 !important;
+  font-weight: 800 !important;
+  border-radius: 6px !important;
+  font-size: 7px !important;
 }
-.kalender-legenda .kl { display: flex; align-items: center; gap: 5px; }
-.kalender-legenda .k-dot {
-    width: 10px; height: 10px; border-radius: 4px;
-    display: inline-block; border: 1px solid rgba(255,255,255,0.15);
-}
-.kalender-legenda .k-dot.k-isi { background: rgba(16,185,129,0.6); border-color: rgba(16,185,129,0.85); }
-.kalender-legenda .k-dot.k-kosong { background: rgba(239,68,68,0.6); border-color: rgba(239,68,68,0.85); }
-.kalender-legenda .k-dot.k-libur { background: rgba(148,163,184,0.35); border-color: rgba(148,163,184,0.6); }
-
-@media (max-width: 768px) {
-    .kalender-hari { height: auto; min-height: 50px; font-size: 12px; }
-    .kalender-hari .k-tanggal { font-size: 12px; }
-    .kalender-kosong { height: 50px; }
-}
-
+.k-chip-nasional { background: var(--cyan) !important; color: #000 !important; }
+.k-chip-cuti { background: var(--pink) !important; color: #000 !important; border-style: solid !important; }
+.k-chip-libur { background: #E2E8F0 !important; color: #000 !important; }
 
 /* ============================================================
-   PANEL PERIODE & TARGET PKL (Paket C)
+   PROGRESS BAR BRUTAL
    ============================================================ */
-
 .progress-track {
-    width: 100%; height: 10px; border-radius: 999px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    overflow: hidden;
+  border: 3px solid #000 !important;
+  box-shadow: 4px 4px 0px 0px #000 !important;
+  background: #fff !important;
+  height: 18px !important;
+  border-radius: 10px !important;
 }
 .progress-fill {
-    height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, #10b981 0%, #34d399 45%, #c026d3 100%);
-    box-shadow: 0 0 14px rgba(16,185,129,0.45);
-    transition: width .5s cubic-bezier(.4,0,.2,1);
+  background: var(--yellow) !important;
+  border-right: 3px solid #000;
+  box-shadow: none !important;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(0,0,0,0.1) 6px, rgba(0,0,0,0.1) 12px) !important;
 }
 
 /* ============================================================
-   KETERANGAN NAMA HARI LIBUR DI KALENDER (seperti kalender HP)
+   LAPORAN PAPER BRUTAL
    ============================================================ */
+#tabLaporan { width: 100% !important; max-width: 100vw !important; overflow-x: hidden; }
+.cetak-wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: 24px;
+}
+.area-kertas {
+  font-family: "Times New Roman", Times, serif;
+  background-color: white !important; 
+  color: black !important;
+  border: 5px solid #000 !important;
+  box-shadow: 12px 12px 0px 0px #000 !important;
+  border-radius: 16px !important;
+  position: relative;
+  display: block !important;
+  width: 780px !important;
+  min-width: 780px !important;
+  max-width: 780px !important;
+  margin: 0 auto;
+  overflow: hidden !important; 
+}
+.konten-tabel { width: 100% !important; background: white !important; border-radius: 12px; }
+.area-kertas table { border-collapse: collapse !important; font-size: 11px !important; width: 100% !important; table-layout: fixed !important; }
+.area-kertas th, .area-kertas td { border: 2px solid black !important; padding: 6px 8px !important; }
+.area-kertas th { background: var(--yellow) !important; font-weight: 900 !important; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif !important; }
 
-/* sel kalender jadi 2 baris: angka tanggal + chip nama libur */
-.kalender-kosong { height: 50px; }
+/* HEADER PRINT */
+.header-print { font-family: "Times New Roman", Times, serif; text-align: center; color: black; width: 100%; min-height: 1000px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; }
+.watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-size: 4rem; color: rgba(0,0,0,0.06); font-weight: 900; white-space: nowrap; pointer-events: none; z-index: 1; font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: -2px; }
+.logo-kover-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 35px 0; min-height: 160px;}
 
-.kalender-hari {
-    height: auto; min-height: 50px;
-    flex-direction: column; gap: 2px;
-    padding: 4px 2px;
-    justify-content: flex-start;
-}
-.kalender-hari .k-tanggal { font-size: 11px; font-weight: 700; line-height: 1.1; }
-
-/* chip nama libur */
-.k-chip {
-    display: block; width: 100%;
-    font-size: 7.5px; font-weight: 700; line-height: 1.15;
-    font-style: normal; text-align: center;
-    padding: 1px 2px; border-radius: 4px;
-    overflow: hidden; text-overflow: ellipsis;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    word-break: break-word; hyphens: auto;
-    max-height: 2.4em;
-}
-.k-chip-nasional {
-    background: rgba(20,184,166,0.28);
-    border: 1px solid rgba(45,212,191,0.55);
-    color: #ccfbf1;
-}
-.k-chip-cuti {
-    background: rgba(139,92,246,0.24);
-    border: 1px dashed rgba(167,139,250,0.6);
-    color: #ede9fe;
-}
-.k-chip-libur {
-    background: rgba(148,163,184,0.16);
-    border: 1px solid rgba(148,163,184,0.28);
-    color: #cbd5e1;
-    font-weight: 600;
-}
-/* chip di legenda tampil sebaris */
-.kalender-legenda .k-chip {
-    display: inline-block; width: auto; -webkit-line-clamp: 1;
-    font-size: 9px; padding: 2px 6px; margin-right: 2px;
-}
 /* ============================================================
-   TOMBOL AKSI DI DALAM TABEL LAPORAN (Edit di samping foto)
+   BRUTAL SCROLLBAR
    ============================================================ */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: #FFFCE1; border-left: 2px solid #000; }
+::-webkit-scrollbar-thumb { background: #000; border-radius: 0; border: 2px solid #FFFCE1; }
+::-webkit-scrollbar-thumb:hover { background: #222; }
+
+/* SELECT */
+select.glass-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 44px;
+}
+
+/* GOOGLE BUTTON BRUTAL */
+.btn-google {
+  background: var(--white) !important;
+  border: 3px solid #000 !important;
+  box-shadow: 5px 5px 0px 0px #000 !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  color: #000 !important;
+}
+.btn-google:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 7px 7px 0px 0px #000 !important;
+}
+
+/* DIVIDER */
+.divider-atau { font-weight: 800; text-transform: uppercase; color: #000 !important; font-size: 11px !important; }
+.divider-atau::before, .divider-atau::after { border-bottom: 3px solid #000 !important; }
+
+/* BADGE ACHIEVEMENT BRUTAL */
+#wadahBadgeAchievement > div {
+  border: 3px solid #000 !important;
+  box-shadow: 4px 4px 0px 0px #000 !important;
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+}
+#wadahBadgeAchievement > div.border-accent\/40 {
+  background: var(--yellow) !important;
+  border-color: #000 !important;
+}
+
+/* BUTTON EDIT FOTO */
 .btn-edit-foto {
-    font-family: 'Inter', sans-serif;
-    transition: background-color 0.2s ease, transform 0.15s ease;
+  font-family: 'Space Grotesk', sans-serif !important;
+  border: 2px solid #000 !important;
+  box-shadow: 2px 2px 0px 0px #000 !important;
+  border-radius: 6px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  font-size: 9px !important;
 }
-.btn-edit-foto:hover {
-    background: #bfdbfe !important;
-    transform: translateY(-1px);
-}
-.btn-edit-foto:active { transform: translateY(0); }
 
-/* Tombol aksi & elemen berkelas no-print tidak ikut tercetak / masuk print */
+/* HERO */
+.hero-section { position: relative; padding: 0 !important; }
+.gradient-text, .gradient-text-hero { 
+  background: none !important; 
+  -webkit-background-clip: unset !important; 
+  background-clip: unset !important; 
+  color: #000 !important; 
+}
+
+/* ANIMATIONS */
+@keyframes brutalPop {
+  0% { transform: scale(0.9) rotate(-1deg); }
+  50% { transform: scale(1.02) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.animate-fade-in { animation: brutalPop 0.4s cubic-bezier(0.68,-0.55,0.265,1.55) forwards; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  :root { --shadow: 6px 6px 0px 0px #000; }
+  .area-kertas { margin: 0; border-width: 4px !important; box-shadow: 6px 6px 0px 0px #000 !important; }
+  .brutal-card { border-radius: 16px; }
+}
+
+/* PRINT */
 @media print {
-    .btn-edit-foto, .no-print { display: none !important; }
+  body { background: white !important; background-image: none !important; }
+  .brutal-card, .glass-panel, .stat-card, .area-kertas { box-shadow: none !important; border: 2px solid #000 !important; }
+  .btn-edit-foto, .no-print { display: none !important; }
+}
+
+/* EXTRA BRUTAL DECOR */
+.brutal-sticker {
+  position: absolute;
+  font-weight: 900;
+  text-transform: uppercase;
+  border: 3px solid #000;
+  padding: 4px 10px;
+  font-size: 10px;
+  transform: rotate(-3deg);
+  box-shadow: 3px 3px 0px 0px #000;
+  z-index: 2;
 }
