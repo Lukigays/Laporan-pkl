@@ -74,6 +74,35 @@ function updateDropdownEditTab() {
     });
 }
 
+// ---------- Tombol Edit di samping foto (tabel laporan) ----------
+// Mengembalikan index asli di dataLaporan (tabel bisa terfilter/terurut,
+// jadi index tampilan belum tentu sama dengan index data).
+function cariIndexAsliLaporan(item) {
+    if (!item) return -1;
+    let idx = dataLaporan.indexOf(item);
+    if (idx !== -1) return idx;
+    // Cadangan: cocokkan berdasarkan isi jika referensi objek berbeda
+    return dataLaporan.findIndex(d => d.tanggal === item.tanggal && d.uraian === item.uraian && d.foto === item.foto);
+}
+
+function editLaporanDariTabel(idx) {
+    if (typeof idx !== 'number' || idx < 0 || !dataLaporan[idx]) {
+        showToast('⚠️ Laporan tidak ditemukan, coba muat ulang halaman.');
+        return;
+    }
+    // Pindah ke tab Edit (sekalian menyegarkan isi dropdown)
+    switchTab('edit');
+    const dropdown = document.getElementById('pilihEditDropdown');
+    if (!dropdown) return;
+    dropdown.value = String(idx);
+    pilihTanggalEditDropdown();
+    showToast(`✏️ Mengedit laporan tanggal ${dataLaporan[idx].tanggal}`);
+    setTimeout(() => {
+        const form = document.getElementById('formEditContainer');
+        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+}
+
 function pilihTanggalEditDropdown() {
     const idx = document.getElementById('pilihEditDropdown').value;
     const container = document.getElementById('formEditContainer');
@@ -227,19 +256,34 @@ function renderSemuaData() {
                         <tbody>`;
         dataBulanIni.forEach((item, idx) => {
             const idxTampil = idx + 1;
+            const idxAsli = cariIndexAsliLaporan(item);
             const namaFileFoto = `PKL_${item.tanggal.replace(/\//g,'-')}_${idxTampil}.jpg`;
-            
-            // LINK DOWNLOAD FOTO
+
+            // TOMBOL EDIT (langsung buka form edit untuk baris ini) — disembunyikan saat print/PDF
+            const tombolEditHtml = `
+                     <button type="button" class="btn-edit-foto no-print" onclick="editLaporanDariTabel(${idxAsli})"
+                        title="Edit laporan tanggal ${item.tanggal}"
+                        style="font-size: 9px; color: #1e40af; text-decoration: none; font-weight: bold;
+                               background: #dbeafe; border: 1px solid #93c5fd; padding: 2px 6px; border-radius: 4px;
+                               display: inline-block; white-space: nowrap; cursor: pointer; line-height: 1.4;">
+                        ✏️ Edit
+                     </button>`;
+
+            // LINK DOWNLOAD FOTO + TOMBOL EDIT DI SAMPINGNYA
             const fotoHtml = item.foto 
                 ? `<div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
                      <img src="${item.foto}" style="max-height: 65px; max-width: 75px; object-fit: contain; display: block;" class="border border-gray-300">
-                     <a href="${item.foto}" download="${namaFileFoto}" 
-                        style="font-size: 9px; color: #7c3aed; text-decoration: none; font-weight: bold; 
-                               background: #f3e8ff; padding: 2px 6px; border-radius: 4px; display: inline-block; white-space: nowrap;">
-                        ⬇️ Unduh
-                     </a>
+                     <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3px;">
+                       <a href="${item.foto}" download="${namaFileFoto}" 
+                          style="font-size: 9px; color: #7c3aed; text-decoration: none; font-weight: bold; 
+                                 background: #f3e8ff; padding: 2px 6px; border-radius: 4px; display: inline-block; white-space: nowrap;">
+                          ⬇️ Unduh
+                       </a>${tombolEditHtml}
+                     </div>
                    </div>`
-                : '-';
+                : `<div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                     <span>-</span>${tombolEditHtml}
+                   </div>`;
             
             htmlTabel += `
                             <tr>
