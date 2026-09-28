@@ -4,7 +4,9 @@
 
 async function muatProfil() {
     try {
-        const profil = await localforage.getItem('profilPKL');
+        const profil = (typeof localforage !== 'undefined' && localforage.getItem)
+            ? await localforage.getItem('profilPKL')
+            : null;
         if (profil) dataProfil = { ...dataProfil, ...profil };
     } catch (err) { console.error(err); }
     renderProfil();
@@ -45,6 +47,7 @@ function renderProfil() {
 
 // ---------- Modal Pengaturan ----------
 function bukaSettings() {
+    if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalSettings');
     document.getElementById('setNama').value = dataProfil.nama || '';
     document.getElementById('setKelas').value = dataProfil.kelas || '';
     document.getElementById('setNis').value = dataProfil.nis || '';

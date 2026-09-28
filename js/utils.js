@@ -12,6 +12,14 @@ function showToast(message) {
     }, 3500);
 }
 
+// ---------- Modal: tutup modal lain agar tidak bertumpuk ----------
+function tutupSemuaModal(kecualiId) {
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        if (kecualiId && m.id === kecualiId) return;
+        m.classList.add('hidden', 'opacity-0');
+    });
+}
+
 // ---------- Kompresi gambar ringan berbasis canvas ----------
 function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
     return new Promise((resolve) => {

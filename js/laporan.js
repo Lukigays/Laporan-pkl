@@ -23,6 +23,7 @@ function switchTab(tabName) {
         tabLaporan.classList.add('active');
         btnLaporan.classList.add('active');
     }
+    if (typeof window.syncNavMobile === 'function') window.syncNavMobile(tabName);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -199,7 +200,7 @@ function renderSemuaData() {
     wadahTabel.innerHTML = '';
     
     if (dataLaporan.length === 0) {
-        wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Belum ada data laporan.</p>';
+        wadahTabel.innerHTML = '<p class="text-center font-semibold my-10 muted">Belum ada data laporan.</p>';
         updateStatistik([]);
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
         if (typeof refreshTanggalDanTarget === 'function') refreshTanggalDanTarget();
@@ -227,7 +228,7 @@ function renderSemuaData() {
     });
     updateStatistik(dataFiltered);
     if (dataFiltered.length === 0) {
-        wadahTabel.innerHTML = '<p class="text-center font-bold my-10 opacity-60">Tidak ada data yang sesuai filter.</p>';
+        wadahTabel.innerHTML = '<p class="text-center font-semibold my-10 muted">Tidak ada data yang sesuai filter.</p>';
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
         if (typeof refreshTanggalDanTarget === 'function') refreshTanggalDanTarget();
         return;
@@ -263,8 +264,8 @@ function renderSemuaData() {
             const tombolEditHtml = `
                      <button type="button" class="btn-edit-foto no-print" onclick="editLaporanDariTabel(${idxAsli})"
                         title="Edit laporan tanggal ${item.tanggal}"
-                        style="font-size: 9px; color: #1e40af; text-decoration: none; font-weight: bold;
-                               background: #dbeafe; border: 1px solid #93c5fd; padding: 2px 6px; border-radius: 4px;
+                        style="font-size: 9px; color: #1D2BF0; text-decoration: none; font-weight: 600;
+                               background: #E4E6FE; border: 0; padding: 3px 8px; border-radius: 999px;
                                display: inline-block; white-space: nowrap; cursor: pointer; line-height: 1.4;">
                         ✏️ Edit
                      </button>`;
@@ -275,8 +276,8 @@ function renderSemuaData() {
                      <img src="${item.foto}" style="max-height: 65px; max-width: 75px; object-fit: contain; display: block;" class="border border-gray-300">
                      <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3px;">
                        <a href="${item.foto}" download="${namaFileFoto}" 
-                          style="font-size: 9px; color: #7c3aed; text-decoration: none; font-weight: bold; 
-                                 background: #f3e8ff; padding: 2px 6px; border-radius: 4px; display: inline-block; white-space: nowrap;">
+                          style="font-size: 9px; color: #6B1A8E; text-decoration: none; font-weight: 600; 
+                                 background: #F3E1FB; padding: 3px 8px; border-radius: 999px; display: inline-block; white-space: nowrap;">
                           ⬇️ Unduh
                        </a>${tombolEditHtml}
                      </div>

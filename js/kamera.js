@@ -7,6 +7,7 @@ let targetInput = 'input'; // 'input' atau 'edit'
 let hasilFotoBase64 = null;
 
 async function bukaKamera(target) {
+    if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalKamera');
     targetInput = target;
     const modal = document.getElementById('modalKamera');
     const video = document.getElementById('videoKamera');

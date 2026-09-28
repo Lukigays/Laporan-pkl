@@ -10,15 +10,21 @@ function initTailwindConfig() {
         theme: {
             extend: {
                 fontFamily: {
-                    sans: ['Inter', 'sans-serif'],
-                    display: ['Space Grotesk', 'sans-serif'],
+                    sans: ['Inter', 'system-ui', 'sans-serif'],
+                    display: ['Inter', 'system-ui', 'sans-serif'],
                 },
                 colors: {
-                    void: '#030308',
-                    midnight: '#0a0a12',
-                    surface: '#12121a',
-                    accent: { DEFAULT: '#c026d3', light: '#d946ef', dark: '#a21caf' },
-                    cosmic: { purple: '#7c3aed', violet: '#8b5cf6', pink: '#ec4899', rose: '#f43f5e' }
+                    // Palet FLAT DESIGN
+                    brand: { DEFAULT: '#1D2BF0', dark: '#1723C9', 100: '#E4E6FE', 50: '#F1F2FE' },
+                    flat: {
+                        ink: '#12161F', muted: '#6B7280', line: '#EBE9F0',
+                        surface: '#F5F4F2', navy: '#131A2B',
+                        lilac: '#E7C6F7', lilacSoft: '#F3E1FB', pinkSoft: '#EFC4F6',
+                        sky: '#BEE7FB', mint: '#D9F6E6', danger: '#E5484D'
+                    },
+                    // Alias lama (dipakai oleh beberapa template JS) → diarahkan ke palet flat
+                    accent: { DEFAULT: '#1D2BF0', light: '#1D2BF0', dark: '#1723C9' },
+                    cosmic: { purple: '#1D2BF0', violet: '#4B4DF5', pink: '#EFC4F6', rose: '#E5484D' }
                 }
             }
         }

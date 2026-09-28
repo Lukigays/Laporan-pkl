@@ -12,7 +12,7 @@ window.onload = async function() {
         if (dataDariIndexedDB !== null) dataLaporan = dataDariIndexedDB;
     } catch (err) { console.error(err); }
 
-    await muatProfil();
+    try { await muatProfil(); } catch (err) { console.warn('muatProfil gagal:', err); }
     renderSemuaData();
 
     // Kalender mini pemilih tanggal (hijau = sudah diisi, merah = belum)

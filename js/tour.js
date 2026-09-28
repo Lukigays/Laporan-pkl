@@ -15,6 +15,7 @@ function cekDanJalankanTour() {
 }
 
 function bukaTourManual() {
+    if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalTour');
     indexTourAktif = 0;
     renderTourStep();
     const modal = document.getElementById('modalTour');
@@ -29,13 +30,7 @@ function renderTourStep() {
     document.getElementById('tourDesc').innerText = step.desc;
     for (let i = 0; i < 4; i++) {
         const dot = document.getElementById('dot-' + i);
-        if (i === indexTourAktif) {
-            dot.classList.remove('bg-white/20');
-            dot.classList.add('bg-accent');
-        } else {
-            dot.classList.remove('bg-accent');
-            dot.classList.add('bg-white/20');
-        }
+        dot.classList.toggle('active', i === indexTourAktif);
     }
 }
 

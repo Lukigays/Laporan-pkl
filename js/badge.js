@@ -44,11 +44,11 @@ function hitungDanRenderBadge() {
     ];
 
     wadahBadge.innerHTML = daftarBadge.map(b => `
-        <div class="glass-panel p-3 rounded-2xl flex items-center gap-3 transition-all ${b.aktif ? 'border-accent/40 bg-accent/10 shadow-lg shadow-accent/10' : 'opacity-40 grayscale'}">
-            <div class="text-2xl">${b.icon}</div>
+        <div class="badge-item ${b.aktif ? 'on' : 'off'}">
+            <div class="badge-icon">${b.icon}</div>
             <div>
-                <p class="text-xs font-bold text-white">${b.nama}</p>
-                <p class="text-[10px] text-slate-400">${b.desc}</p>
+                <p class="badge-name">${b.nama}</p>
+                <p class="badge-desc">${b.desc}</p>
             </div>
         </div>
     `).join('');

@@ -119,20 +119,20 @@ function cekHariKerjaInput(namaId = 'inputTanggal', infoId = 'infoTanggalInput')
 
     let warna, teks;
     if (libur) {
-        warna = 'text-slate-400';
+        warna = 'st-libur';
         const sebab = infoLib
             ? (infoLib.jenis === 'cuti' ? 'Cuti Bersama' : 'Libur Nasional') + ': ' + infoLib.nama
             : 'Minggu';
         teks = `⚪ ${hari} • LIBUR (${sebab})${sudahAda ? ' • catatan libur sudah ada' : ''}`;
     } else if (sudahAda) {
-        warna = 'text-emerald-400';
+        warna = 'st-ok';
         teks = `🟢 ${hari} • laporan sudah ada`;
     } else {
-        warna = 'text-red-400';
+        warna = 'st-warn';
         teks = `🔴 ${hari} • laporan belum diisi`;
     }
 
-    info.className = `text-[11px] mt-1.5 font-semibold ${warna}`;
+    info.className = `text-[11px] mt-2 font-semibold rounded-xl px-3 py-2 ${warna}`;
     info.classList.remove('hidden');
     info.innerText = teks;
 }
@@ -333,12 +333,12 @@ function renderDaftarLiburPeriode() {
     if (!wadah) return;
     const r = rentangPKL();
     if (!r) {
-        wadah.innerHTML = '<p class="text-[11px] text-slate-500 italic">Isi tanggal mulai & selesai PKL di atas untuk melihat daftar libur nasional pada periode tersebut.</p>';
+        wadah.innerHTML = '<p class="text-[11px]" style="color:var(--muted)">Isi tanggal mulai & selesai PKL di atas untuk melihat daftar libur nasional pada periode tersebut.</p>';
         return;
     }
     const daftar = daftarLiburRentang(r.mulai, r.selesai);
     if (daftar.length === 0) {
-        wadah.innerHTML = '<p class="text-[11px] text-slate-500 italic">Tidak ada libur nasional pada periode PKL ini.</p>';
+        wadah.innerHTML = '<p class="text-[11px]" style="color:var(--muted)">Tidak ada libur nasional pada periode PKL ini.</p>';
         return;
     }
     wadah.innerHTML = daftar.map(item => `
@@ -355,8 +355,8 @@ function renderInfoLibur() {
     const el = document.getElementById('infoJumlahLibur');
     if (!el) return;
     const daftarTahun = (typeof TAHUN_LIBUR_TERSEDIA !== 'undefined') ? TAHUN_LIBUR_TERSEDIA : [];
-    el.innerHTML = `Kalender libur nasional otomatis aktif untuk tahun <b class="text-slate-200">${daftarTahun.join(', ')}</b> `
-        + `(sumber: SKB 3 Menteri) — total <b class="text-slate-200">${Object.keys(LIBUR_NASIONAL).length}</b> tanggal.`;
+    el.innerHTML = `Kalender libur nasional otomatis aktif untuk tahun <b style="color:var(--ink)">${daftarTahun.join(', ')}</b> `
+        + `(sumber: SKB 3 Menteri) — total <b style="color:var(--ink)">${Object.keys(LIBUR_NASIONAL).length}</b> tanggal.`;
 }
 
 // Buatkan catatan "Libur" untuk satu tanggal tertentu (dipakai isi otomatis hari Minggu)
@@ -486,37 +486,37 @@ function renderPanelTarget() {
         wadah.innerHTML = `
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h3 class="text-sm font-display font-bold text-accent-light flex items-center gap-2"><span>🎯</span> Periode & Target PKL</h3>
-                    <p class="text-xs text-slate-400 mt-1">Periode PKL belum diatur, jadi laporan belum bisa menampilkan "dari bulan apa sampai bulan apa".</p>
+                    <h3 class="text-sm font-bold">🎯 Periode &amp; Target PKL</h3>
+                    <p class="text-xs mt-1" style="color:var(--muted)">Periode PKL belum diatur, jadi laporan belum bisa menampilkan "dari bulan apa sampai bulan apa".</p>
                 </div>
-                <button type="button" onclick="bukaSettings()" class="btn-secondary px-5 py-2.5 rounded-xl text-xs font-bold">⚙️ Atur Periode</button>
+                <button type="button" onclick="bukaSettings()" class="flat-btn flat-btn-soft">⚙️ Atur Periode</button>
             </div>
-            ${p.terisi > 0 ? `<p class="text-[11px] text-slate-500 mt-3">Sementara ini dihitung dari laporan pertama (${p.terisi} hari terisi).</p>` : ''}`;
+            ${p.terisi > 0 ? `<p class="text-[11px] mt-3" style="color:var(--muted)">Sementara ini dihitung dari laporan pertama (${p.terisi} hari terisi).</p>` : ''}`;
         return;
     }
 
     wadah.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
-                <h3 class="text-sm font-display font-bold text-accent-light flex items-center gap-2"><span>🎯</span> Periode & Target PKL</h3>
-                <p class="text-xs text-slate-300 mt-1.5">
-                    📆 Laporan PKL: <b class="text-white">Bulan ${p.teksPeriode}</b>
-                    <span class="text-slate-500">(${p.teksTanggal})</span>
+                <h3 class="text-sm font-bold">🎯 Periode &amp; Target PKL</h3>
+                <p class="text-xs mt-1.5" style="color:var(--muted)">
+                    📆 Laporan PKL: <b style="color:var(--ink)">Bulan ${p.teksPeriode}</b>
+                    <span style="color:var(--muted-2)">(${p.teksTanggal})</span>
                 </p>
             </div>
-            <button type="button" onclick="cariTanggalBelumDiisi()" class="btn-secondary px-4 py-2.5 rounded-xl text-[11px] font-bold">🔎 Lompat ke Tanggal Kosong</button>
+            <button type="button" onclick="cariTanggalBelumDiisi()" class="flat-btn flat-btn-ghost flat-btn-sm">🔎 Lompat ke Tanggal Kosong</button>
         </div>
 
         <div class="progress-track"><div class="progress-fill" style="width: ${p.persen}%"></div></div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-3 text-[11px]">
-            <span class="text-slate-300">Terisi <b class="text-emerald-400">${p.terisi}</b> dari <b class="text-white">${p.target}</b> hari kerja
-                ${p.targetManual ? '<span class="text-slate-500">(target manual)</span>' : '<span class="text-slate-500">(otomatis dari rentang)</span>'}
-                • <b class="text-accent-light">${p.persen}%</b></span>
-            <span class="text-slate-400">
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-3 text-[11px]" style="color:var(--muted)">
+            <span>Terisi <b style="color:#1B7A4B">${p.terisi}</b> dari <b style="color:var(--ink)">${p.target}</b> hari kerja
+                ${p.targetManual ? '<span style="color:var(--muted-2)">(target manual)</span>' : '<span style="color:var(--muted-2)">(otomatis dari rentang)</span>'}
+                • <b style="color:var(--blue)">${p.persen}%</b></span>
+            <span style="color:var(--muted)">
                 ${p.belumSampaiHariIni > 0
-                    ? `<b class="text-red-400">${p.belumSampaiHariIni} hari kerja belum diisi</b>`
-                    : '<b class="text-emerald-400">Semua hari kerja terisi ✓</b>'}
+                    ? `<b style="color:#C4342F">${p.belumSampaiHariIni} hari kerja belum diisi</b>`
+                    : '<b style="color:#1B7A4B">Semua hari kerja terisi ✓</b>'}
                 • ${p.liburTercatat} catatan libur • ${p.tanggalMerahDalamRentang} tanggal merah dalam periode • sisa ${p.sisa} hari kerja
             </span>
         </div>`;
@@ -583,5 +583,6 @@ function refreshTanggalDanTarget() {
     if (typeof renderPanelTarget === 'function') renderPanelTarget();
     if (typeof renderDaftarLiburPeriode === 'function') renderDaftarLiburPeriode();
     if (typeof renderInfoLibur === 'function') renderInfoLibur();
+    if (typeof renderRingkasanHero === 'function') renderRingkasanHero();
 }
 

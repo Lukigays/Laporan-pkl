@@ -4,6 +4,7 @@
 
 // ---------- Modal Opsi Ekspor ----------
 function bukaOspiExport() {
+    if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalExportOspi');
     const modal = document.getElementById('modalExportOspi');
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -18,6 +19,10 @@ function tutupOspiExport() {
 }
 
 function prosesEksekusiPDF() {
+    if (typeof pdfMake === 'undefined') {
+        showToast('⚠️ Fitur PDF butuh koneksi internet (pdfMake belum termuat).');
+        return;
+    }
     const opsi = document.querySelector('input[name="opsiCover"]:checked')
         ? document.querySelector('input[name="opsiCover"]:checked').value
         : 'dengan';

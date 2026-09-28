@@ -50,12 +50,10 @@ function cekKonfirmasiHapus(inputEl) {
     const btn = document.getElementById('btnHapusSemuaData');
     if (inputEl.value.trim() === 'HAPUS') {
         btn.disabled = false;
-        btn.classList.remove('bg-white/5', 'text-slate-500', 'cursor-not-allowed');
-        btn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
+        btn.classList.add('is-active', 'flat-btn-danger');
     } else {
         btn.disabled = true;
-        btn.classList.add('bg-white/5', 'text-slate-500', 'cursor-not-allowed');
-        btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'text-white', 'cursor-pointer', 'shadow-md');
+        btn.classList.remove('is-active', 'flat-btn-danger');
     }
 }
 

@@ -194,6 +194,7 @@ function updateAuthUI() {
 
 // ---------- Modal Auth ----------
 function bukaModalAuth() {
+    if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalAuth');
     const modal = document.getElementById('modalAuth');
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -352,7 +353,7 @@ async function prosesLupaPassword() {
     
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<span class="text-accent-light animate-pulse">⏳ Mengirim...</span>`;
+    btn.innerHTML = `<span class="animate-pulse">⏳ Mengirim...</span>`;
     
     try {
         showToast("⏳ Mengirim link reset password...");
