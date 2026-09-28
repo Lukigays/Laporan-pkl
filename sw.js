@@ -1,13 +1,37 @@
 // ============================================================
-// SERVICE WORKER — CACHING & OFFLINE MODE
+// SERVICE WORKER — CACHING & OFFLINE MODE (FLAT DESIGN BUILD)
 // ============================================================
 
-const CACHE_NAME = 'laporan-pkl-v7';
+const CACHE_NAME = 'laporan-pkl-flat-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './css/style.css',
   './manifest.json',
+  './css/style.css',
+  './css/fonts/inter-400-latin.woff2',
+  './css/fonts/inter-500-latin.woff2',
+  './css/fonts/inter-600-latin.woff2',
+  './css/fonts/inter-700-latin.woff2',
+  './css/fonts/inter-800-latin.woff2',
+  './css/fonts/inter-400-latin-ext.woff2',
+  './css/fonts/inter-500-latin-ext.woff2',
+  './css/fonts/inter-600-latin-ext.woff2',
+  './css/fonts/inter-700-latin-ext.woff2',
+  './css/fonts/inter-800-latin-ext.woff2',
+  './js/vendor/tailwind.js',
+  './js/vendor/localforage.min.js',
+  './js/vendor/confetti.browser.min.js',
+  './css/fonts/emoji-1.woff2',
+  './css/fonts/emoji-2.woff2',
+  './css/fonts/emoji-3.woff2',
+  './css/fonts/emoji-4.woff2',
+  './css/fonts/emoji-5.woff2',
+  './css/fonts/emoji-7.woff2',
+  './css/fonts/emoji-9.woff2',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './favicon.png',
   './js/config.js',
   './js/particles.js',
   './js/utils.js',
@@ -27,9 +51,7 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
   self.skipWaiting();
 });

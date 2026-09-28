@@ -1,46 +1,127 @@
-# 🚀 Aplikasi Laporan PKL (Praktek Kerja Lapangan)
+# 📘 Laporan PKL by Lukyy — **FLAT DESIGN EDITION**
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-
-Aplikasi berbasis web futuristik untuk mencatat, mengelola, dan mengekspor Laporan Kegiatan Harian Praktek Kerja Lapangan (PKL) dengan mudah dan praktis. Dibuat khusus dengan antarmuka mode gelap bergaya *glassmorphism* yang elegan.
+Versi ini adalah **aplikasi yang sama** dengan sebelumnya, tetapi seluruh tampilannya
+diubah total dari gaya *Neobrutalism* (border tebal + shadow keras) menjadi
+**flat design** yang bersih, terang, dan modern — mengikuti referensi desain
+(biru terang + lavender, sudut membulat, garis tipis, tanpa shadow keras).
 
 ---
 
-## ✨ Fitur Unggulan
+## 🎨 Yang berubah (tampilan)
 
-*   📝 **Manajemen Jurnal Harian:** Input dan edit uraian kegiatan harian beserta foto bukti kegiatan.
-*   📥 **Ekspor Laporan Otomatis:**
-    *   **Export to PDF:** Cetak tabel laporan beserta kover otomatis menggunakan `pdfMake`.
-    *   **Export to Word (.doc):** Unduh laporan dalam format Microsoft Word yang 100% rapi dan siap print.
-*   ☁️ **Sinkronisasi Cloud:** Terintegrasi dengan **Supabase** untuk menyimpan dan menarik data secara online (Fitur Login/Register akun).
-*   💾 **Penyimpanan Offline First:** Data tersimpan otomatis di perangkat secara lokal (menggunakan `localForage`/IndexedDB), sehingga bisa digunakan tanpa internet.
-*   📦 **Backup & Restore:** Fitur ekspor/impor seluruh data jurnal beserta profil pengguna ke dalam format file `.json`.
-*   📊 **Dashboard Statistik:** Menampilkan total hari, total uraian, dan jumlah foto secara *real-time*.
+| Sebelum (Neobrutalism) | Sesudah (Flat Design) |
+|---|---|
+| Border hitam 4–5 px | Border tipis 1 px `#EBE9F0` |
+| Shadow keras `8px 8px 0 #000` | Shadow lembut / tanpa shadow |
+| Sudut tajam 12–20 px | Sudut membulat 14–30 px & pill |
+| Warna kuning/pink neon | **Biru `#1D2BF0`**, lavender, biru langit, mint |
+| Font Space Grotesk + JetBrains Mono | **Inter** (self-hosted, tanpa CDN) |
+| Background titik-titik hitam | Background flat `#F5F4F2` |
+| Sticker miring, teks uppercase semua | Tipografi tenang, *sentence case* |
 
----
-
-## 🛠️ Teknologi yang Digunakan
-
-*   **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6)
-*   **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via CDN)
-*   **Database & Auth:** [Supabase](https://supabase.com/)
-*   **Library Eksternal:**
-    *   `pdfMake` (Pembuat dokumen PDF)
-    *   `docx.js` (Pembuat dokumen Word)
-    *   `localForage` (Penyimpanan lokal)
-    *   `FileSaver.js` (Pengunduh file)
-    *   `canvas-confetti` (Animasi partikel)
+**Elemen baru mengikuti referensi:**
+- **Hero panel gradasi lavender → ungu** dengan bulatan dekoratif flat.
+- **Kartu ringkasan progres** di dalam hero: pill `25% / 50% / 75% / Max`,
+  ring progres SVG biru, angka besar, tombol pink lembut **“Lihat Laporan →”**.
+  *(Di layar kecil kartu ini otomatis berubah menjadi ringkasan ringkas.)*
+- **Segmented tab** gaya pill dengan item aktif navy gelap.
+- Tombol pill, input bulat, kartu-kartu pastel (biru langit, lavender, mint).
+- Toast **navy pill**, modal dengan header/footer tipis, dan bottom-nav mengapung.
+- **Ikon emoji** tetap tampil (font Noto Color Emoji subset lokal), plus **logo lotus flat** di header.
 
 ---
 
-## 💻 Cara Penggunaan (Instalasi)
+## ✅ Yang TIDAK berubah (fungsi)
 
-Karena aplikasi ini adalah *Static Web App* (berbasis murni *client-side*), Anda tidak perlu menginstal server khusus seperti Node.js atau XAMPP.
+Semua fitur tetap utuh — hanya kelas CSS/struktur tampilannya yang diganti:
 
-1. **Clone Repository**
-   ```bash
-   git clone [https://github.com/USERNAME_ANDA/NAMA_REPO_ANDA.git](https://github.com/USERNAME_ANDA/NAMA_REPO_ANDA.git)
-   
+- Input/edit/hapus laporan harian + foto bukti (kamera web / galeri).
+- Kalender hari kerja (hijau = terisi, merah = kosong, abu = libur) + chip tanggal merah.
+- Periode & target PKL, badge pencapaian, statistik.
+- Ekspor **PDF** (dengan/tanpa kover), **backup/restore JSON**.
+- Login/register **Supabase** (email + Google), sinkronisasi cloud.
+- Panduan/tour, PWA install, **mode offline** (service worker).
+- Semua `id` elemen, nama fungsi, dan handler `onclick` dipertahankan 1:1,
+  jadi data lokal (localForage/IndexedDB) milik pengguna **tidak hilang**.
+
+---
+
+## 📁 Struktur File
+
+```
+pkl-flat/
+├── index.html              # UI flat design (semua id/handler lama dipertahankan)
+├── manifest.json           # tema flat: theme_color #1D2BF0
+├── sw.js                   # service worker (cache versi flat + font lokal)
+├── favicon.png, icon-192.png, icon-512.png, icon-maskable-512.png
+├── css/
+│   ├── style.css           # ← seluruh tema FLAT DESIGN (menggantikan style.css lama)
+│   └── fonts/              # Inter (latin & latin-ext) + Noto Color Emoji subset
+└── js/
+    ├── config.js           # palet Tailwind diarahkan ke warna flat
+    ├── utils.js            # + helper tutupSemuaModal()
+    ├── auth.js, tour.js, profil.js, laporan.js, backup.js, pdf.js,
+    │   kamera.js, badge.js, liburnasional.js, harikerja.js, pwa.js, main.js
+    └── vendor/             # library yang di-host lokal:
+        ├── tailwind.js                  #   - Tailwind Play CDN
+        ├── localforage.min.js           #   - penyimpanan lokal (IndexedDB)
+        └── confetti.browser.min.js      #   - animasi perayaan
+```
+
+### Catatan perubahan kecil di JS (hanya soal tampilan)
+- `harikerja.js` — panel “Periode & Target PKL” ditulis ulang dengan kelas flat;
+  kalender memakai kelas flat; status tanggal pakai kelas `st-ok` / `st-warn` / `st-libur`.
+- `badge.js` — kartu pencapaian memakai kelas `badge-item`.
+- `tour.js` — indikator langkah memakai kelas `tour-dot`.
+- `backup.js` — tombol hapus data memakai kelas `is-active` (bukan kelas warna lama).
+- `laporan.js` — tombol Edit/Unduh di tabel dll. memakai gaya pill flat;
+  `switchTab()` juga menyinkronkan bottom-nav mobile.
+- `pdf.js` & `kamera.js` — dokumentasi/komentar gaya, tanpa perubahan logika.
+- `index.html` — tambahan skrip ringkasan hero (`renderRingkasanHero`) yang membaca
+  `hitungProgresPKL()`; kalau fungsi itu tidak ada, kartu ringkasan dibiarkan apa adanya.
+
+---
+
+## 🚀 Cara Menjalankan
+
+Karena ini aplikasi statis (client-side):
+
+```bash
+# dari folder pkl-flat
+python3 -m http.server 8080
+# lalu buka http://localhost:8080
+```
+
+Untuk **fitur cloud (Supabase)** dan **kamera**, jalankan lewat `http://localhost`
+atau hosting HTTPS (mis. GitHub Pages / Netlify / Vercel). Semua fitur lain
+(termasuk ekspor PDF & penyimpanan lokal) tetap bekerja offline.
+
+---
+
+## 📶 Catatan Koneksi
+
+| Fitur | Butuh internet? |
+|---|---|
+| Input/edit laporan, kalender, statistik, badge | ❌ (offline, IndexedDB) |
+| Tampilan & font (Inter, emoji) | ❌ (di-host lokal) |
+| Ekspor PDF (pdfMake), Login/Sinkronisasi Cloud (Supabase) | ✅ (di-load dari CDN) |
+
+Kalau CDN tidak tersedia, aplikasi tetap terbuka normal — hanya tombol PDF/cloud
+yang menampilkan pesan bahwa butuh koneksi.
+
+---
+
+## 🎨 Palet Warna
+
+| Token | Nilai | Pemakaian |
+|---|---|---|
+| `--blue` | `#1D2BF0` | aksen utama, tombol primer, angka penting |
+| `--navy` | `#131A2B` | tab aktif, toast, panel gelap |
+| `--lilac-100/200` | `#F3E1FB` / `#E7C6F7` | panel lembut, pill aktif |
+| `--pink-soft` | `#EFC4F6` | tombol sekunder (gaya referensi) |
+| `--sky-100/200` | `#D8F0FC` / `#BEE7FB` | kartu cloud sync |
+| `--mint-100` | `#D9F6E6` | badge aktif, periode PKL |
+| `--surface` | `#F5F4F2` | latar halaman |
+| `--line` | `#EBE9F0` | garis/border tipis |
+
+Sudut: `--r: 18px`, `--r-md: 24px`, `--r-lg: 30px`, `--r-pill: 999px`.
