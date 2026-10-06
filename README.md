@@ -90,6 +90,10 @@ pkl-flat/
 - Jika penyimpanan browser gagal dibaca, ekspor tetap mencoba membuat file dari data aktif di layar dan memberi peringatan agar hasilnya tidak disangka salinan lengkap.
 - Browser yang mendukung pemilih file memakai dialog simpan; pada iPhone/iPad tersedia lembar berbagi sebagai opsi menyimpan ke Files.
 
+## ☁️ Perbaikan Sinkronisasi Cloud
+
+Sinkronisasi Supabase sekarang membaca ID secara berpaginasi, menghapus per kelompok kecil, membatasi ukuran batch insert (terutama foto), dan mencoba ulang kegagalan jaringan/statement timeout. Data lokal tidak dihapus saat sinkronisasi gagal. Jika timeout masih terjadi, jalankan `supabase/sync-index.sql` sekali melalui **Supabase Dashboard → SQL Editor** agar filter `user_id` lebih cepat.
+
 ## 🚀 Cara Menjalankan
 
 Karena ini aplikasi statis (client-side):

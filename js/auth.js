@@ -380,34 +380,228 @@ async function logoutAuth() {
 }
 
 // ---------- Sinkronisasi Cloud ----------
-async function simpanKeCloud() {
-    if (!supabaseClient || !currentUser) { showToast('⚠️ Belum login akun cloud!'); return; }
-    showToast("⏳ Sedang menyimpan data ke Cloud...");
-    try {
-        await supabaseClient.from('laporan_pkl').delete().eq('user_id', currentUser.id);
-        const rowsToInsert = dataLaporan.map(item => ({
-            user_id: currentUser.id,
+let sinkronisasiCloudSedangBerjalan = false;
+const HALAMAN_BACA_CLOUD = 100;
+const BATCH_HAPUS_CLOUD = 25;
+const BATCH_INSERT_CLOUD = 8;
+const BATAS_BYTE_BATCH_CLOUD = 350 * 1024;
+const BATAS_FOTO_CLOUD = 256 * 1024;
+const MAKS_PERCOBAAN_SYNC_CLOUD = 3;
+
+function tungguSyncCloud(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function errorSyncBisaDicobaUlang(error) {
+    const teks = [error && error.message, error && error.details, error && error.hint]
+        .filter(Boolean).join(' ').toLowerCase();
+    const status = Number(error && (error.status || error.statusCode));
+    return error && (String(error.code) === '57014' || error.name === 'AbortError')
+        || [408, 425, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524].includes(status)
+        || /failed to fetch|fetch failed|load failed|networkerror|network request failed|network unreachable|connection reset|statement timeout|timed out|temporarily unavailable|gateway timeout/.test(teks);
+}
+
+function keteranganErrorSyncCloud(error) {
+    const teks = [error && error.message, error && error.details, error && error.hint]
+        .filter(Boolean).join(' ');
+    const rendah = teks.toLowerCase();
+    if (error && String(error.code) === '57014' || /statement timeout|canceling statement due to statement timeout/.test(rendah)) {
+        return 'Database Supabase kehabisan waktu memproses data. Data lokal tetap aman; coba lagi. Jika berulang, jalankan SQL index laporan_pkl_user_id_id_idx yang disertakan.';
+    }
+    if (/failed to fetch|fetch failed|load failed|networkerror|network request failed|network unreachable|connection reset/.test(rendah)) {
+        return 'Koneksi ke Supabase gagal. Periksa internet/URL Supabase lalu coba lagi; data lokal tetap aman.';
+    }
+    return teks || 'Terjadi kesalahan yang tidak diketahui.';
+}
+
+async function jalankanPermintaanCloudDenganRetry(request, label = 'permintaan cloud') {
+    let errorTerakhir;
+    for (let percobaan = 1; percobaan <= MAKS_PERCOBAAN_SYNC_CLOUD; percobaan++) {
+        try {
+            const hasil = await request();
+            if (hasil && hasil.error) throw hasil.error;
+            return hasil;
+        } catch (err) {
+            errorTerakhir = err;
+            if (!errorSyncBisaDicobaUlang(err) || percobaan === MAKS_PERCOBAAN_SYNC_CLOUD) break;
+            console.warn(`${label} gagal pada percobaan ${percobaan}; akan dicoba ulang:`, err);
+            showToast(`⚠️ Koneksi cloud lambat. Mengulang ${label} (${percobaan + 1}/${MAKS_PERCOBAAN_SYNC_CLOUD})...`);
+            await tungguSyncCloud(700 * Math.pow(2, percobaan - 1));
+        }
+    }
+    throw errorTerakhir;
+}
+
+function pecahArray(array, ukuran) {
+    const hasil = [];
+    for (let i = 0; i < array.length; i += ukuran) hasil.push(array.slice(i, i + ukuran));
+    return hasil;
+}
+
+function ukuranTeksUtf8(teks) {
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(teks).length;
+    return teks.length * 2;
+}
+
+function buatBatchInsertCloud(baris) {
+    const hasil = [];
+    let current = [];
+    let currentBytes = 2;
+    for (const row of baris) {
+        const bytes = ukuranTeksUtf8(JSON.stringify(row)) + 1;
+        if (current.length && (current.length >= BATCH_INSERT_CLOUD || currentBytes + bytes > BATAS_BYTE_BATCH_CLOUD)) {
+            hasil.push(current);
+            current = [];
+            currentBytes = 2;
+        }
+        current.push(row);
+        currentBytes += bytes;
+    }
+    if (current.length) hasil.push(current);
+    return hasil;
+}
+
+async function siapkanBarisLaporanCloud(userId, snapshotLokal) {
+    const hasil = [];
+    for (const item of snapshotLokal) {
+        let foto = item.foto;
+        // Foto lokal beresolusi tinggi dapat membuat request Supabase terlalu besar.
+        // Kecilkan hanya salinan cloud; file lokal asli tidak disentuh.
+        if (typeof foto === 'string' && foto.startsWith('data:image/') && foto.length > BATAS_FOTO_CLOUD
+            && typeof kompresGambarRingan === 'function') {
+            try {
+                for (const [maksDimensi, kualitas] of [[900, 0.72], [600, 0.6], [400, 0.5]]) {
+                    if (foto.length <= BATAS_FOTO_CLOUD) break;
+                    const fotoLebihRingan = await kompresGambarRingan(foto, maksDimensi, kualitas);
+                    if (typeof fotoLebihRingan === 'string' && fotoLebihRingan.length < foto.length) foto = fotoLebihRingan;
+                }
+            } catch (err) {
+                console.warn(`Foto tanggal ${item.tanggal} gagal diperkecil untuk cloud; memakai versi lokal.`, err);
+            }
+        }
+        hasil.push({
+            user_id: userId,
             hari: item.hari,
             tanggal: item.tanggal,
             uraian: item.uraian,
-            foto: item.foto,
+            foto,
             bulan_label: item.bulanLabel
-        }));
-        const chunkSize = 50;
-        for (let i = 0; i < rowsToInsert.length; i += chunkSize) {
-            const chunk = rowsToInsert.slice(i, i + chunkSize);
-            const { error } = await supabaseClient.from('laporan_pkl').insert(chunk);
-            if (error) throw error;
+        });
+    }
+    return hasil;
+}
+
+async function ambilSemuaIdLaporanCloud(userId) {
+    const semua = [];
+    for (let offset = 0; ; offset += HALAMAN_BACA_CLOUD) {
+        const { data, error } = await supabaseClient
+            .from('laporan_pkl')
+            .select('id')
+            .eq('user_id', userId)
+            .order('id', { ascending: true })
+            .range(offset, offset + HALAMAN_BACA_CLOUD - 1);
+        if (error) throw error;
+        if (!Array.isArray(data)) throw new Error('Respons daftar laporan cloud tidak valid.');
+        semua.push(...data.filter(row => row && row.id !== null && row.id !== undefined).map(row => row.id));
+        if (data.length < HALAMAN_BACA_CLOUD) break;
+    }
+    return semua;
+}
+
+async function sinkronisasiCloudSatuPutaran(userId, baris) {
+    // Jangan jalankan DELETE user_id sekaligus: ambil ID berpaginasi lalu hapus kecil-kecil.
+    const idLama = await ambilSemuaIdLaporanCloud(userId);
+    for (const batchId of pecahArray(idLama, BATCH_HAPUS_CLOUD)) {
+        const { data, error } = await supabaseClient
+            .from('laporan_pkl')
+            .delete()
+            .eq('user_id', userId)
+            .in('id', batchId)
+            .select('id');
+        if (error) throw error;
+        if (!Array.isArray(data) || data.length !== batchId.length) {
+            throw new Error(`Supabase hanya menghapus ${Array.isArray(data) ? data.length : 0} dari ${batchId.length} baris. Periksa policy DELETE/RLS tabel laporan_pkl.`);
         }
-        dataTelahBerubah = false;
-        showToast("✅ Data berhasil disimpan ke Cloud!");
+    }
+
+    // Insert dibatasi jumlah baris dan total ukuran payload agar foto tidak memicu timeout.
+    for (const batch of buatBatchInsertCloud(baris)) {
+        const { error } = await supabaseClient.from('laporan_pkl').insert(batch);
+        if (error) throw error;
+    }
+}
+
+function snapshotLaporanCloud() {
+    return (Array.isArray(dataLaporan) ? dataLaporan : []).map(item => ({
+        hari: item && item.hari,
+        tanggal: item && item.tanggal,
+        uraian: item && item.uraian,
+        foto: item && item.foto,
+        bulanLabel: item && item.bulanLabel
+    }));
+}
+
+function laporanCloudBelumBerubah(snapshot) {
+    if (!Array.isArray(dataLaporan) || dataLaporan.length !== snapshot.length) return false;
+    return dataLaporan.every((item, index) => {
+        const awal = snapshot[index];
+        return item && item.hari === awal.hari && item.tanggal === awal.tanggal
+            && item.uraian === awal.uraian && item.foto === awal.foto
+            && item.bulanLabel === awal.bulanLabel;
+    });
+}
+
+async function simpanKeCloud(opsi = {}) {
+    const senyap = !!opsi.senyap;
+    if (!supabaseClient || !currentUser) {
+        if (!senyap) showToast('⚠️ Belum login akun cloud!');
+        return;
+    }
+    if (sinkronisasiCloudSedangBerjalan) {
+        if (!senyap) showToast('⏳ Sinkronisasi cloud sedang berjalan, tunggu sebentar.');
+        return;
+    }
+
+    sinkronisasiCloudSedangBerjalan = true;
+    const userId = currentUser.id;
+    const snapshotLokal = snapshotLaporanCloud();
+    if (!senyap) showToast('⏳ Menyiapkan data dan menyimpan ke Cloud...');
+
+    try {
+        const baris = await siapkanBarisLaporanCloud(userId, snapshotLokal);
+        let errorTerakhir = null;
+        for (let percobaan = 1; percobaan <= MAKS_PERCOBAAN_SYNC_CLOUD; percobaan++) {
+            try {
+                // Setiap percobaan mengulang satu siklus penuh. Ini aman jika fetch
+                // putus setelah server sempat menerima sebagian insert: percobaan baru
+                // membaca dan membersihkan ID yang sudah ada sebelum mengirim ulang.
+                await sinkronisasiCloudSatuPutaran(userId, baris);
+                errorTerakhir = null;
+                break;
+            } catch (err) {
+                errorTerakhir = err;
+                if (!errorSyncBisaDicobaUlang(err) || percobaan === MAKS_PERCOBAAN_SYNC_CLOUD) break;
+                console.warn(`Sinkronisasi cloud gagal pada percobaan ${percobaan}; akan dicoba ulang:`, err);
+                if (!senyap) showToast(`⚠️ Koneksi/server lambat. Mencoba ulang ${percobaan + 1}/${MAKS_PERCOBAAN_SYNC_CLOUD}...`);
+                await tungguSyncCloud(700 * Math.pow(2, percobaan - 1));
+            }
+        }
+        if (errorTerakhir) throw errorTerakhir;
+
+        dataTelahBerubah = !laporanCloudBelumBerubah(snapshotLokal);
+        if (!senyap) showToast(`✅ ${baris.length} laporan berhasil disinkronkan ke Cloud!`);
     } catch (err) {
-        showToast("❌ Gagal sinkronisasi: " + err.message);
+        console.error('Gagal sinkronisasi ke Cloud:', err);
+        showToast(`❌ Gagal sinkronisasi: ${keteranganErrorSyncCloud(err)}`);
+        // Tetap dirty agar sinkronisasi otomatis berikutnya bisa mencoba ulang.
+        dataTelahBerubah = true;
+    } finally {
+        sinkronisasiCloudSedangBerjalan = false;
     }
 }
 
 async function autoSyncKeCloud() {
-    if (currentUser && dataTelahBerubah && supabaseClient) simpanKeCloud();
+    if (currentUser && dataTelahBerubah && supabaseClient) simpanKeCloud({ senyap: true });
 }
 
 async function tarikDariCloud() {
@@ -415,30 +609,50 @@ async function tarikDariCloud() {
         showToast('⚠️ Belum login akun cloud!');
         return;
     }
-    showToast("⏳ Mengambil data dari Cloud...");
+    if (sinkronisasiCloudSedangBerjalan) {
+        showToast('⏳ Tunggu sinkronisasi yang sedang berjalan selesai dulu.');
+        return;
+    }
+    sinkronisasiCloudSedangBerjalan = true;
+    const userId = currentUser.id;
+    const ukuranHalaman = 20; // respons berisi foto Base64, jadi jangan tarik ribuan baris sekaligus
+    const semuaBaris = [];
+    showToast('⏳ Mengambil data Cloud per halaman...');
+
     try {
-        const { data, error } = await supabaseClient
-            .from('laporan_pkl')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .order('id', { ascending: true });
-        if (error) throw error;
-        if (data && data.length > 0) {
-            dataLaporan = data.map(row => ({
+        for (let offset = 0; ; offset += ukuranHalaman) {
+            const hasil = await jalankanPermintaanCloudDenganRetry(() => supabaseClient
+                .from('laporan_pkl')
+                .select('*')
+                .eq('user_id', userId)
+                .order('id', { ascending: true })
+                .range(offset, offset + ukuranHalaman - 1), 'unduhan halaman cloud');
+            const halaman = hasil && hasil.data;
+            if (!Array.isArray(halaman)) throw new Error('Respons data Cloud tidak valid.');
+            semuaBaris.push(...halaman);
+            if (halaman.length < ukuranHalaman) break;
+        }
+
+        if (semuaBaris.length > 0) {
+            const laporanBaru = semuaBaris.map(row => ({
                 hari: row.hari,
                 tanggal: row.tanggal,
                 uraian: row.uraian,
                 foto: row.foto,
                 bulanLabel: row.bulan_label
             }));
-            await localforage.setItem('laporanPKL', dataLaporan);
+            await localforage.setItem('laporanPKL', laporanBaru);
+            dataLaporan = laporanBaru;
+            dataTelahBerubah = false;
             renderSemuaData();
-            showToast("✅ Data berhasil ditarik dari Cloud!");
+            showToast(`✅ ${laporanBaru.length} laporan berhasil ditarik dari Cloud!`);
         } else {
-            showToast("⚠️ Belum ada data tersimpan di akun cloud Anda.");
+            showToast('⚠️ Belum ada data tersimpan di akun cloud Anda. Data lokal tidak diubah.');
         }
     } catch (err) {
-        console.error("Gagal tarik cloud:", err);
-        showToast("❌ Gagal mengambil data dari cloud.");
+        console.error('Gagal tarik cloud:', err);
+        showToast(`❌ Gagal mengambil data Cloud: ${keteranganErrorSyncCloud(err)}`);
+    } finally {
+        sinkronisasiCloudSedangBerjalan = false;
     }
 }

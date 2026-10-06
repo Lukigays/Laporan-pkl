@@ -2,7 +2,7 @@
 // SERVICE WORKER — CACHING & OFFLINE MODE (FLAT DESIGN BUILD)
 // ============================================================
 
-const CACHE_NAME = 'laporan-pkl-flat-v2';
+const CACHE_NAME = 'laporan-pkl-flat-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
