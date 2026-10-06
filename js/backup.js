@@ -7,6 +7,42 @@ const VERSI_FORMAT_BACKUP_PKL = 1;
 const KUNCI_LAPORAN_PKL = 'laporanPKL';
 const KUNCI_PROFIL_PKL = 'profilPKL';
 
+function tampilkanStatusBackup(status, judul, pesan) {
+    const modal = document.getElementById('modalStatusBackup');
+    if (!modal) return;
+
+    const spinner = document.getElementById('statusBackupSpinner');
+    const icon = document.getElementById('statusBackupIcon');
+    const tombolTutup = document.getElementById('statusBackupClose');
+    const judulEl = document.getElementById('statusBackupTitle');
+    const pesanEl = document.getElementById('statusBackupMessage');
+    const sedangMemproses = status === 'loading';
+    const ikonStatus = {
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+        info: 'ℹ️'
+    };
+
+    if (spinner) spinner.classList.toggle('hidden', !sedangMemproses);
+    if (icon) {
+        icon.classList.toggle('hidden', sedangMemproses);
+        icon.textContent = ikonStatus[status] || '💾';
+    }
+    if (judulEl) judulEl.textContent = judul || (sedangMemproses ? 'Memproses...' : 'Selesai');
+    if (pesanEl) pesanEl.textContent = pesan || '';
+    if (tombolTutup) tombolTutup.classList.toggle('hidden', sedangMemproses);
+
+    modal.classList.remove('hidden', 'opacity-0');
+}
+
+function tutupStatusBackup() {
+    const modal = document.getElementById('modalStatusBackup');
+    if (!modal) return;
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 180);
+}
+
 function isPlainRecord(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -175,11 +211,13 @@ async function simpanBlobBackup(blob, namaFile, promiseSavePicker) {
 }
 
 async function eksporDataJSON() {
-    const namaAwal = buatNamaFileBackup();
-    const promiseSavePicker = mulaiSavePicker(namaAwal);
+    tampilkanStatusBackup('loading', 'Menyiapkan backup...', 'Membaca database lokal dan menyiapkan file. Mohon tunggu.');
     showToast('⏳ Membaca database dan menyiapkan backup...');
 
     try {
+        // Panggil picker sebelum await agar tetap dianggap sebagai aksi pengguna.
+        const namaAwal = buatNamaFileBackup();
+        const promiseSavePicker = mulaiSavePicker(namaAwal);
         await tungguDataAplikasiSiap();
         const { database, databaseTerbaca, errorStorage } = await bacaDatabaseLokalUntukBackup();
         const laporan = database[KUNCI_LAPORAN_PKL];
@@ -195,23 +233,34 @@ async function eksporDataJSON() {
         const jsonString = JSON.stringify(payload, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
         const namaFile = buatNamaFileBackup();
+        tampilkanStatusBackup('loading', 'Menyimpan file backup...', `Membuat ${namaFile} (${formatUkuranFile(blob.size)}).`);
         const hasilSimpan = await simpanBlobBackup(blob, namaFile, promiseSavePicker);
 
         if (hasilSimpan === 'dibatalkan') {
+            tampilkanStatusBackup('info', 'Backup dibatalkan', 'Tidak ada file backup yang disimpan. Data Anda tidak berubah.');
             showToast('Backup dibatalkan. Data Anda tidak berubah.');
             return;
         }
 
         const ukuran = formatUkuranFile(blob.size);
+        const caraSimpan = hasilSimpan === 'tersimpan'
+            ? 'File tersimpan di lokasi yang Anda pilih.'
+            : (hasilSimpan === 'dibagikan'
+                ? 'Pilih lokasi/aplikasi tujuan dari menu berbagi untuk menyimpan file.'
+                : 'Browser sudah memulai unduhan; cek folder Unduhan/Downloads.');
         if (!databaseTerbaca) {
-            const alasan = errorStorage ? 'database lokal gagal dibaca' : 'penyimpanan lokal tidak dapat diperiksa';
-            showToast(`⚠️ Backup ${laporan.length} laporan dibuat dari sesi aktif (${ukuran}); ${alasan}.`);
+            const alasan = errorStorage ? 'Database lokal tidak terbaca penuh.' : 'Penyimpanan lokal tidak dapat diperiksa.';
+            tampilkanStatusBackup('warning', 'Backup dibuat dengan peringatan', `${laporan.length} laporan, ${foto} foto (${ukuran}). ${alasan} File: ${namaFile}`);
+            showToast(`⚠️ Backup ${laporan.length} laporan dibuat dari sesi aktif (${ukuran}); database lokal tidak terbaca penuh.`);
         } else {
+            tampilkanStatusBackup('success', 'Backup berhasil dibuat', `${laporan.length} laporan, ${foto} foto (${ukuran}). ${caraSimpan} File: ${namaFile}`);
             showToast(`✅ Backup ${laporan.length} laporan (${foto} foto, ${ukuran}) berhasil dibuat!`);
         }
     } catch (err) {
         console.error('Gagal membuat backup database:', err);
-        showToast(`❌ Backup gagal: ${err && err.message ? err.message : 'terjadi kesalahan saat membaca database.'}`);
+        const pesan = err && err.message ? err.message : 'terjadi kesalahan saat membaca database.';
+        tampilkanStatusBackup('error', 'Backup gagal', pesan);
+        showToast(`❌ Backup gagal: ${pesan}`);
     }
 }
 
@@ -374,22 +423,31 @@ async function imporDataJSON(event) {
     const file = input && input.files ? input.files[0] : null;
     if (!file) return;
 
+    tampilkanStatusBackup('loading', 'Memulihkan backup...', `Membaca ${file.name || 'file JSON'} dan memeriksa isinya.`);
     showToast('⏳ Membaca dan memeriksa file backup...');
     try {
         const teks = await bacaTeksFile(file);
+        tampilkanStatusBackup('loading', 'Memeriksa data...', 'Memvalidasi format backup sebelum mengubah database.');
         let parsed;
         try { parsed = JSON.parse(teks); } catch (err) { throw new Error('Format JSON rusak atau tidak valid.'); }
+        tampilkanStatusBackup('loading', 'Menyimpan data...', 'Memulihkan laporan, foto, profil, dan data kalender. Mohon tunggu.');
         const hasilPemulihan = await pulihkanDatabaseDariJSON(parsed);
         if (hasilPemulihan.dibatalkan) {
+            tampilkanStatusBackup('info', 'Pemulihan dibatalkan', 'Data Anda tidak berubah.');
             showToast('Pemulihan dibatalkan. Data Anda tidak berubah.');
         } else if (!hasilPemulihan.permanen) {
+            tampilkanStatusBackup('warning', 'Data dibuka sementara', 'Penyimpanan lokal tidak tersedia, jadi perubahan mungkin hilang saat halaman ditutup. Coba browser lain.');
             showToast('⚠️ Data dibuka, tetapi penyimpanan lokal tidak tersedia. Coba browser lain.');
         } else {
+            const jumlah = Array.isArray(dataLaporan) ? dataLaporan.length : 0;
+            tampilkanStatusBackup('success', 'Pemulihan berhasil', `${jumlah} laporan berhasil dipulihkan dari ${file.name || 'file backup'}.`);
             showToast('✅ Data backup berhasil dipulihkan!');
         }
     } catch (err) {
         console.error('Gagal mengimpor backup:', err);
-        showToast(`❌ Pemulihan gagal: ${err && err.message ? err.message : 'periksa file dan ruang penyimpanan.'}`);
+        const pesan = err && err.message ? err.message : 'periksa file dan ruang penyimpanan.';
+        tampilkanStatusBackup('error', 'Pemulihan gagal', pesan);
+        showToast(`❌ Pemulihan gagal: ${pesan}`);
     } finally {
         if (input) input.value = '';
     }

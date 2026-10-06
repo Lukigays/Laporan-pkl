@@ -89,6 +89,7 @@ pkl-flat/
 - Pemulihan meminta konfirmasi dan hanya mengganti database lokal. Data cloud tidak langsung ditimpa; sinkronisasi cloud dilakukan terpisah.
 - Jika penyimpanan browser gagal dibaca, ekspor tetap mencoba membuat file dari data aktif di layar dan memberi peringatan agar hasilnya tidak disangka salinan lengkap.
 - Browser yang mendukung pemilih file memakai dialog simpan; pada iPhone/iPad tersedia lembar berbagi sebagai opsi menyimpan ke Files.
+- Saat backup/pemulihan berjalan, aplikasi menampilkan indikator loading penuh dan hasil akhir yang tetap terlihat (berhasil, peringatan, atau gagal beserta pesannya).
 
 ## ☁️ Perbaikan Sinkronisasi Cloud
 

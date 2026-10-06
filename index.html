@@ -50,6 +50,22 @@
         </div>
     </div>
 
+    <!-- ===================== STATUS BACKUP / RESTORE ===================== -->
+    <div id="modalStatusBackup" class="fixed inset-0 z-[200] hidden modal-overlay flex justify-center items-center p-4" role="dialog" aria-modal="true" aria-labelledby="statusBackupTitle">
+        <div class="modal-content w-full max-w-sm p-7 text-center">
+            <div id="statusBackupSpinner" class="flex justify-center mb-4" aria-hidden="true">
+                <svg class="animate-spin" style="width:40px;height:40px;color:var(--blue);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style="opacity:.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path style="opacity:.85;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+            </div>
+            <div id="statusBackupIcon" class="hidden icon-tile mx-auto mb-4" style="width:52px;height:52px;border-radius:18px;font-size:24px;">💾</div>
+            <h3 id="statusBackupTitle" class="text-lg font-bold mb-2">Memproses backup...</h3>
+            <p id="statusBackupMessage" class="text-sm leading-relaxed mb-5" style="color:var(--muted);" aria-live="polite">Mohon tunggu sebentar.</p>
+            <button id="statusBackupClose" type="button" onclick="tutupStatusBackup()" class="hidden flat-btn flat-btn-primary">Tutup</button>
+        </div>
+    </div>
+
     <!-- ===================== MODAL RESET PASSWORD ===================== -->
     <div id="modalResetPassword" class="fixed inset-0 z-[130] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-md p-8 text-center relative transform scale-95 transition-transform">
