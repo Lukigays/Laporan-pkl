@@ -82,6 +82,14 @@ pkl-flat/
 
 ---
 
+## 💾 Backup & Restore Database Lokal
+
+- Tombol **Unduh Backup Database** menunggu IndexedDB selesai dimuat, lalu mengekspor seluruh key LocalForage yang dipakai aplikasi—laporan, foto bukti, profil/logo, dan data kalender—ke file JSON bertanda versi.
+- Tombol **Pulihkan Backup** menerima format baru dan juga format lama `{ "profil": ..., "laporan": [...] }`.
+- Pemulihan meminta konfirmasi dan hanya mengganti database lokal. Data cloud tidak langsung ditimpa; sinkronisasi cloud dilakukan terpisah.
+- Jika penyimpanan browser gagal dibaca, ekspor tetap mencoba membuat file dari data aktif di layar dan memberi peringatan agar hasilnya tidak disangka salinan lengkap.
+- Browser yang mendukung pemilih file memakai dialog simpan; pada iPhone/iPad tersedia lembar berbagi sebagai opsi menyimpan ke Files.
+
 ## 🚀 Cara Menjalankan
 
 Karena ini aplikasi statis (client-side):

@@ -3,14 +3,22 @@
 // ============================================================
 
 async function muatProfil() {
+    let berhasilMembaca = true;
     try {
         const profil = (typeof localforage !== 'undefined' && localforage.getItem)
             ? await localforage.getItem('profilPKL')
             : null;
         if (profil) dataProfil = { ...dataProfil, ...profil };
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        berhasilMembaca = false;
+        console.error(err);
+    }
+    if (typeof window !== 'undefined' && window.appDataLoadStatus) {
+        window.appDataLoadStatus.profilLoaded = berhasilMembaca;
+    }
     renderProfil();
     renderLogoPreview();
+    return berhasilMembaca;
 }
 
 function renderProfil() {

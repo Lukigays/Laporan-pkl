@@ -339,10 +339,13 @@
 
                 <!-- BACKUP -->
                 <div class="flat-card p-5">
-                    <h4 class="text-sm font-bold mb-3">💾 Backup &amp; Restore (JSON)</h4>
+                    <h4 class="text-sm font-bold mb-2">💾 Backup &amp; Restore Database (JSON)</h4>
+                    <p class="text-[11px] leading-relaxed mb-3" style="color:var(--muted);">
+                        Backup mencakup semua data lokal: laporan, foto bukti, profil, dan kalender. Simpan file JSON ini di perangkat lain/cloud sebagai salinan aman.
+                    </p>
                     <div class="flex gap-3 flex-wrap">
-                        <button onclick="eksporDataJSON()" class="flat-btn flat-btn-soft flex-1">📤 Ekspor Data</button>
-                        <label class="flat-btn flat-btn-ghost flex-1 cursor-pointer">📥 Impor Data<input type="file" id="inputImporJSON" accept=".json" onchange="imporDataJSON(event)" class="hidden"></label>
+                        <button type="button" onclick="eksporDataJSON()" class="flat-btn flat-btn-soft flex-1">📤 Unduh Backup Database</button>
+                        <label class="flat-btn flat-btn-ghost flex-1 cursor-pointer">📥 Pulihkan Backup<input type="file" id="inputImporJSON" accept=".json,application/json" onchange="imporDataJSON(event)" class="hidden"></label>
                     </div>
                 </div>
 
