@@ -387,126 +387,39 @@
     <header class="site-header no-print">
         <div class="max-w-6xl mx-auto px-4 md:px-8 site-header-inner">
             <div class="brand-lockup">
-                <div class="brand-mark" aria-hidden="true">L<span>.</span></div>
-                <div>
-                    <h1>Laporan PKL</h1>
-                    <p>JURNAL HARIAN / BY LUKYY</p>
-                </div>
+                <div class="brand-mark" aria-hidden="true">L</div>
+                <div><h1>Laporan PKL</h1><p>Jurnal praktik kerja lapangan</p></div>
             </div>
             <div class="header-actions">
-                <span class="header-caption">RUANG KERJA SISWA</span>
-                <button onclick="bukaTourManual()" class="flat-btn flat-btn-ghost flat-btn-sm">Panduan <span aria-hidden="true">↗</span></button>
+                <button onclick="bukaTourManual()" class="header-link">Panduan</button>
                 <button id="btnInstallPWA" onclick="installPWA()" class="hidden flat-btn flat-btn-primary flat-btn-sm">Install App</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 md:px-8 relative pt-8">
-
-        <!-- ============================== HERO ============================== -->
-        <section class="hero-section no-print mb-8">
-            <div class="flat-card panel-gradient overflow-hidden p-6 md:p-10 relative">
-
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                    <!-- KIRI: teks -->
-                    <div>
-                        <span class="hero-eyebrow"><span></span> JURNAL PRAKTIK KERJA LAPANGAN</span>
-                        <h2 class="hero-title mb-4">
-                            Setiap hari,<br>ada cerita <em>baru.</em>
-                        </h2>
-                        <p class="hero-sub max-w-md">
-                            Simpan proses belajarmu dalam satu tempat. Catat kegiatan, pantau hari kerja, dan siapkan laporan saat dibutuhkan.
-                        </p>
-                        <div class="flex flex-wrap gap-2.5 mt-6">
-                            <button onclick="bukaRuangKerja('input')" class="flat-btn flat-btn-primary">Mulai mencatat <span aria-hidden="true">↗</span></button>
-                            <button onclick="bukaRuangKerja('laporan')" class="flat-btn flat-btn-ghost">Lihat laporan</button>
-                        </div>
-
-                        <!-- Ringkasan ringkas (hanya tampil di layar kecil) -->
-                        <div class="hero-compact mt-6 rounded-2xl p-4" style="background:#fff;">
-                            <div class="flex items-center justify-between text-xs font-semibold mb-2">
-                                <span style="color:var(--muted);">Progres hari kerja</span>
-                                <span id="heroPersenM" style="color:var(--blue);">0%</span>
-                            </div>
-                            <div class="progress-track"><div class="progress-fill" id="heroBarM" style="width:0%"></div></div>
-                            <p class="text-[11px] mt-2" style="color:var(--muted);"><span id="heroTerisiM">0</span> dari <span id="heroTargetM">0</span> hari kerja terisi</p>
-                        </div>
-                    </div>
-
-                    <!-- KANAN: kartu ringkasan -->
-                    <div class="flat-card hero-summary p-5 md:p-6">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-[11px] font-semibold uppercase tracking-wide" style="color:var(--muted);">Target Hari Kerja</p>
-                                <p id="heroPeriode" class="text-[11px] mt-1" style="color:var(--muted-2);">Periode PKL belum diatur</p>
-                            </div>
-                            <span id="heroStatus" class="chip-soft">—</span>
-                        </div>
-
-                        <!-- milestone pills (mirip 25% / 50% / 75% / Max) -->
-                        <div class="flex gap-2 mt-5 flex-wrap" id="heroMilestones">
-                            <span class="pill" data-min="25">25%</span>
-                            <span class="pill" data-min="50">50%</span>
-                            <span class="pill" data-min="75">75%</span>
-                            <span class="pill" data-min="100">Max</span>
-                        </div>
-
-                        <div class="flex items-center gap-5 mt-6">
-                            <div class="relative" style="width:118px;height:118px;flex:none;">
-                                <svg viewBox="0 0 120 120" class="w-full h-full hero-ring">
-                                    <circle cx="60" cy="60" r="52" fill="none" stroke="#EFE9F7" stroke-width="12"></circle>
-                                    <circle id="heroRing" cx="60" cy="60" r="52" fill="none" stroke="#344d70" stroke-width="12"
-                                            stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
-                                </svg>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span id="heroPersen" class="text-xl font-bold" style="color:var(--blue);">0%</span>
-                                </div>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-[11px] font-semibold uppercase tracking-wide" style="color:var(--muted);">Hari kerja terisi</p>
-                                <div class="flex items-end gap-2 mt-1">
-                                    <span id="heroTerisi" class="hero-number" style="color:var(--ink);">0</span>
-                                    <span class="text-sm font-semibold mb-2" style="color:var(--muted);">/ <span id="heroTarget">0</span> hari</span>
-                                </div>
-                                <div class="progress-track mt-3"><div class="progress-fill" id="heroBar" style="width:0%"></div></div>
-                            </div>
-                        </div>
-
-                        <div class="mt-5 rounded-2xl p-4" style="background:var(--lilac-050);">
-                            <div class="flex items-center justify-between gap-3 py-1">
-                                <span class="text-xs" style="color:var(--muted);">Sisa hari kerja</span>
-                                <span id="heroSisa" class="text-xs font-bold" style="color:var(--ink);">0</span>
-                            </div>
-                            <div class="my-2" style="height:1px;background:#EDE4F6;"></div>
-                            <div class="flex items-center justify-between gap-3 py-1">
-                                <span class="text-xs" style="color:var(--muted);">Belum diisi sampai hari ini</span>
-                                <span id="heroBelum" class="text-xs font-bold" style="color:#C4342F;">0</span>
-                            </div>
-                        </div>
-
-                        <button onclick="bukaRuangKerja('laporan')" class="flat-btn flat-btn-pink flat-btn-block flat-btn-lg mt-5">Lihat Laporan →</button>
-                    </div>
-                </div>
+        <section class="journal-intro no-print" aria-labelledby="journal-title">
+            <div class="intro-copy">
+                <p class="section-kicker">BUKU KEGIATAN</p>
+                <h2 id="journal-title">Jurnal PKL<span>.</span></h2>
+                <p>Catatan harian dan progres praktik kerjamu.</p>
+            </div>
+            <div class="progress-summary" aria-label="Ringkasan progres PKL">
+                <div class="progress-topline"><span>Progres hari kerja</span><span id="heroStatus">Belum ada periode</span></div>
+                <div class="progress-count"><strong id="heroTerisi">0</strong><span>/ <span id="heroTarget">0</span> hari terisi</span><strong id="heroPersen">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill" id="heroBar" style="width:0%"></div></div>
+                <div class="progress-caption"><span id="heroPeriode">Periode PKL belum diatur</span><button type="button" onclick="bukaSettings()">Atur periode ↗</button></div>
+                <div class="progress-detail"><span>Sisa: <b id="heroSisa">0 hari</b></span><span>Belum diisi: <b id="heroBelum">0 hari</b></span></div>
             </div>
         </section>
 
-        <div class="workspace-heading no-print"><div><span>RUANG KERJA</span><h2>Jurnal kegiatan</h2></div><p>Semua catatanmu, di satu tempat.</p></div>
-        <!-- ======================== NAV TAB (DESKTOP) ======================== -->
-        <div class="no-print hidden md:flex items-center gap-3 mb-8">
-            <div class="segmented flex-1" style="max-width:620px;">
-                <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active">
-                    <span class="nav-number">01</span> Input
-                </button>
-                <button onclick="switchTab('edit')" id="btnTabEdit" class="nav-item">
-                    <span class="nav-number">02</span> Edit
-                </button>
-                <button onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item">
-                    <span class="nav-number">03</span> Laporan
-                </button>
-            </div>
-            <button onclick="bukaSettings()" class="flat-btn flat-btn-ghost">
-                Pengaturan <span aria-hidden="true">↗</span>
-            </button>
+        <div class="workspace-bar no-print hidden md:flex">
+            <nav class="workspace-nav" aria-label="Navigasi jurnal">
+                <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active">Catat kegiatan</button>
+                <button onclick="switchTab('edit')" id="btnTabEdit" class="nav-item">Edit catatan</button>
+                <button onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item">Lihat laporan</button>
+            </nav>
+            <button onclick="bukaSettings()" class="settings-link">Pengaturan <span aria-hidden="true">↗</span></button>
         </div>
 
         <div class="relative min-h-[600px]">
@@ -514,37 +427,32 @@
             <!-- ========================== TAB INPUT ========================== -->
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="flat-card p-6 md:p-8 relative z-20 no-print">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="form-index" aria-hidden="true">01</div>
-                        <div>
-                            <h2 class="text-xl font-bold tracking-tight">Catatan baru</h2>
-                            <p class="text-xs mt-1" style="color:var(--muted);">Mulai dengan kegiatan yang kamu lakukan hari ini.</p>
-                        </div>
+                    <div class="form-heading">
+                        <div><p class="section-kicker">CATAT KEGIATAN</p><h2>Catatan baru</h2></div>
+                        <p>Isi tanggal dan kegiatan, lalu simpan.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="lg:col-span-1">
-                            <label class="flat-label">📅 Tanggal Pelaksanaan</label>
+                            <label class="flat-label" for="inputTanggal">Tanggal pelaksanaan</label>
                             <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="flat-input">
                             <p id="infoTanggalInput" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#F7F7FA;"></p>
                             <div id="kalenderHariKerja" class="kalender-box mt-4"></div>
                         </div>
                         <div class="lg:col-span-3">
-                            <label class="flat-label">📝 Uraian Kegiatan</label>
+                            <label class="flat-label" for="inputUraian">Uraian kegiatan</label>
                             <textarea id="inputUraian" class="flat-input min-h-[140px]" rows="4" placeholder="Contoh: Mendesain denah tata letak ruang server..."></textarea>
-                            <div class="mt-4 rounded-2xl px-4 py-3 text-xs" style="background:var(--blue-050);color:#2A3462;">
-                                Tulis kegiatan dengan jelas agar mudah diingat saat menyusun laporan.
-                            </div>
+                            <p class="form-hint">Jelaskan pekerjaan yang dilakukan dan hasilnya.</p>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="flat-label">📸 Upload / Ambil Foto Bukti</label>
+                            <label class="flat-label" for="inputFoto">Foto bukti <span class="optional-label">Opsional</span></label>
                             <div class="flex flex-col md:flex-row gap-3">
                                 <input type="file" id="inputFoto" accept="image/*" class="flat-input md:w-1/2">
-                                <button type="button" onclick="bukaKamera('input')" class="flat-btn flat-btn-soft px-6">📷 Buka Kamera</button>
+                                <button type="button" onclick="bukaKamera('input')" class="flat-btn flat-btn-soft px-6">Buka kamera</button>
                             </div>
                         </div>
                     </div>
                     <div class="mt-8 flex justify-end">
-                        <button onclick="tambahBaris()" class="flat-btn flat-btn-primary flat-btn-lg">💾 Simpan Laporan Baru</button>
+                        <button onclick="tambahBaris()" class="flat-btn flat-btn-primary flat-btn-lg">Simpan catatan <span aria-hidden="true">↗</span></button>
                     </div>
                 </div>
             </div>
@@ -553,15 +461,15 @@
             <div id="tabEdit" class="tab-content pb-10">
                 <div class="flat-card p-6 md:p-8 relative z-20 no-print">
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="icon-tile lilac">✏️</div>
+                        <div class="section-symbol" aria-hidden="true">✎</div>
                         <div>
-                            <h2 class="text-xl font-bold tracking-tight">Pengeditan Laporan</h2>
+                            <h2 class="text-xl font-bold tracking-tight">Edit catatan</h2>
                             <p class="text-xs mt-1" style="color:var(--muted);">Pilih dan edit catatan yang sudah ada</p>
                         </div>
                     </div>
 
                     <div class="mb-6 rounded-2xl p-5" style="background:var(--lilac-050);border:1px solid #EFE3F9;">
-                        <label class="flat-label">📋 Pilih laporan yang ingin diedit</label>
+                        <label class="flat-label">Pilih laporan yang ingin diedit</label>
                         <select id="pilihEditDropdown" onchange="pilihTanggalEditDropdown()" class="flat-input">
                             <option value="">-- Pilih catatan laporan --</option>
                         </select>
@@ -570,27 +478,27 @@
                     <div id="formEditContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
                         <input type="hidden" id="editIndexHidden">
                         <div class="lg:col-span-1">
-                            <label class="flat-label">📅 Tanggal Pelaksanaan</label>
+                            <label class="flat-label">Tanggal Pelaksanaan</label>
                             <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="flat-input">
                             <p id="infoTanggalEdit" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#F7F7FA;"></p>
                         </div>
                         <div class="lg:col-span-3">
-                            <label class="flat-label">📝 Uraian Kegiatan</label>
+                            <label class="flat-label">Uraian Kegiatan</label>
                             <textarea id="editUraian" class="flat-input min-h-[120px]" rows="3"></textarea>
                         </div>
                         <div class="lg:col-span-4">
-                            <label class="flat-label">📸 Ganti / Ambil Foto Bukti (opsional)</label>
+                            <label class="flat-label">Ganti / Ambil Foto Bukti (opsional)</label>
                             <div class="flex flex-col md:flex-row gap-3">
                                 <input type="file" id="editFoto" accept="image/*" class="flat-input md:w-1/2">
-                                <button type="button" onclick="bukaKamera('edit')" class="flat-btn flat-btn-pink px-6">📷 Buka Kamera</button>
+                                <button type="button" onclick="bukaKamera('edit')" class="flat-btn flat-btn-pink px-6">Buka Kamera</button>
                             </div>
                             <p class="text-[11px] mt-2 inline-block rounded-full px-3 py-1.5" style="background:var(--lilac-100);color:#6B1A8E;">
                                 *Kosongkan jika foto tidak ingin diubah.
                             </p>
                         </div>
                         <div class="lg:col-span-4 flex flex-wrap gap-3 justify-end pt-2">
-                            <button onclick="hapusLaporanSelected()" class="flat-btn flat-btn-danger">🗑️ Hapus Laporan</button>
-                            <button onclick="simpanLaporanEdited()" class="flat-btn flat-btn-primary">💾 Perbarui Data</button>
+                            <button onclick="hapusLaporanSelected()" class="flat-btn flat-btn-danger">Hapus Laporan</button>
+                            <button onclick="simpanLaporanEdited()" class="flat-btn flat-btn-primary">Perbarui Data</button>
                         </div>
                     </div>
                 </div>
@@ -601,35 +509,35 @@
                 <div id="panelTargetPKL" class="flat-card p-5 md:p-6 mb-6 no-print"></div>
 
                 <div class="flat-card p-5 mb-6 no-print">
-                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">🎖️ Pencapaian PKL</h3>
+                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">Pencapaian</h3>
                     <div id="wadahBadgeAchievement" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
                     <div class="stat-card p-5 flex items-center gap-4">
-                        <div class="stat-icon">📅</div>
+
                         <div><p class="stat-label">Total Hari</p><h3 id="statTotalHari" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-                        <div class="stat-icon">📝</div>
+
                         <div><p class="stat-label">Total Uraian</p><h3 id="statTotalUraian" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-                        <div class="stat-icon">🖼️</div>
+
                         <div><p class="stat-label">Total Foto</p><h3 id="statTotalFoto" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-                        <div class="stat-icon">📊</div>
+
                         <div><p class="stat-label">Rata-rata/Bulan</p><h3 id="statRataBulan" class="stat-value">0</h3></div>
                     </div>
                 </div>
 
                 <div class="flat-card p-5 md:p-6 mb-8 space-y-5 no-print relative z-10">
                     <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                        <button onclick="bukaOspiExport()" id="btnDownload" class="flat-btn flat-btn-primary flat-btn-lg">📥 Export PDF</button>
+                        <button onclick="bukaOspiExport()" id="btnDownload" class="flat-btn flat-btn-primary flat-btn-lg">Unduh PDF</button>
                         <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <select id="filterBulan" onchange="renderSemuaData()" class="flat-input text-xs"><option value="SEMUA">Filter: semua bulan</option></select>
-                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="flat-input text-xs" placeholder="🔍 Cari laporan...">
+                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="flat-input text-xs" placeholder="Cari laporan...">
                             <div class="sm:col-span-2 flex items-center gap-2 rounded-2xl p-2" style="background:#F7F7FA;border:1px solid var(--line);">
                                 <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-medium w-full" style="border:0;outline:none;">
                                 <span class="text-xs" style="color:var(--muted);">→</span>
@@ -683,27 +591,22 @@
     <nav class="no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[420px] md:hidden">
         <div class="bottom-nav-shell">
             <button onclick="switchTab('input')" id="btnTabInputMobile" class="nav-item-mobile active flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <span class="text-lg">📝</span><span>Input</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg><span>Catat</span>
             </button>
             <button onclick="switchTab('edit')" id="btnTabEditMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <span class="text-lg">✏️</span><span>Edit</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4-.8L19 8.2 15.8 5 4.8 16 4 20ZM14.5 6.3l3.2 3.2"/></svg><span>Edit</span>
             </button>
             <button onclick="switchTab('laporan')" id="btnTabLaporanMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <span class="text-lg">📋</span><span>Laporan</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg><span>Laporan</span>
             </button>
             <button onclick="bukaSettings()" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <span class="text-lg">⚙️</span><span>Setting</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg><span>Pengaturan</span>
             </button>
         </div>
     </nav>
 
     <!-- =============== SINKRONISASI NAV MOBILE + RINGKASAN HERO =============== -->
     <script>
-        function bukaRuangKerja(tab) {
-            switchTab(tab);
-            document.getElementById('tab' + (tab === 'input' ? 'Input' : 'Laporan')).scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
         // --- sinkronkan gaya nav mobile dengan tab yang aktif ---
         document.addEventListener('DOMContentLoaded', () => {
             const syncNav = (tabName) => {
@@ -716,7 +619,7 @@
             syncNav('input');
         });
 
-        // --- kartu ringkasan pada hero (flat) ---
+        // Ringkasan progres mengikuti data PKL yang tersimpan.
         function renderRingkasanHero() {
             const setTeks = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
             if (typeof hitungProgresPKL !== 'function') return;
@@ -734,38 +637,17 @@
             if (periode) {
                 periode.innerText = p.adaRentang
                     ? 'Bulan ' + p.teksPeriode
-                    : 'Periode PKL belum diatur — atur di Setting';
+                    : 'Periode PKL belum diatur';
             }
 
             const status = document.getElementById('heroStatus');
             if (status) {
                 status.innerText = !p.adaRentang ? 'Belum ada periode'
-                    : (persen >= 100 ? 'Target tercapai 🎉' : (p.belumSampaiHariIni > 0 ? p.belumSampaiHariIni + ' hari tertinggal' : 'On track'));
-                status.style.background = persen >= 100 ? 'var(--mint-100)' : 'var(--blue-050)';
-                status.style.color = persen >= 100 ? '#1B7A4B' : 'var(--blue)';
+                    : (persen >= 100 ? 'Target tercapai' : (p.belumSampaiHariIni > 0 ? p.belumSampaiHariIni + ' hari tertinggal' : 'Sesuai target'));
             }
 
-            const ring = document.getElementById('heroRing');
-            if (ring) {
-                const keliling = 2 * Math.PI * 52;
-                ring.setAttribute('stroke-dasharray', keliling.toFixed(1));
-                ring.setAttribute('stroke-dashoffset', (keliling * (1 - persen / 100)).toFixed(1));
-            }
             const bar = document.getElementById('heroBar');
             if (bar) bar.style.width = persen + '%';
-
-            // versi ringkas untuk layar kecil
-            setTeks('heroPersenM', persen + '%');
-            setTeks('heroTerisiM', p.terisi || 0);
-            setTeks('heroTargetM', p.target || 0);
-            const barM = document.getElementById('heroBarM');
-            if (barM) barM.style.width = persen + '%';
-
-            const milestones = document.querySelectorAll('#heroMilestones .pill');
-            milestones.forEach(el => {
-                const min = parseInt(el.dataset.min, 10);
-                el.classList.toggle('active', persen >= min);
-            });
         }
         window.addEventListener('load', () => setTimeout(renderRingkasanHero, 60));
     </script>

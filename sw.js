@@ -2,14 +2,13 @@
 // SERVICE WORKER — CACHING & OFFLINE MODE (FLAT DESIGN BUILD)
 // ============================================================
 
-const CACHE_NAME = 'laporan-pkl-jurnal-v5';
+const CACHE_NAME = 'laporan-pkl-jurnal-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './css/style.css',
   './css/theme.css',
-  './assets/workspace-dusk.jpg',
   './css/fonts/inter-400-latin.woff2',
   './css/fonts/inter-500-latin.woff2',
   './css/fonts/inter-600-latin.woff2',

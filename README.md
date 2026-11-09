@@ -4,7 +4,7 @@ Aplikasi jurnal PKL untuk mencatat kegiatan harian, memantau hari kerja, dan men
 
 ## Tema jurnal
 
-Tema ini mengambil inspirasi dari komposisi fotografis dan panel membulat: warna biru senja, permukaan netral, dan aksen hangat. Foto ruang kerja pada halaman utama bersifat ilustratif; ringkasan progres tetap berasal dari data pengguna. Tampilan beradaptasi untuk desktop dan ponsel, dan aset tema disimpan lokal untuk penggunaan offline.
+Tema jurnal menempatkan progres dan formulir pencatatan di depan. Permukaan seperti kertas, warna biru yang tenang, serta navigasi sederhana membantu menjaga fokus pada kegiatan PKL. Tampilan beradaptasi untuk desktop dan ponsel, dan aset tema disimpan lokal untuk penggunaan offline.
 
 ## ✅ Yang TIDAK berubah (fungsi)
 
@@ -33,7 +33,6 @@ pkl-flat/
 │   ├── style.css           # gaya dasar komponen
 │   ├── theme.css           # tema jurnal
 │   └── fonts/              # Inter (latin & latin-ext) + Noto Color Emoji subset
-├── assets/                 # foto ilustrasi tema
 └── js/
     ├── config.js           # palet Tailwind diarahkan ke warna flat
     ├── utils.js            # + helper tutupSemuaModal()
