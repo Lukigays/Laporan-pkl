@@ -1,35 +1,10 @@
-# 📘 Laporan PKL by Lukyy — **FLAT DESIGN EDITION**
+# Laporan PKL by Lukyy
 
-Versi ini adalah **aplikasi yang sama** dengan sebelumnya, tetapi seluruh tampilannya
-diubah total dari gaya *Neobrutalism* (border tebal + shadow keras) menjadi
-**flat design** yang bersih, terang, dan modern — mengikuti referensi desain
-(biru terang + lavender, sudut membulat, garis tipis, tanpa shadow keras).
+Aplikasi jurnal PKL untuk mencatat kegiatan harian, memantau hari kerja, dan menyiapkan laporan.
 
----
+## Tema jurnal
 
-## 🎨 Yang berubah (tampilan)
-
-| Sebelum (Neobrutalism) | Sesudah (Flat Design) |
-|---|---|
-| Border hitam 4–5 px | Border tipis 1 px `#EBE9F0` |
-| Shadow keras `8px 8px 0 #000` | Shadow lembut / tanpa shadow |
-| Sudut tajam 12–20 px | Sudut membulat 14–30 px & pill |
-| Warna kuning/pink neon | **Biru `#1D2BF0`**, lavender, biru langit, mint |
-| Font Space Grotesk + JetBrains Mono | **Inter** (self-hosted, tanpa CDN) |
-| Background titik-titik hitam | Background flat `#F5F4F2` |
-| Sticker miring, teks uppercase semua | Tipografi tenang, *sentence case* |
-
-**Elemen baru mengikuti referensi:**
-- **Hero panel gradasi lavender → ungu** dengan bulatan dekoratif flat.
-- **Kartu ringkasan progres** di dalam hero: pill `25% / 50% / 75% / Max`,
-  ring progres SVG biru, angka besar, tombol pink lembut **“Lihat Laporan →”**.
-  *(Di layar kecil kartu ini otomatis berubah menjadi ringkasan ringkas.)*
-- **Segmented tab** gaya pill dengan item aktif navy gelap.
-- Tombol pill, input bulat, kartu-kartu pastel (biru langit, lavender, mint).
-- Toast **navy pill**, modal dengan header/footer tipis, dan bottom-nav mengapung.
-- **Ikon emoji** tetap tampil (font Noto Color Emoji subset lokal), plus **logo lotus flat** di header.
-
----
+Tema ini mengambil inspirasi dari komposisi fotografis dan panel membulat: warna biru senja, permukaan netral, dan aksen hangat. Foto ruang kerja pada halaman utama bersifat ilustratif; ringkasan progres tetap berasal dari data pengguna. Tampilan beradaptasi untuk desktop dan ponsel, dan aset tema disimpan lokal untuk penggunaan offline.
 
 ## ✅ Yang TIDAK berubah (fungsi)
 
@@ -50,13 +25,15 @@ Semua fitur tetap utuh — hanya kelas CSS/struktur tampilannya yang diganti:
 
 ```
 pkl-flat/
-├── index.html              # UI flat design (semua id/handler lama dipertahankan)
-├── manifest.json           # tema flat: theme_color #1D2BF0
-├── sw.js                   # service worker (cache versi flat + font lokal)
+├── index.html              # UI jurnal (semua id/handler lama dipertahankan)
+├── manifest.json           # metadata PWA
+├── sw.js                   # service worker (cache aset tema + font lokal)
 ├── favicon.png, icon-192.png, icon-512.png, icon-maskable-512.png
 ├── css/
-│   ├── style.css           # ← seluruh tema FLAT DESIGN (menggantikan style.css lama)
+│   ├── style.css           # gaya dasar komponen
+│   ├── theme.css           # tema jurnal
 │   └── fonts/              # Inter (latin & latin-ext) + Noto Color Emoji subset
+├── assets/                 # foto ilustrasi tema
 └── js/
     ├── config.js           # palet Tailwind diarahkan ke warna flat
     ├── utils.js            # + helper tutupSemuaModal()

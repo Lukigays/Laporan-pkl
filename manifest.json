@@ -1,11 +1,11 @@
 {
-  "name": "Laporan PKL by Lukyy — Flat Design",
+  "name": "Laporan PKL by Lukyy",
   "short_name": "PKL Lukyy",
-  "description": "Aplikasi laporan PKL harian dengan tampilan flat design yang bersih: catat, kelola, dan ekspor laporan.",
+  "description": "Jurnal harian untuk mencatat, mengelola, dan mengekspor laporan PKL.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F5F4F2",
-  "theme_color": "#1D2BF0",
+  "background_color": "#e8e5df",
+  "theme_color": "#222b3c",
   "icons": [
     {
       "src": "icon-192.png",
