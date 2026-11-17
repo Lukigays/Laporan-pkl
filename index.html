@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#222b3c">
+    <meta name="theme-color" content="#1e40af">
     <meta name="description" content="Jurnal harian untuk mencatat, mengelola, dan mengekspor laporan PKL.">
     <title>Laporan PKL by Lukyy</title>
 
@@ -41,13 +41,39 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/theme.css">
 </head>
-<body class="antialiased min-h-screen pb-40 md:pb-28">
+<body class="antialiased min-h-screen pb-44 md:pb-28">
 
     <!-- ============================== TOAST ============================== -->
-    <div id="toast-container" class="fixed top-6 right-6 z-[110] transform translate-x-full opacity-0 pointer-events-none transition-all duration-300">
+    <div id="toast-container" class="fixed top-6 right-6 z-[210] transform translate-x-full opacity-0 pointer-events-none transition-all duration-300">
         <div id="toast-box" class="flex items-center gap-3">
             <span id="toast-icon" class="text-lg">⚡</span>
             <p id="toast-message" class="text-sm font-semibold">Pesan...</p>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL KONFIRMASI HAPUS ===================== -->
+    <div id="modalKonfirmasiHapus" class="fixed inset-0 z-[190] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0" role="dialog" aria-modal="true" aria-labelledby="judulKonfirmasiHapus">
+        <div class="modal-content w-full max-w-md flex flex-col overflow-hidden">
+            <div class="modal-topbar">
+                <div class="flex items-center gap-3">
+                    <div class="icon-tile sm" style="background:var(--danger-soft);color:#B02328;">🗑️</div>
+                    <div>
+                        <h3 id="judulKonfirmasiHapus" class="text-base font-bold leading-tight">Konfirmasi Hapus Laporan</h3>
+                        <p id="subjudulKonfirmasiHapus" class="text-[11px]" style="color:var(--muted);">Tindakan ini tidak dapat dibatalkan</p>
+                    </div>
+                </div>
+                <button type="button" onclick="tutupModalKonfirmasiHapus()" class="modal-close" aria-label="Tutup">&times;</button>
+            </div>
+            <div class="p-6">
+                <p id="pesanKonfirmasiHapus" class="text-sm leading-relaxed mb-4" style="color:var(--ink-soft);">
+                    Apakah Anda yakin ingin menghapus laporan yang dipilih?
+                </p>
+                <div id="daftarPreviewHapus" class="max-h-48 overflow-y-auto space-y-2 mb-5 p-3 rounded-2xl" style="background:#F8FAFC;border:1px solid var(--line);"></div>
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" onclick="tutupModalKonfirmasiHapus()" class="flat-btn flat-btn-ghost flex-1">Batal</button>
+                    <button type="button" id="btnEksekusiHapusModal" onclick="eksekusiKonfirmasiHapus()" class="flat-btn flat-btn-danger-solid flex-1">🗑️ Ya, Hapus</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -84,7 +110,7 @@
     <!-- ========================== MODAL TOUR ========================== -->
     <div id="modalTour" class="fixed inset-0 z-[120] hidden modal-overlay flex justify-center items-center p-4 transition-all duration-300 opacity-0">
         <div class="modal-content w-full max-w-lg p-8 text-center relative transform scale-95 transition-transform">
-            <span class="chip-soft">Panduan</span>
+            <span class="chip-soft">Panduan Aplikasi</span>
             <div id="tourIcon" class="icon-tile mx-auto mb-5 mt-4" style="width:64px;height:64px;border-radius:22px;font-size:28px;">🚀</div>
             <h3 id="tourTitle" class="text-xl font-bold mb-3">Selamat Datang</h3>
             <p id="tourDesc" class="text-sm mb-8 leading-relaxed" style="color:var(--muted);">
@@ -113,17 +139,17 @@
                     <div class="icon-tile sm sky">☁️</div>
                     <div>
                         <h3 class="text-base font-bold leading-tight">Sinkronisasi Cloud</h3>
-                        <p class="text-[11px]" style="color:var(--muted);">Supabase akun</p>
+                        <p class="text-[11px]" style="color:var(--muted);">Akun Cloud Supabase</p>
                     </div>
                 </div>
                 <button onclick="tutupModalAuth()" class="modal-close" aria-label="Tutup">&times;</button>
             </div>
             <div class="p-6 space-y-4">
                 <p class="text-xs rounded-2xl px-4 py-3" style="background:var(--blue-050);color:var(--ink-soft);">
-                    Masuk atau daftar akun untuk menyimpan laporan Anda di cloud.
+                    Masuk atau daftar akun untuk menyimpan laporan Anda di cloud secara aman.
                 </p>
 
-                <button onclick="prosesLoginGoogle()" class="btn-google w-full py-4 flex items-center justify-center gap-3 text-sm">
+                <button onclick="prosesLoginGoogle()" class="btn-google w-full py-3.5 flex items-center justify-center gap-3 text-sm">
                     <svg class="google-icon" width="20" height="20" viewBox="0 0 24 24">
                         <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                         <path fill="#4285F4" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -135,7 +161,7 @@
 
                 <div class="divider-atau flex items-center gap-3 py-1">
                     <div class="flex-1" style="height:1px;background:var(--line);"></div>
-                    <span class="text-[11px]" style="color:var(--muted);">atau email</span>
+                    <span class="text-[11px]" style="color:var(--muted);">atau dengan email</span>
                     <div class="flex-1" style="height:1px;background:var(--line);"></div>
                 </div>
 
@@ -148,10 +174,10 @@
                     <input type="password" id="authPassword" class="flat-input" placeholder="Minimal 6 karakter">
                 </div>
 
-                <div class="flex flex-col gap-3 pt-1">
+                <div class="flex flex-col gap-2.5 pt-1">
                     <button onclick="prosesLoginAuth()" class="flat-btn flat-btn-primary flat-btn-block flat-btn-lg">🔑 Masuk (Login)</button>
                     <button onclick="prosesRegisterAuth()" class="flat-btn flat-btn-soft flat-btn-block flat-btn-lg">✨ Daftar Akun Baru</button>
-                    <button onclick="prosesLupaPassword()" class="text-xs py-2" style="color:var(--muted);background:none;border:0;cursor:pointer;">Lupa password?</button>
+                    <button onclick="prosesLupaPassword()" class="text-xs py-2 font-semibold" style="color:var(--blue);background:none;border:0;cursor:pointer;">Lupa password?</button>
                 </div>
             </div>
         </div>
@@ -165,25 +191,25 @@
                     <div class="icon-tile sm lilac">📑</div>
                     <div>
                         <h3 class="text-base font-bold leading-tight">Opsi Ekspor PDF</h3>
-                        <p class="text-[11px]" style="color:var(--muted);">Pilih format dokumen</p>
+                        <p class="text-[11px]" style="color:var(--muted);">Pilih format cetak dokumen laporan</p>
                     </div>
                 </div>
                 <button onclick="tutupOspiExport()" class="modal-close" aria-label="Tutup">&times;</button>
             </div>
             <div class="p-6">
                 <div class="space-y-3 mb-6 text-left">
-                    <label class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all" style="background:var(--lilac-050);border:1px solid #EFE3F9;">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all" style="background:var(--lilac-050);border:1px solid #E2E8F0;">
                         <input type="radio" name="opsiCover" value="dengan" checked class="w-5 h-5">
                         <div>
                             <p class="font-semibold text-sm">Dengan Judul &amp; Kover</p>
-                            <p class="text-xs mt-0.5" style="color:var(--muted);">Mencetak halaman kover lengkap beserta tabel.</p>
+                            <p class="text-xs mt-0.5" style="color:var(--muted);">Mencetak halaman kover sekolah lengkap beserta tabel bulanan.</p>
                         </div>
                     </label>
-                    <label class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all" style="background:var(--blue-050);border:1px solid #E1E3FD;">
+                    <label class="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all" style="background:var(--blue-050);border:1px solid #DBEAFE;">
                         <input type="radio" name="opsiCover" value="tanpa" class="w-5 h-5">
                         <div>
-                            <p class="font-semibold text-sm">Hanya Tabel Saja</p>
-                            <p class="text-xs mt-0.5" style="color:var(--muted);">Langsung mencetak halaman data tabel.</p>
+                            <p class="font-semibold text-sm">Hanya Tabel Kegiatan Saja</p>
+                            <p class="text-xs mt-0.5" style="color:var(--muted);">Langsung mencetak halaman tabel laporan kegiatan harian.</p>
                         </div>
                     </label>
                 </div>
@@ -201,7 +227,7 @@
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-3">
                     <div class="icon-tile sm">📷</div>
-                    <h3 class="text-base font-bold">Kamera Web</h3>
+                    <h3 class="text-base font-bold">Kamera Dokumentasi PKL</h3>
                 </div>
                 <button onclick="tutupKamera()" class="modal-close" aria-label="Tutup">&times;</button>
             </div>
@@ -209,17 +235,17 @@
             <div class="relative w-full rounded-3xl overflow-hidden aspect-[3/4] flex justify-center items-center mb-5" style="background:#0B0F1A;">
                 <video id="videoKamera" autoplay playsinline class="w-full h-full object-cover"></video>
                 <img id="previewHasilKamera" class="w-full h-full object-cover hidden absolute inset-0 z-10" alt="Hasil Foto" />
-                <div class="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-wide px-3 py-1.5 rounded-full" style="background:rgba(255,255,255,.92);color:#B02328;">● Rec</div>
+                <div class="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-wide px-3 py-1.5 rounded-full" style="background:rgba(255,255,255,.92);color:#B02328;">● Live Kamera</div>
             </div>
 
             <div id="kontrolKameraAktif" class="flex justify-center w-full">
-                <button onclick="ambilFoto()" class="flat-btn flat-btn-primary flat-btn-block flat-btn-lg">📸 Jepret Foto</button>
+                <button onclick="ambilFoto()" class="flat-btn flat-btn-primary flat-btn-block flat-btn-lg">📸 Jepret Foto Sekarang</button>
             </div>
 
             <div id="kontrolKameraHasil" class="hidden flex-col gap-3">
                 <div class="flex gap-2">
                     <button onclick="ulangiFoto()" class="flat-btn flat-btn-ghost flex-1 flat-btn-lg">🔄 Ulangi</button>
-                    <button onclick="simpanKeGaleri()" class="flat-btn flat-btn-pink flex-1 flat-btn-lg">⬇️ Simpan Galeri</button>
+                    <button onclick="simpanKeGaleri()" class="flat-btn flat-btn-soft flex-1 flat-btn-lg">⬇️ Simpan Galeri</button>
                 </div>
                 <button onclick="gunakanFoto()" class="flat-btn flat-btn-primary flat-btn-block flat-btn-lg">✅ Gunakan Foto Ini</button>
             </div>
@@ -233,8 +259,8 @@
                 <div class="flex items-center gap-3">
                     <div class="icon-tile sm">⚙️</div>
                     <div>
-                        <h3 class="text-base font-bold leading-tight">Pengaturan &amp; Profil</h3>
-                        <p class="text-[11px]" style="color:var(--muted);">Profil, periode PKL, backup data</p>
+                        <h3 class="text-base font-bold leading-tight">Pengaturan &amp; Profil PKL</h3>
+                        <p class="text-[11px]" style="color:var(--muted);">Identitas siswa, periode PKL, cloud sync &amp; backup database</p>
                     </div>
                 </div>
                 <button onclick="tutupSettings()" class="modal-close" aria-label="Tutup">&times;</button>
@@ -245,21 +271,21 @@
                 <!-- CLOUD SYNC -->
                 <div class="flat-card p-5 panel-sky">
                     <h4 class="text-sm font-bold mb-3 flex items-center gap-2">☁️ Sinkronisasi Cloud</h4>
-                    <p id="labelStatusAuth" class="text-xs mb-3 inline-block rounded-full px-3 py-1.5" style="background:#fff;color:var(--muted);">Status: belum masuk akun cloud.</p>
-                    <p class="text-[11px] mb-4 leading-relaxed" style="color:var(--muted);">Sinkronisasi dikirim bertahap agar tidak timeout. Foto hanya diperkecil pada salinan cloud; foto asli di perangkat tetap utuh.</p>
+                    <p id="labelStatusAuth" class="text-xs mb-3 inline-block rounded-full px-3 py-1.5 font-semibold" style="background:#fff;color:var(--ink-soft);">Status: belum masuk akun cloud.</p>
+                    <p class="text-[11px] mb-4 leading-relaxed" style="color:var(--ink-soft);">Sinkronisasi dikirim bertahap agar tidak timeout. Foto hanya diperkecil pada salinan cloud; foto asli di perangkat tetap utuh.</p>
                     <div id="wrapperTombolAuth" class="flex gap-3">
-                        <button onclick="bukaModalAuth()" class="flat-btn flat-btn-navy">Masuk / Daftar</button>
+                        <button onclick="bukaModalAuth()" class="flat-btn flat-btn-navy">🔑 Masuk / Daftar Cloud</button>
                     </div>
-                    <div id="wrapperTombolSync" class="hidden flex gap-3 flex-wrap">
+                    <div id="wrapperTombolSync" class="hidden flex gap-2.5 flex-wrap">
                         <button onclick="simpanKeCloud()" class="flat-btn flat-btn-navy">⬆️ Simpan ke Cloud</button>
                         <button onclick="tarikDariCloud()" class="flat-btn flat-btn-ghost">⬇️ Ambil dari Cloud</button>
-                        <button onclick="logoutAuth()" class="flat-btn flat-btn-danger">Keluar</button>
+                        <button onclick="logoutAuth()" class="flat-btn flat-btn-danger">🚪 Keluar</button>
                     </div>
                 </div>
 
                 <!-- PROFIL -->
                 <div class="flat-card p-6">
-                    <h4 class="text-sm font-bold mb-4">✏️ Edit Profil Pengguna</h4>
+                    <h4 class="text-sm font-bold mb-4">✏️ Identitas &amp; Profil Siswa</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
                             <label class="flat-label">👤 Nama Lengkap</label>
@@ -274,7 +300,7 @@
                             <input type="text" id="setNis" class="flat-input" placeholder="Contoh: 1234567890">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="flat-label">📍 Alamat Tempat PKL</label>
+                            <label class="flat-label">📍 Tempat / Instansi PKL</label>
                             <input type="text" id="setAlamat" class="flat-input" placeholder="Contoh: PT. Teknologi Indonesia">
                         </div>
                         <div>
@@ -287,39 +313,39 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="flat-label">📅 Tahun Pelajaran</label>
-                            <input type="text" id="setTahun" class="flat-input" placeholder="Contoh: 2026...">
+                            <input type="text" id="setTahun" class="flat-input" placeholder="Contoh: 2026/2027">
                         </div>
                     </div>
                 </div>
 
                 <!-- LOGO SEKOLAH -->
                 <div class="flat-card p-5 panel-lilac">
-                    <h4 class="text-sm font-bold mb-3">🏫 Logo Sekolah</h4>
+                    <h4 class="text-sm font-bold mb-3">🏫 Logo Sekolah (Halaman Kover)</h4>
                     <p class="text-xs mb-4 rounded-2xl px-4 py-3" style="background:#fff;color:var(--ink-soft);">
-                        Upload foto logo sekolah dari galeri HP atau tempel URL direct link PNG.
+                        Upload foto logo sekolah dari perangkat atau tempel URL direct link PNG/JPG.
                     </p>
                     <div class="mb-4">
                         <label class="flat-label">🔗 Direct Link URL (opsional)</label>
                         <input type="text" id="inputUrlLogoCatbox" onchange="simpanUrlLogoCatbox(this.value)" class="flat-input text-xs" placeholder="https://i.postimg.cc/xxxx/logo.png">
                     </div>
                     <div class="flex items-center gap-4 flex-wrap">
-                        <div id="previewLogoContainer" class="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden p-1" style="background:#fff;border:1px solid #EFE3F9;">
+                        <div id="previewLogoContainer" class="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden p-1" style="background:#fff;border:1px solid var(--line);">
                             <img id="previewLogoSekolah" src="" alt="Logo" class="w-full h-full object-contain hidden">
                             <span id="placeholderLogo" class="text-3xl">🏫</span>
                         </div>
                         <div class="flex-1" style="min-width:200px;">
                             <input type="file" id="inputLogoSekolah" accept="image/*" class="flat-input text-xs" onchange="previewLogoUpload(this)">
-                            <p class="text-[10px] mt-2" style="color:var(--muted);">*Pilih file foto dari galeri HP.</p>
+                            <p class="text-[10px] mt-2" style="color:var(--muted);">*Pilih file gambar logo dari galeri.</p>
                         </div>
-                        <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden flat-btn flat-btn-danger flat-btn-sm">🗑️ Hapus</button>
+                        <button onclick="hapusLogoSekolah()" id="btnHapusLogo" class="hidden flat-btn flat-btn-danger flat-btn-sm">🗑️ Hapus Logo</button>
                     </div>
                 </div>
 
                 <!-- PERIODE PKL -->
                 <div class="flat-card p-5 panel-mint">
-                    <h4 class="text-sm font-bold mb-1">📆 Periode &amp; Target PKL</h4>
+                    <h4 class="text-sm font-bold mb-1">📆 Periode &amp; Target Hari Kerja PKL</h4>
                     <p class="text-xs mb-4 rounded-2xl px-4 py-3" style="background:#fff;color:var(--ink-soft);">
-                        Dipakai untuk menampilkan <b>laporan PKL dari bulan apa sampai bulan apa</b> dan menghitung target hari kerja.
+                        Dipakai untuk menampilkan <b>rentang bulan PKL</b> dan menghitung progres target hari kerja.
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -332,26 +358,26 @@
                         </div>
                         <div>
                             <label class="flat-label">🎯 Target Hari Kerja</label>
-                            <input type="number" id="setTargetHari" min="1" class="flat-input" placeholder="Kosongkan = otomatis">
+                            <input type="number" id="setTargetHari" min="1" class="flat-input" placeholder="Kosongkan = hitung otomatis">
                             <p class="text-[10px] mt-2" style="color:var(--muted);">Misalnya target 90 hari kerja.</p>
                         </div>
                         <div class="flex flex-col justify-center gap-2">
                             <label class="flex items-center gap-3 cursor-pointer select-none text-xs font-semibold rounded-2xl px-4 py-3" style="background:#fff;color:var(--ink-soft);">
                                 <input type="checkbox" id="setAutoLibur" class="w-4 h-4">
-                                Auto libur hari Minggu
+                                Auto isi "Libur" hari Minggu
                             </label>
-                            <button type="button" onclick="isiLiburOtomatisRentang()" class="flat-btn flat-btn-ghost flat-btn-sm">⚡ Isi sekarang</button>
+                            <button type="button" onclick="isiLiburOtomatisRentang()" class="flat-btn flat-btn-ghost flat-btn-sm">⚡ Isi Libur Minggu Sekarang</button>
                         </div>
                     </div>
 
-                    <div class="my-5" style="height:1px;background:rgba(0,0,0,.06);"></div>
+                    <div class="my-5" style="height:1px;background:rgba(0,0,0,.08);"></div>
 
-                    <h4 class="text-xs font-bold mb-2">🔴 Tanggal Merah</h4>
+                    <h4 class="text-xs font-bold mb-2">🔴 Kalender Tanggal Merah Nasional</h4>
                     <p class="text-[11px] leading-relaxed mb-3 rounded-2xl px-4 py-3" style="background:#fff;color:var(--ink-soft);">
-                        Sudah <b>otomatis</b> — seperti kalender HP. Tanggal merah tampil di kalender dengan keterangan nama liburnya.
+                        Sudah <b>otomatis</b> berdasarkan SKB 3 Menteri. Tanggal merah tampil langsung di kalender.
                     </p>
                     <p id="infoJumlahLibur" class="text-[10px] mb-3 inline-block rounded-full px-3 py-1.5" style="background:#fff;color:var(--muted);"></p>
-                    <p class="text-[11px] font-semibold mb-2">Libur pada periode PKL Anda:</p>
+                    <p class="text-[11px] font-semibold mb-2">Daftar libur nasional pada periode PKL Anda:</p>
                     <div id="daftarLiburPeriode" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
 
@@ -359,18 +385,18 @@
                 <div class="flat-card p-5">
                     <h4 class="text-sm font-bold mb-2">💾 Backup &amp; Restore Database (JSON)</h4>
                     <p class="text-[11px] leading-relaxed mb-3" style="color:var(--muted);">
-                        Backup mencakup semua data lokal: laporan, foto bukti, profil, dan kalender. Simpan file JSON ini di perangkat lain/cloud sebagai salinan aman.
+                        Backup mencakup seluruh laporan, foto bukti, profil, dan pengaturan kalender ke dalam 1 file JSON.
                     </p>
                     <div class="flex gap-3 flex-wrap">
-                        <button type="button" onclick="eksporDataJSON()" class="flat-btn flat-btn-soft flex-1">📤 Unduh Backup Database</button>
-                        <label class="flat-btn flat-btn-ghost flex-1 cursor-pointer">📥 Pulihkan Backup<input type="file" id="inputImporJSON" accept=".json,application/json" onchange="imporDataJSON(event)" class="hidden"></label>
+                        <button type="button" onclick="eksporDataJSON()" class="flat-btn flat-btn-soft flex-1">📤 Unduh Backup JSON</button>
+                        <label class="flat-btn flat-btn-ghost flex-1 cursor-pointer">📥 Pulihkan dari JSON<input type="file" id="inputImporJSON" accept=".json,application/json" onchange="imporDataJSON(event)" class="hidden"></label>
                     </div>
                 </div>
 
                 <!-- ZONA BAHAYA -->
-                <div class="flat-card p-5" style="background:var(--danger-soft);border-color:#F6D2D3;">
-                    <h4 class="text-sm font-bold mb-2" style="color:#B02328;">⚠️ Zona Bahaya: Hapus Semua Data</h4>
-                    <p class="text-xs mb-3" style="color:#8C2F32;">Ketik kata <b>HAPUS</b> untuk mengaktifkan tombol:</p>
+                <div class="flat-card p-5" style="background:var(--danger-soft);border-color:#FECACA;">
+                    <h4 class="text-sm font-bold mb-2" style="color:#B02328;">⚠️ Zona Bahaya: Reset Seluruh Laporan</h4>
+                    <p class="text-xs mb-3" style="color:#8C2F32;">Ketik kata <b>HAPUS</b> di bawah ini untuk mengaktifkan tombol hapus permanen:</p>
                     <input type="text" id="inputKonfirmasiHapus" oninput="cekKonfirmasiHapus(this)" class="flat-input w-full text-xs mb-3" placeholder="Ketik HAPUS di sini...">
                     <button id="btnHapusSemuaData" onclick="hapusSemuaDataLaporan()" disabled class="flat-btn flat-btn-block">🗑️ Hapus Seluruh Laporan</button>
                 </div>
@@ -378,48 +404,118 @@
 
             <div class="modal-footbar">
                 <button onclick="tutupSettings()" class="flat-btn flat-btn-ghost">Batal</button>
-                <button onclick="simpanSettings()" class="flat-btn flat-btn-primary">💾 Simpan Profil</button>
+                <button onclick="simpanSettings()" class="flat-btn flat-btn-primary">💾 Simpan Pengaturan</button>
             </div>
         </div>
     </div>
 
     <!-- ============================= HEADER ============================= -->
-    <header class="site-header no-print">
+    <header class="site-header no-print sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 md:px-8 site-header-inner">
             <div class="brand-lockup">
-                <div class="brand-mark" aria-hidden="true">L</div>
-                <div><h1>Laporan PKL</h1><p>Jurnal praktik kerja lapangan</p></div>
+                <div class="brand-mark" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M8 7h6"/>
+                        <path d="M8 11h8"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Laporan PKL <span class="brand-badge">by Lukyy</span></h1>
+                    <p>Jurnal Harian Praktik Kerja Lapangan</p>
+                </div>
             </div>
             <div class="header-actions">
-                <button onclick="bukaTourManual()" class="header-link">Panduan</button>
-                <button id="btnInstallPWA" onclick="installPWA()" class="hidden flat-btn flat-btn-primary flat-btn-sm">Install App</button>
+                <button type="button" onclick="bukaTourManual()" class="flat-btn flat-btn-ghost flat-btn-sm">
+                    <span>💡</span> <span class="hidden sm:inline">Panduan</span>
+                </button>
+                <button type="button" onclick="bukaModalAuth()" class="flat-btn flat-btn-soft flat-btn-sm">
+                    <span>☁️</span> <span class="hidden sm:inline">Cloud</span>
+                </button>
+                <button type="button" onclick="bukaSettings()" class="flat-btn flat-btn-navy flat-btn-sm">
+                    <span>⚙️</span> <span>Pengaturan</span>
+                </button>
+                <button id="btnInstallPWA" onclick="installPWA()" class="hidden flat-btn flat-btn-primary flat-btn-sm">
+                    <span>📲</span> <span>Install App</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 md:px-8 relative pt-8">
+    <main class="max-w-6xl mx-auto px-4 md:px-8 relative pt-6 md:pt-8">
+
+        <!-- ====================== HERO & PROGRES SUMMARY ====================== -->
         <section class="journal-intro no-print" aria-labelledby="journal-title">
             <div class="intro-copy">
-                <p class="section-kicker">BUKU KEGIATAN</p>
-                <h2 id="journal-title">Jurnal PKL<span>.</span></h2>
-                <p>Catatan harian dan progres praktik kerjamu.</p>
+                <span class="section-kicker">✨ BUKU JURNAL KEGIATAN HARIAN</span>
+                <h2 id="journal-title">Kelola Jurnal PKL Jadi Lebih Cepat<span>.</span></h2>
+                <p>Catat kegiatan harian, lampirkan foto dokumentasi, kelola banyak laporan sekaligus, dan unduh PDF siap cetak kapan saja.</p>
+                <div class="hero-action-group">
+                    <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-primary">
+                        <span>📝</span> <span>Catat Kegiatan</span>
+                    </button>
+                    <button type="button" onclick="switchTab('laporan')" class="flat-btn flat-btn-ghost">
+                        <span>📋</span> <span>Lihat &amp; Pilih Laporan</span>
+                    </button>
+                    <button type="button" onclick="bukaOspiExport()" class="flat-btn flat-btn-soft">
+                        <span>📥</span> <span>Ekspor PDF</span>
+                    </button>
+                </div>
             </div>
+
             <div class="progress-summary" aria-label="Ringkasan progres PKL">
-                <div class="progress-topline"><span>Progres hari kerja</span><span id="heroStatus">Belum ada periode</span></div>
-                <div class="progress-count"><strong id="heroTerisi">0</strong><span>/ <span id="heroTarget">0</span> hari terisi</span><strong id="heroPersen">0%</strong></div>
+                <div class="progress-topline">
+                    <span class="flex items-center gap-1.5 font-bold">🎯 Progres Hari Kerja</span>
+                    <span id="heroStatus" class="status-pill">Belum ada periode</span>
+                </div>
+                <div class="progress-count">
+                    <strong id="heroTerisi">0</strong>
+                    <span>/ <span id="heroTarget">0</span> hari kerja terisi</span>
+                    <strong id="heroPersen" class="persen-badge">0%</strong>
+                </div>
                 <div class="progress-track"><div class="progress-fill" id="heroBar" style="width:0%"></div></div>
-                <div class="progress-caption"><span id="heroPeriode">Periode PKL belum diatur</span><button type="button" onclick="bukaSettings()">Atur periode ↗</button></div>
-                <div class="progress-detail"><span>Sisa: <b id="heroSisa">0 hari</b></span><span>Belum diisi: <b id="heroBelum">0 hari</b></span></div>
+                <div class="progress-detail">
+                    <div class="detail-chip">
+                        <span>⏳ Sisa target</span>
+                        <b id="heroSisa">0 hari</b>
+                    </div>
+                    <div class="detail-chip">
+                        <span>📌 Belum diisi</span>
+                        <b id="heroBelum">0 hari</b>
+                    </div>
+                </div>
+                <div class="progress-caption">
+                    <span id="heroPeriode" class="truncate">Periode PKL belum diatur</span>
+                    <button type="button" onclick="bukaSettings()" class="flat-btn flat-btn-ghost flat-btn-xs">⚙️ Atur Periode</button>
+                </div>
             </div>
         </section>
 
+        <!-- =================== NAVIGASI UTAMA (DESKTOP) =================== -->
         <div class="workspace-bar no-print hidden md:flex">
             <nav class="workspace-nav" aria-label="Navigasi jurnal">
-                <button onclick="switchTab('input')" id="btnTabInput" class="nav-item active">Catat kegiatan</button>
-                <button onclick="switchTab('edit')" id="btnTabEdit" class="nav-item">Edit catatan</button>
-                <button onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item">Lihat laporan</button>
+                <button type="button" onclick="switchTab('input')" id="btnTabInput" class="nav-item active">
+                    <span class="nav-icon">📝</span>
+                    <span>Catat Kegiatan</span>
+                </button>
+                <button type="button" onclick="switchTab('edit')" id="btnTabEdit" class="nav-item">
+                    <span class="nav-icon">✏️</span>
+                    <span>Edit &amp; Kelola</span>
+                </button>
+                <button type="button" onclick="switchTab('laporan')" id="btnTabLaporan" class="nav-item">
+                    <span class="nav-icon">📋</span>
+                    <span>Tabel Laporan</span>
+                    <span id="navBadgeTotalLaporan" class="nav-badge">0</span>
+                </button>
             </nav>
-            <button onclick="bukaSettings()" class="settings-link">Pengaturan <span aria-hidden="true">↗</span></button>
+            <div class="workspace-quick-actions">
+                <button type="button" onclick="cariTanggalBelumDiisi()" class="flat-btn flat-btn-ghost flat-btn-sm" title="Cari hari kerja yang belum diisi">
+                    <span>🔎</span> <span>Cek Tanggal Kosong</span>
+                </button>
+                <button type="button" onclick="bukaOspiExport()" class="flat-btn flat-btn-primary flat-btn-sm">
+                    <span>📥</span> <span>Unduh PDF</span>
+                </button>
+            </div>
         </div>
 
         <div class="relative min-h-[600px]">
@@ -428,31 +524,67 @@
             <div id="tabInput" class="tab-content active pb-10">
                 <div class="flat-card p-6 md:p-8 relative z-20 no-print">
                     <div class="form-heading">
-                        <div><p class="section-kicker">CATAT KEGIATAN</p><h2>Catatan baru</h2></div>
-                        <p>Isi tanggal dan kegiatan, lalu simpan.</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="lg:col-span-1">
-                            <label class="flat-label" for="inputTanggal">Tanggal pelaksanaan</label>
-                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="flat-input">
-                            <p id="infoTanggalInput" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#F7F7FA;"></p>
-                            <div id="kalenderHariKerja" class="kalender-box mt-4"></div>
-                        </div>
-                        <div class="lg:col-span-3">
-                            <label class="flat-label" for="inputUraian">Uraian kegiatan</label>
-                            <textarea id="inputUraian" class="flat-input min-h-[140px]" rows="4" placeholder="Contoh: Mendesain denah tata letak ruang server..."></textarea>
-                            <p class="form-hint">Jelaskan pekerjaan yang dilakukan dan hasilnya.</p>
-                        </div>
-                        <div class="lg:col-span-4">
-                            <label class="flat-label" for="inputFoto">Foto bukti <span class="optional-label">Opsional</span></label>
-                            <div class="flex flex-col md:flex-row gap-3">
-                                <input type="file" id="inputFoto" accept="image/*" class="flat-input md:w-1/2">
-                                <button type="button" onclick="bukaKamera('input')" class="flat-btn flat-btn-soft px-6">Buka kamera</button>
+                        <div class="flex items-center gap-3.5">
+                            <div class="icon-tile">📝</div>
+                            <div>
+                                <p class="section-kicker">FORMULIR JURNAL HARIAN</p>
+                                <h2>Catat Kegiatan Baru</h2>
                             </div>
                         </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="cariTanggalBelumDiisi()" class="flat-btn flat-btn-soft flat-btn-sm">
+                                <span>🔎</span> <span>Isi Tanggal Kosong</span>
+                            </button>
+                            <button type="button" onclick="switchTab('laporan')" class="flat-btn flat-btn-ghost flat-btn-sm">
+                                <span>📋</span> <span>Lihat Tabel</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="mt-8 flex justify-end">
-                        <button onclick="tambahBaris()" class="flat-btn flat-btn-primary flat-btn-lg">Simpan catatan <span aria-hidden="true">↗</span></button>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        <!-- Kolom Kiri: Tanggal & Kalender Mini -->
+                        <div class="lg:col-span-5">
+                            <label class="flat-label" for="inputTanggal">📅 Tanggal Pelaksanaan</label>
+                            <input type="date" id="inputTanggal" onchange="cekHariKerjaInput(); renderKalender();" class="flat-input">
+                            <p id="infoTanggalInput" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#F8FAFC;"></p>
+                            <div id="kalenderHariKerja" class="kalender-box mt-4"></div>
+                        </div>
+
+                        <!-- Kolom Kanan: Uraian, Foto & Tombol Aksi -->
+                        <div class="lg:col-span-7 flex flex-col gap-5">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                                    <label class="flat-label !mb-0" for="inputUraian">✍️ Uraian Kegiatan Harian</label>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-[10px] font-semibold" style="color:var(--muted);">Isi cepat:</span>
+                                        <button type="button" onclick="isiCepatUraian('Libur')" class="quick-chip">🏖️ Libur</button>
+                                        <button type="button" onclick="isiCepatUraian('Melakukan pengecekan dan perawatan perangkat kerja serta membantu operasional harian di tempat PKL.')" class="quick-chip">🔧 Operasional</button>
+                                        <button type="button" onclick="isiCepatUraian('Merapikan administrasi data, menyusun dokumen laporan, dan berkoordinasi dengan pembimbing lapangan.')" class="quick-chip">📂 Administrasi</button>
+                                    </div>
+                                </div>
+                                <textarea id="inputUraian" class="flat-input min-h-[160px]" rows="5" placeholder="Contoh: Mendesain denah tata letak ruang server dan melakukan instalasi jaringan LAN..."></textarea>
+                                <p class="form-hint">Jelaskan kegiatan yang Anda kerjakan dengan kalimat yang jelas dan rapi.</p>
+                            </div>
+
+                            <div class="upload-panel">
+                                <label class="flat-label" for="inputFoto">📸 Foto Bukti Kegiatan <span class="optional-label">(Opsional)</span></label>
+                                <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                                    <input type="file" id="inputFoto" accept="image/*" class="flat-input flex-1">
+                                    <button type="button" onclick="bukaKamera('input')" class="flat-btn flat-btn-soft px-5">
+                                        <span>📷</span> <span>Buka Kamera</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-footer-bar">
+                                <button type="button" onclick="resetFormInput()" class="flat-btn flat-btn-ghost">
+                                    <span>🔄</span> <span>Bersihkan Form</span>
+                                </button>
+                                <button type="button" onclick="tambahBaris()" class="flat-btn flat-btn-primary flat-btn-lg">
+                                    <span>💾</span> <span>Simpan Catatan Laporan</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -460,46 +592,102 @@
             <!-- =========================== TAB EDIT =========================== -->
             <div id="tabEdit" class="tab-content pb-10">
                 <div class="flat-card p-6 md:p-8 relative z-20 no-print">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="section-symbol" aria-hidden="true">✎</div>
-                        <div>
-                            <h2 class="text-xl font-bold tracking-tight">Edit catatan</h2>
-                            <p class="text-xs mt-1" style="color:var(--muted);">Pilih dan edit catatan yang sudah ada</p>
+                    <div class="form-heading">
+                        <div class="flex items-center gap-3.5">
+                            <div class="icon-tile lilac">✏️</div>
+                            <div>
+                                <p class="section-kicker">KELOLA &amp; PERBARUI DATA</p>
+                                <h2>Edit &amp; Pilih Catatan Laporan</h2>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-soft flat-btn-sm">
+                                <span>➕</span> <span>Tambah Baru</span>
+                            </button>
+                            <button type="button" onclick="switchTab('laporan')" class="flat-btn flat-btn-ghost flat-btn-sm">
+                                <span>📋</span> <span>Lihat Tabel Cetak</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="mb-6 rounded-2xl p-5" style="background:var(--lilac-050);border:1px solid #EFE3F9;">
-                        <label class="flat-label">Pilih laporan yang ingin diedit</label>
+                    <!-- Dropdown Cepat Pilih Edit -->
+                    <div class="mb-6 rounded-2xl p-5" style="background:#F8FAFC;border:1px solid var(--line);">
+                        <label class="flat-label" for="pilihEditDropdown">📋 Pilih laporan yang ingin diedit lewat daftar</label>
                         <select id="pilihEditDropdown" onchange="pilihTanggalEditDropdown()" class="flat-input">
-                            <option value="">-- Pilih catatan laporan --</option>
+                            <option value="">-- Pilih catatan laporan untuk diedit --</option>
                         </select>
                     </div>
 
-                    <div id="formEditContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
-                        <input type="hidden" id="editIndexHidden">
-                        <div class="lg:col-span-1">
-                            <label class="flat-label">Tanggal Pelaksanaan</label>
-                            <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="flat-input">
-                            <p id="infoTanggalEdit" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#F7F7FA;"></p>
-                        </div>
-                        <div class="lg:col-span-3">
-                            <label class="flat-label">Uraian Kegiatan</label>
-                            <textarea id="editUraian" class="flat-input min-h-[120px]" rows="3"></textarea>
-                        </div>
-                        <div class="lg:col-span-4">
-                            <label class="flat-label">Ganti / Ambil Foto Bukti (opsional)</label>
-                            <div class="flex flex-col md:flex-row gap-3">
-                                <input type="file" id="editFoto" accept="image/*" class="flat-input md:w-1/2">
-                                <button type="button" onclick="bukaKamera('edit')" class="flat-btn flat-btn-pink px-6">Buka Kamera</button>
+                    <!-- Form Edit Catatan Terpilih -->
+                    <div id="formEditContainer" class="hidden mb-8 rounded-2xl p-6" style="background:var(--blue-050);border:1px solid #BFDBFE;">
+                        <div class="flex items-center justify-between gap-3 mb-5 pb-3" style="border-bottom:1px solid #DBEAFE;">
+                            <div class="flex items-center gap-2.5">
+                                <span class="chip-soft">✏️ Mode Edit Aktif</span>
+                                <h3 class="text-sm font-bold" id="judulFormEditAktif">Perbarui Catatan</h3>
                             </div>
-                            <p class="text-[11px] mt-2 inline-block rounded-full px-3 py-1.5" style="background:var(--lilac-100);color:#6B1A8E;">
-                                *Kosongkan jika foto tidak ingin diubah.
-                            </p>
+                            <button type="button" onclick="batalEditLaporan()" class="flat-btn flat-btn-ghost flat-btn-xs">✖️ Tutup Form Edit</button>
                         </div>
-                        <div class="lg:col-span-4 flex flex-wrap gap-3 justify-end pt-2">
-                            <button onclick="hapusLaporanSelected()" class="flat-btn flat-btn-danger">Hapus Laporan</button>
-                            <button onclick="simpanLaporanEdited()" class="flat-btn flat-btn-primary">Perbarui Data</button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <input type="hidden" id="editIndexHidden">
+                            <div class="lg:col-span-1">
+                                <label class="flat-label">📅 Tanggal Pelaksanaan</label>
+                                <input type="date" id="editTanggal" onchange="cekHariKerjaInput('editTanggal', 'infoTanggalEdit'); renderKalender();" class="flat-input">
+                                <p id="infoTanggalEdit" class="text-[11px] mt-2 hidden rounded-xl px-3 py-2" style="background:#fff;"></p>
+                            </div>
+                            <div class="lg:col-span-3">
+                                <label class="flat-label">✍️ Uraian Kegiatan</label>
+                                <textarea id="editUraian" class="flat-input min-h-[120px]" rows="4"></textarea>
+                            </div>
+                            <div class="lg:col-span-4">
+                                <label class="flat-label">📸 Ganti / Ambil Foto Bukti <span class="optional-label">(Opsional)</span></label>
+                                <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                                    <input type="file" id="editFoto" accept="image/*" class="flat-input flex-1">
+                                    <button type="button" onclick="bukaKamera('edit')" class="flat-btn flat-btn-ghost px-5">
+                                        <span>📷</span> <span>Buka Kamera</span>
+                                    </button>
+                                </div>
+                                <p class="text-[11px] mt-2 inline-block rounded-full px-3 py-1 font-medium" style="background:#fff;color:var(--muted);">
+                                    *Biarkan kosong jika foto sebelumnya tidak ingin diganti.
+                                </p>
+                            </div>
+                            <div class="lg:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-3" style="border-top:1px solid #DBEAFE;">
+                                <button type="button" onclick="hapusLaporanSelected()" class="flat-btn flat-btn-danger">
+                                    <span>🗑️</span> <span>Hapus Laporan Ini</span>
+                                </button>
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <button type="button" onclick="batalEditLaporan()" class="flat-btn flat-btn-ghost">Batal</button>
+                                    <button type="button" onclick="simpanLaporanEdited()" class="flat-btn flat-btn-primary">
+                                        <span>💾</span> <span>Simpan Perubahan</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Panel Daftar Pilih & Hapus Banyak Laporan di Tab Edit -->
+                    <div class="bulk-manage-panel">
+                        <div class="bulk-manage-header">
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <label class="select-all-pill cursor-pointer select-none">
+                                    <input type="checkbox" id="chkSelectAllEdit" onchange="toggleSelectAllLaporan(this.checked)" class="custom-checkbox">
+                                    <span>Pilih Semua Laporan</span>
+                                </label>
+                                <span id="badgeJumlahTerpilihEdit" class="selection-counter">0 dipilih</span>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button type="button" id="btnBatalPilihEdit" onclick="batalPilihSemuaLaporan()" class="hidden flat-btn flat-btn-ghost flat-btn-sm">
+                                    <span>✖️</span> <span>Batal Pilih</span>
+                                </button>
+                                <button type="button" id="btnHapusTerpilihEdit" onclick="hapusLaporanTerpilih()" disabled class="flat-btn flat-btn-danger flat-btn-sm">
+                                    <span>🗑️</span> <span id="teksBtnHapusTerpilihEdit">Hapus Terpilih (0)</span>
+                                </button>
+                                <button type="button" onclick="bukaKonfirmasiHapusSemuaCepat()" class="flat-btn flat-btn-danger-outline flat-btn-sm">
+                                    <span>🧹</span> <span>Hapus Semua</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="daftarKelolaEdit" class="divide-y divide-slate-100 max-h-[440px] overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
@@ -508,42 +696,87 @@
             <div id="tabLaporan" class="tab-content w-full">
                 <div id="panelTargetPKL" class="flat-card p-5 md:p-6 mb-6 no-print"></div>
 
-                <div class="flat-card p-5 mb-6 no-print">
-                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">Pencapaian</h3>
-                    <div id="wadahBadgeAchievement" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 no-print">
+                <!-- KARTU STATISTIK -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 no-print">
                     <div class="stat-card p-5 flex items-center gap-4">
-
+                        <div class="stat-icon">📅</div>
                         <div><p class="stat-label">Total Hari</p><h3 id="statTotalHari" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-
+                        <div class="stat-icon">📝</div>
                         <div><p class="stat-label">Total Uraian</p><h3 id="statTotalUraian" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-
+                        <div class="stat-icon">🖼️</div>
                         <div><p class="stat-label">Total Foto</p><h3 id="statTotalFoto" class="stat-value">0</h3></div>
                     </div>
                     <div class="stat-card p-5 flex items-center gap-4">
-
+                        <div class="stat-icon">📊</div>
                         <div><p class="stat-label">Rata-rata/Bulan</p><h3 id="statRataBulan" class="stat-value">0</h3></div>
                     </div>
                 </div>
 
-                <div class="flat-card p-5 md:p-6 mb-8 space-y-5 no-print relative z-10">
-                    <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                        <button onclick="bukaOspiExport()" id="btnDownload" class="flat-btn flat-btn-primary flat-btn-lg">Unduh PDF</button>
-                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <select id="filterBulan" onchange="renderSemuaData()" class="flat-input text-xs"><option value="SEMUA">Filter: semua bulan</option></select>
-                            <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="flat-input text-xs" placeholder="Cari laporan...">
-                            <div class="sm:col-span-2 flex items-center gap-2 rounded-2xl p-2" style="background:#F7F7FA;border:1px solid var(--line);">
-                                <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-medium w-full" style="border:0;outline:none;">
-                                <span class="text-xs" style="color:var(--muted);">→</span>
-                                <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-medium w-full" style="border:0;outline:none;">
-                                <button onclick="resetFilterTanggal()" class="flat-btn flat-btn-soft flat-btn-sm">Reset</button>
+                <!-- PENCAPAIAN / BADGE -->
+                <div class="flat-card p-5 mb-6 no-print">
+                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">🏅 Pencapaian Jurnal PKL</h3>
+                    <div id="wadahBadgeAchievement" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3"></div>
+                </div>
+
+                <!-- TOOLBAR FILTER, EKSPOR & SELECT ALL / HAPUS -->
+                <div class="flat-card p-5 md:p-6 mb-8 no-print relative z-10 space-y-4">
+                    <!-- Baris 1: Pencarian, Filter Bulan, Rentang Tanggal & Tombol Utama -->
+                    <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-4">
+                                <input type="text" id="inputPencarian" oninput="renderSemuaData()" class="flat-input text-xs" placeholder="🔍 Cari uraian atau tanggal...">
                             </div>
+                            <div class="sm:col-span-3">
+                                <select id="filterBulan" onchange="renderSemuaData()" class="flat-input text-xs">
+                                    <option value="SEMUA">📅 Semua Bulan</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-5 flex items-center gap-1.5 rounded-xl px-3 py-1.5" style="background:#F8FAFC;border:1px solid var(--line);">
+                                <input type="date" id="filterTglMulai" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-medium w-full" style="border:0;outline:none;" title="Dari tanggal">
+                                <span class="text-xs font-bold" style="color:var(--muted);">→</span>
+                                <input type="date" id="filterTglAkhir" onchange="renderSemuaData()" class="bg-transparent text-[11px] p-1 font-medium w-full" style="border:0;outline:none;" title="Sampai tanggal">
+                                <button type="button" onclick="resetFilterTanggal()" class="flat-btn flat-btn-soft flat-btn-xs">Reset</button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2.5 justify-end">
+                            <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-soft">
+                                <span>➕</span> <span>Catat Baru</span>
+                            </button>
+                            <button type="button" onclick="bukaOspiExport()" id="btnDownload" class="flat-btn flat-btn-primary">
+                                <span>📥</span> <span>Unduh PDF</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Baris 2: Panel Select All & Hapus Laporan -->
+                    <div class="selection-toolbar">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <label class="select-all-pill cursor-pointer select-none" for="chkSelectAllLaporan">
+                                <input type="checkbox" id="chkSelectAllLaporan" onchange="toggleSelectAllLaporan(this.checked)" class="custom-checkbox">
+                                <span id="labelSelectAllLaporan">Pilih Semua Laporan</span>
+                            </label>
+                            <span id="badgeJumlahTerpilih" class="selection-counter">0 dipilih</span>
+                            <span class="text-[11px] hidden sm:inline" style="color:var(--muted);">Centang baris laporan di tabel untuk memilih satu per satu atau sekaligus.</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button type="button" id="btnToggleSelectAllText" onclick="toggleSelectAllLaporan()" class="flat-btn flat-btn-ghost flat-btn-sm">
+                                <span>☑️</span> <span>Pilih Semua</span>
+                            </button>
+                            <button type="button" id="btnBatalPilih" onclick="batalPilihSemuaLaporan()" class="hidden flat-btn flat-btn-ghost flat-btn-sm">
+                                <span>✖️</span> <span>Batal Pilih</span>
+                            </button>
+                            <button type="button" id="btnHapusTerpilih" onclick="hapusLaporanTerpilih()" disabled class="flat-btn flat-btn-danger flat-btn-sm">
+                                <span>🗑️</span> <span id="teksBtnHapusTerpilih">Hapus Terpilih (0)</span>
+                            </button>
+                            <button type="button" id="btnHapusSemuaCepat" onclick="bukaKonfirmasiHapusSemuaCepat()" class="flat-btn flat-btn-danger-outline flat-btn-sm">
+                                <span>🧹</span> <span>Hapus Semua</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -587,27 +820,54 @@
         </div>
     </main>
 
+    <!-- ================ FLOATING BULK SELECTION BAR ================ -->
+    <div id="floatingBulkBar" class="no-print fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden w-[94%] max-w-xl">
+        <div class="floating-bulk-inner">
+            <div class="flex items-center gap-2.5">
+                <span class="floating-check-badge">✓</span>
+                <div>
+                    <p class="text-xs font-bold text-white leading-tight"><span id="floatingCountTerpilih">0</span> laporan dipilih</p>
+                    <p class="text-[10px] text-slate-300 hidden sm:block">Siap dihapus sekaligus</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="pilihSemuaLaporanGlobal()" class="flat-btn flat-btn-xs" style="background:rgba(255,255,255,.14);color:#fff;">
+                    Pilih Semua
+                </button>
+                <button type="button" onclick="batalPilihSemuaLaporan()" class="flat-btn flat-btn-xs" style="background:rgba(255,255,255,.14);color:#fff;">
+                    Batal
+                </button>
+                <button type="button" id="btnFloatingHapus" onclick="hapusLaporanTerpilih()" class="flat-btn flat-btn-danger-solid flat-btn-sm">
+                    🗑️ Hapus (<span id="floatingBtnCount">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== BOTTOM NAV (MOBILE) ==================== -->
-    <nav class="no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[420px] md:hidden">
+    <nav class="no-print fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-[430px] md:hidden">
         <div class="bottom-nav-shell">
-            <button onclick="switchTab('input')" id="btnTabInputMobile" class="nav-item-mobile active flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg><span>Catat</span>
+            <button type="button" onclick="switchTab('input')" id="btnTabInputMobile" class="nav-item-mobile active flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-[11px] font-semibold">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg>
+                <span>Catat</span>
             </button>
-            <button onclick="switchTab('edit')" id="btnTabEditMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4-.8L19 8.2 15.8 5 4.8 16 4 20ZM14.5 6.3l3.2 3.2"/></svg><span>Edit</span>
+            <button type="button" onclick="switchTab('edit')" id="btnTabEditMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-[11px] font-semibold">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4-.8L19 8.2 15.8 5 4.8 16 4 20ZM14.5 6.3l3.2 3.2"/></svg>
+                <span>Kelola</span>
             </button>
-            <button onclick="switchTab('laporan')" id="btnTabLaporanMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg><span>Laporan</span>
+            <button type="button" onclick="switchTab('laporan')" id="btnTabLaporanMobile" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-[11px] font-semibold">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16H7zM10 8h4M10 12h4M10 16h4"/></svg>
+                <span>Laporan</span>
             </button>
-            <button onclick="bukaSettings()" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 text-[10px] font-semibold">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg><span>Pengaturan</span>
+            <button type="button" onclick="bukaSettings()" class="nav-item-mobile flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-[11px] font-semibold">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>
+                <span>Pengaturan</span>
             </button>
         </div>
     </nav>
 
     <!-- =============== SINKRONISASI NAV MOBILE + RINGKASAN HERO =============== -->
     <script>
-        // --- sinkronkan gaya nav mobile dengan tab yang aktif ---
         document.addEventListener('DOMContentLoaded', () => {
             const syncNav = (tabName) => {
                 document.querySelectorAll('.nav-item-mobile').forEach(el => el.classList.remove('active'));
@@ -619,7 +879,6 @@
             syncNav('input');
         });
 
-        // Ringkasan progres mengikuti data PKL yang tersimpan.
         function renderRingkasanHero() {
             const setTeks = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
             if (typeof hitungProgresPKL !== 'function') return;
@@ -636,14 +895,14 @@
             const periode = document.getElementById('heroPeriode');
             if (periode) {
                 periode.innerText = p.adaRentang
-                    ? 'Bulan ' + p.teksPeriode
-                    : 'Periode PKL belum diatur';
+                    ? '📆 Bulan ' + p.teksPeriode
+                    : '📆 Periode PKL belum diatur';
             }
 
             const status = document.getElementById('heroStatus');
             if (status) {
-                status.innerText = !p.adaRentang ? 'Belum ada periode'
-                    : (persen >= 100 ? 'Target tercapai' : (p.belumSampaiHariIni > 0 ? p.belumSampaiHariIni + ' hari tertinggal' : 'Sesuai target'));
+                status.innerText = !p.adaRentang ? 'Belum diatur'
+                    : (persen >= 100 ? '🎉 Target Tercapai' : (p.belumSampaiHariIni > 0 ? p.belumSampaiHariIni + ' hari belum diisi' : '✓ Sesuai Target'));
             }
 
             const bar = document.getElementById('heroBar');
