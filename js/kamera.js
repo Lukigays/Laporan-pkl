@@ -108,8 +108,10 @@ function gunakanFoto() {
     // Tempelkan file ke input form yang sesuai
     if (targetInput === 'input') {
         document.getElementById('inputFoto').files = dataTransfer.files;
+        if (typeof siapkanFotoCepat === 'function') siapkanFotoCepat('input');
     } else if (targetInput === 'edit') {
         document.getElementById('editFoto').files = dataTransfer.files;
+        if (typeof siapkanFotoCepat === 'function') siapkanFotoCepat('edit');
     }
     
     showToast("✅ Foto berhasil dipasang ke form laporan!");

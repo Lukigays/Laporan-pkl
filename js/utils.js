@@ -1,15 +1,20 @@
 // ============================================================
-// UTILITAS: Toast, Kompresi Gambar, Helper Tanggal
+// UTILITAS: Toast, Kompresi Gambar Cepat, Helper Tanggal
 // ============================================================
+
+let toastTimeoutId = null;
 
 // ---------- Toast notifikasi ----------
 function showToast(message) {
     const container = document.getElementById('toast-container');
-    document.getElementById('toast-message').innerText = message;
+    const msgEl = document.getElementById('toast-message');
+    if (!container || !msgEl) return;
+    msgEl.innerText = message;
     container.classList.remove('translate-x-full', 'opacity-0', 'pointer-events-none');
-    setTimeout(() => {
+    if (toastTimeoutId) clearTimeout(toastTimeoutId);
+    toastTimeoutId = setTimeout(() => {
         container.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
-    }, 3500);
+    }, 2200);
 }
 
 // ---------- Modal: tutup modal lain agar tidak bertumpuk ----------
@@ -20,8 +25,33 @@ function tutupSemuaModal(kecualiId) {
     });
 }
 
+// ---------- Resize elemen gambar/bitmap ke Base64 JPEG ----------
+function gambarKeBase64Terukur(sumber, widthAsli, heightAsli, maxDimensi = 800, kualitas = 0.75) {
+    let width = widthAsli;
+    let height = heightAsli;
+
+    if (width > height) {
+        if (width > maxDimensi) {
+            height = Math.round(height * (maxDimensi / width));
+            width = maxDimensi;
+        }
+    } else if (height > maxDimensi) {
+        width = Math.round(width * (maxDimensi / height));
+        height = maxDimensi;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(sumber, 0, 0, width, height);
+    return canvas.toDataURL('image/jpeg', kualitas);
+}
+
 // ---------- Kompresi gambar ringan berbasis canvas ----------
-function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
+function kompresGambarRingan(dataBase64, maxDimensi = 800, kualitas = 0.75) {
     return new Promise((resolve) => {
         if (!dataBase64 || !dataBase64.startsWith('data:image')) {
             resolve(dataBase64);
@@ -29,46 +59,20 @@ function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
         }
 
         const timeoutId = setTimeout(() => {
-            console.warn('Kompresi timeout, mengembalikan gambar asli');
             resolve(dataBase64);
-        }, 10000);
+        }, 6000);
 
         const img = new Image();
         img.onload = function() {
             clearTimeout(timeoutId);
             try {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxDimensi) {
-                        height = Math.round(height * (maxDimensi / width));
-                        width = maxDimensi;
-                    }
-                } else {
-                    if (height > maxDimensi) {
-                        width = Math.round(width * (maxDimensi / height));
-                        height = maxDimensi;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, width, height);
-                ctx.drawImage(img, 0, 0, width, height);
-                const result = canvas.toDataURL('image/jpeg', kualitas);
-                resolve(result);
+                resolve(gambarKeBase64Terukur(img, img.width, img.height, maxDimensi, kualitas));
             } catch (err) {
-                console.error('Error kompresi canvas:', err);
                 resolve(dataBase64);
             }
         };
-        img.onerror = function(err) {
+        img.onerror = function() {
             clearTimeout(timeoutId);
-            console.warn('Error load gambar untuk kompresi:', err);
             resolve(dataBase64);
         };
         img.src = dataBase64;
@@ -76,7 +80,7 @@ function kompresGambarRingan(dataBase64, maxDimensi = 200, kualitas = 0.6) {
 }
 
 // ---------- Ambil gambar (base64 / URL) untuk PDF ----------
-async function getImageBase64ForPdf(source, maxDimensi = 200, kualitas = 0.6) {
+async function getImageBase64ForPdf(source, maxDimensi = 500, kualitas = 0.75) {
     if (source && source.startsWith('data:image')) {
         return await kompresGambarRingan(source, maxDimensi, kualitas);
     }
@@ -85,57 +89,71 @@ async function getImageBase64ForPdf(source, maxDimensi = 200, kualitas = 0.6) {
             const response = await fetch(source, { mode: 'cors' });
             if (!response.ok) throw new Error('HTTP ' + response.status);
             const blob = await response.blob();
-            const bitmap = await createImageBitmap(blob);
-            const canvas = document.createElement('canvas');
-            let width = bitmap.width;
-            let height = bitmap.height;
-            if (width > height) {
-                if (width > maxDimensi) { height = Math.round(height * (maxDimensi / width)); width = maxDimensi; }
-            } else {
-                if (height > maxDimensi) { width = Math.round(width * (maxDimensi / height)); height = maxDimensi; }
+            if (typeof createImageBitmap === 'function') {
+                const bitmap = await createImageBitmap(blob);
+                const hasil = gambarKeBase64Terukur(bitmap, bitmap.width, bitmap.height, maxDimensi, kualitas);
+                if (typeof bitmap.close === 'function') bitmap.close();
+                return hasil;
             }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, width, height);
-            ctx.drawImage(bitmap, 0, 0, width, height);
-            return canvas.toDataURL('image/jpeg', kualitas);
         } catch (err) {
-            console.warn('Fetch CORS gagal, mencoba fallback Image:', err.message);
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > height) {
-                        if (width > maxDimensi) { height = Math.round(height * (maxDimensi / width)); width = maxDimensi; }
-                    } else {
-                        if (height > maxDimensi) { width = Math.round(width * (maxDimensi / height)); height = maxDimensi; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', kualitas));
-                };
-                img.onerror = function() {
-                    console.error('Gagal memuat gambar dari URL:', source);
-                    resolve(null);
-                };
-                setTimeout(() => { resolve(null); }, 8000);
-                img.src = source;
-            });
+            // Lanjut ke fallback Image
         }
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function() {
+                try {
+                    resolve(gambarKeBase64Terukur(img, img.width, img.height, maxDimensi, kualitas));
+                } catch (e) {
+                    resolve(null);
+                }
+            };
+            img.onerror = function() { resolve(null); };
+            setTimeout(() => resolve(null), 5000);
+            img.src = source;
+        });
     }
     return null;
 }
 
-// ---------- Baca file lalu kompres ----------
-function bacaDanKompresFile(file, maxDimensi = 200, kualitas = 0.6) {
+// ---------- Baca file lalu kompres (SANGAT CEPAT via createImageBitmap / ObjectURL) ----------
+async function bacaDanKompresFile(file, maxDimensi = 850, kualitas = 0.76) {
+    if (!file) return '';
+
+    // Jalur tercepat: decode langsung dari Blob di thread native browser
+    if (typeof createImageBitmap === 'function') {
+        try {
+            const bitmap = await createImageBitmap(file);
+            const hasil = gambarKeBase64Terukur(bitmap, bitmap.width, bitmap.height, maxDimensi, kualitas);
+            if (typeof bitmap.close === 'function') bitmap.close();
+            return hasil;
+        } catch (e) {
+            // Fallback ke ObjectURL bila format file tidak didukung createImageBitmap
+        }
+    }
+
+    // Jalur cepat kedua: ObjectURL tanpa konversi FileReader Base64 mentah
+    if (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+        return new Promise((resolve, reject) => {
+            const objUrl = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = function() {
+                URL.revokeObjectURL(objUrl);
+                try {
+                    resolve(gambarKeBase64Terukur(img, img.width, img.height, maxDimensi, kualitas));
+                } catch (err) {
+                    reject(err);
+                }
+            };
+            img.onerror = function() {
+                URL.revokeObjectURL(objUrl);
+                reject(new Error('Gagal memuat gambar'));
+            };
+            img.src = objUrl;
+        });
+    }
+
+    // Fallback terakhir untuk browser sangat lama
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = async function(e) {
@@ -146,14 +164,12 @@ function bacaDanKompresFile(file, maxDimensi = 200, kualitas = 0.6) {
                 reject(err);
             }
         };
-        reader.onerror = function(err) {
-            reject(new Error('Gagal membaca file: ' + (err?.message || 'unknown')));
-        };
+        reader.onerror = () => reject(new Error('Gagal membaca file'));
         reader.readAsDataURL(file);
     });
 }
 
-// ---------- Escape HTML (dipakai untuk nama libur & teks dari pengguna) ----------
+// ---------- Escape HTML ----------
 function escapeHtml(teks) {
     return String(teks == null ? '' : teks)
         .replace(/&/g, '&amp;')

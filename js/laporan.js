@@ -1,13 +1,88 @@
 // ============================================================
-// LAPORAN: CRUD, Select All / Multi-Select, Bulk Hapus,
+// LAPORAN: CRUD Cepat, Select All / Multi-Select, Bulk Hapus,
 // Render Tabel, Statistik, & Filter
 // ============================================================
 
-// ---------- State Seleksi Laporan ----------
+// ---------- State Seleksi & Cache Foto ----------
 let selectedLaporanIndices = new Set();
 let pendingDeleteAction = null; // { mode: 'selected' | 'single' | 'all', indices: [] }
+let cacheFotoInput = { file: null, promise: null };
+let cacheFotoEdit = { file: null, promise: null };
+let timerSimpanStorage = null;
 
-// ---------- Navigasi Tab ----------
+// Helper konversi cepat "dd/mm/yyyy" -> integer YYYYMMDD untuk sorting
+function angkaUrutTanggal(tglStr) {
+    if (!tglStr || tglStr.length < 10) return 0;
+    return (
+        tInt(tglStr.slice(6, 10)) * 10000 +
+        tInt(tglStr.slice(3, 5)) * 100 +
+        tInt(tglStr.slice(0, 2))
+    );
+}
+function tInt(s) {
+    const n = parseInt(s, 10);
+    return isNaN(n) ? 0 : n;
+}
+
+function urutkanDataLaporanCepat() {
+    dataLaporan.sort((a, b) => angkaUrutTanggal(a.tanggal) - angkaUrutTanggal(b.tanggal));
+}
+
+// Simpan ke IndexedDB di background agar UI tidak pernah nge-freeze
+function jadwalSimpanLaporanLokal() {
+    if (timerSimpanStorage) clearTimeout(timerSimpanStorage);
+    timerSimpanStorage = setTimeout(() => {
+        if (typeof localforage !== 'undefined' && localforage.setItem) {
+            if (dataLaporan.length > 0) {
+                localforage.setItem('laporanPKL', dataLaporan).catch(err => console.error('Gagal simpan lokal:', err));
+            } else if (localforage.removeItem) {
+                localforage.removeItem('laporanPKL').catch(err => console.error('Gagal hapus lokal:', err));
+            }
+        }
+    }, 10);
+}
+
+// Pra-kompresi foto begitu file dipilih supaya saat klik Simpan langsung instan (0ms)
+function siapkanFotoCepat(mode) {
+    const isEdit = mode === 'edit';
+    const inputEl = document.getElementById(isEdit ? 'editFoto' : 'inputFoto');
+    const statusEl = document.getElementById(isEdit ? 'statusFotoEdit' : 'statusFotoInput');
+    const cache = isEdit ? cacheFotoEdit : cacheFotoInput;
+
+    if (!inputEl || !inputEl.files || !inputEl.files[0]) {
+        cache.file = null;
+        cache.promise = null;
+        if (statusEl) {
+            statusEl.textContent = '';
+            statusEl.classList.add('hidden');
+        }
+        return;
+    }
+
+    const file = inputEl.files[0];
+    cache.file = file;
+    if (statusEl) {
+        statusEl.textContent = 'Memproses foto...';
+        statusEl.classList.remove('hidden');
+    }
+
+    cache.promise = bacaDanKompresFile(file, 850, 0.76)
+        .then(hasil => {
+            if (statusEl && cache.file === file) {
+                statusEl.textContent = 'Foto siap disimpan';
+            }
+            return hasil;
+        })
+        .catch(err => {
+            console.error('Gagal kompres foto:', err);
+            if (statusEl && cache.file === file) {
+                statusEl.textContent = 'Gagal memuat foto';
+            }
+            return '';
+        });
+}
+
+// ---------- Navigasi Tab (Instan, Tanpa Animasi Berat) ----------
 function switchTab(tabName) {
     const tabInput = document.getElementById('tabInput');
     const tabEdit = document.getElementById('tabEdit');
@@ -15,8 +90,10 @@ function switchTab(tabName) {
     const btnInput = document.getElementById('btnTabInput');
     const btnEdit = document.getElementById('btnTabEdit');
     const btnLaporan = document.getElementById('btnTabLaporan');
+
     [tabInput, tabEdit, tabLaporan].forEach(t => { if (t) t.classList.remove('active'); });
     [btnInput, btnEdit, btnLaporan].forEach(b => { if (b) b.classList.remove('active'); });
+
     if (tabName === 'input') {
         if (tabInput) tabInput.classList.add('active');
         if (btnInput) btnInput.classList.add('active');
@@ -31,73 +108,156 @@ function switchTab(tabName) {
         updateBulkActionUI();
     }
     if (typeof window.syncNavMobile === 'function') window.syncNavMobile(tabName);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ---------- Helper Form Input ----------
+function pastikanTanggalDefaultInput() {
+    const tgl = document.getElementById('inputTanggal');
+    if (tgl && !tgl.value) {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        tgl.value = `${y}-${m}-${d}`;
+        if (typeof cekHariKerjaInput === 'function') cekHariKerjaInput();
+    }
+}
+
+function majukanTanggalInputSatuHari(tglStrYmd) {
+    if (!tglStrYmd) return;
+    const p = tglStrYmd.split('-').map(Number);
+    if (p.length !== 3) return;
+    const d = new Date(p[0], p[1] - 1, p[2]);
+    d.setDate(d.getDate() + 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const input = document.getElementById('inputTanggal');
+    if (input) {
+        input.value = `${y}-${m}-${day}`;
+        if (typeof cekHariKerjaInput === 'function') cekHariKerjaInput();
+        if (typeof renderKalender === 'function') renderKalender();
+    }
+}
+
 function isiCepatUraian(teks) {
     const el = document.getElementById('inputUraian');
     if (!el) return;
     el.value = teks;
     el.focus();
-    showToast('✨ Template uraian diterapkan!');
 }
 
 function resetFormInput() {
-    const tgl = document.getElementById('inputTanggal');
     const uraian = document.getElementById('inputUraian');
     const foto = document.getElementById('inputFoto');
-    const info = document.getElementById('infoTanggalInput');
-    if (tgl) tgl.value = '';
+    const statusFoto = document.getElementById('statusFotoInput');
     if (uraian) uraian.value = '';
     if (foto) foto.value = '';
-    if (info) info.classList.add('hidden');
-    if (typeof renderKalender === 'function') renderKalender();
-    showToast('🔄 Formulir dibersihkan.');
+    if (statusFoto) {
+        statusFoto.textContent = '';
+        statusFoto.classList.add('hidden');
+    }
+    cacheFotoInput.file = null;
+    cacheFotoInput.promise = null;
+    pastikanTanggalDefaultInput();
+    if (uraian) uraian.focus();
 }
 
-// ---------- Tambah Laporan Baru ----------
+// Shortcut Ctrl+Enter di textarea untuk langsung simpan
+document.addEventListener('DOMContentLoaded', () => {
+    pastikanTanggalDefaultInput();
+    const inputUraian = document.getElementById('inputUraian');
+    if (inputUraian) {
+        inputUraian.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                tambahBaris();
+            }
+        });
+    }
+    const inputFoto = document.getElementById('inputFoto');
+    if (inputFoto) {
+        inputFoto.addEventListener('change', () => siapkanFotoCepat('input'));
+    }
+    const editFoto = document.getElementById('editFoto');
+    if (editFoto) {
+        editFoto.addEventListener('change', () => siapkanFotoCepat('edit'));
+    }
+});
+
+// ---------- Tambah Laporan Baru (Instan) ----------
 async function tambahBaris() {
-    const tanggalInput = document.getElementById('inputTanggal').value;
-    const uraian = document.getElementById('inputUraian').value;
+    const tglEl = document.getElementById('inputTanggal');
+    const uraianEl = document.getElementById('inputUraian');
     const fotoInput = document.getElementById('inputFoto');
-    if (!tanggalInput || !uraian.trim()) {
-        showToast('⚠️ Isi Tanggal dan Uraian terlebih dahulu!');
+    const tanggalInput = tglEl ? tglEl.value : '';
+    const uraian = uraianEl ? uraianEl.value.trim() : '';
+
+    if (!tanggalInput || !uraian) {
+        showToast('Isi Tanggal dan Uraian terlebih dahulu.');
+        if (!tanggalInput && tglEl) tglEl.focus();
+        else if (uraianEl) uraianEl.focus();
         return;
     }
-    const dateObj = new Date(tanggalInput);
+
+    const parts = tanggalInput.split('-').map(Number);
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
     const formatTgl = formatTanggalIndo(dateObj);
     const labelBulan = labelBulanIndo(dateObj);
+    const namaHari = NAMA_HARI[dateObj.getDay()];
+
     let fotoBase64 = '';
-    if (fotoInput.files && fotoInput.files[0]) {
-        showToast('⏳ Memproses foto HD...');
+    if (fotoInput && fotoInput.files && fotoInput.files[0]) {
+        const file = fotoInput.files[0];
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 1500, 0.9);
-            await simpanDataBaru(NAMA_HARI[dateObj.getDay()], formatTgl, uraian.trim(), fotoBase64, labelBulan);
+            if (cacheFotoInput.file === file && cacheFotoInput.promise) {
+                fotoBase64 = await cacheFotoInput.promise;
+            } else {
+                fotoBase64 = await bacaDanKompresFile(file, 850, 0.76);
+            }
         } catch (err) {
             console.error('Error upload foto:', err);
-            showToast('❌ Gagal memproses foto, coba gambar lain!');
+            showToast('Gagal memproses foto, coba gambar lain.');
+            return;
         }
-    } else {
-        await simpanDataBaru(NAMA_HARI[dateObj.getDay()], formatTgl, uraian.trim(), fotoBase64, labelBulan);
     }
+
+    simpanDataBaru(namaHari, formatTgl, uraian, fotoBase64, labelBulan, tanggalInput);
 }
 
-async function simpanDataBaru(hari, tanggal, uraian, foto, bulanLabel) {
+function simpanDataBaru(hari, tanggal, uraian, foto, bulanLabel, tanggalInputAsal) {
     dataLaporan.push({ hari, tanggal, uraian, foto, bulanLabel });
-    dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
+    urutkanDataLaporanCepat();
     selectedLaporanIndices.clear();
-    await localforage.setItem('laporanPKL', dataLaporan);
     dataTelahBerubah = true;
+
+    // Bersihkan uraian & foto seketika, lalu majukan tanggal ke hari berikutnya
+    // agar pengguna bisa input banyak laporan beruntun dengan cepat
+    const uraianEl = document.getElementById('inputUraian');
+    const fotoEl = document.getElementById('inputFoto');
+    const statusFoto = document.getElementById('statusFotoInput');
+    if (uraianEl) {
+        uraianEl.value = '';
+        uraianEl.focus();
+    }
+    if (fotoEl) fotoEl.value = '';
+    if (statusFoto) {
+        statusFoto.textContent = '';
+        statusFoto.classList.add('hidden');
+    }
+    cacheFotoInput.file = null;
+    cacheFotoInput.promise = null;
+
+    if (tanggalInputAsal) {
+        majukanTanggalInputSatuHari(tanggalInputAsal);
+    }
+
+    // Simpan ke IndexedDB di background (non-blocking)
+    jadwalSimpanLaporanLokal();
+
+    // Render tabel & statistik
     renderSemuaData();
-    document.getElementById('inputTanggal').value = '';
-    document.getElementById('inputUraian').value = '';
-    document.getElementById('inputFoto').value = '';
-    const info = document.getElementById('infoTanggalInput');
-    if (info) info.classList.add('hidden');
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-    showToast('Laporan berhasil disimpan! 🎉');
-    switchTab('laporan');
+    showToast(`Laporan ${tanggal} tersimpan.`);
 }
 
 // ---------- Edit Laporan & Daftar Kelola di Tab Edit ----------
@@ -106,11 +266,13 @@ function updateDropdownEditTab() {
     const dropdown = document.getElementById('pilihEditDropdown');
     if (dropdown) {
         const prevVal = dropdown.value;
-        dropdown.innerHTML = '<option value="">-- Pilih Catatan Laporan --</option>';
-        dataLaporan.forEach((item, idx) => {
-            const cuplikan = (item.uraian || '').substring(0, 42);
-            dropdown.innerHTML += `<option value="${idx}">${item.tanggal} (${item.hari}) — ${escapeHtml(cuplikan)}${(item.uraian || '').length > 42 ? '...' : ''}</option>`;
-        });
+        const opts = ['<option value="">-- Pilih catatan laporan untuk diedit --</option>'];
+        for (let idx = 0; idx < dataLaporan.length; idx++) {
+            const item = dataLaporan[idx];
+            const cuplikan = (item.uraian || '').substring(0, 45);
+            opts.push(`<option value="${idx}">${item.tanggal} (${item.hari}) - ${escapeHtml(cuplikan)}${(item.uraian || '').length > 45 ? '...' : ''}</option>`);
+        }
+        dropdown.innerHTML = opts.join('');
         if (prevVal !== '' && dataLaporan[Number(prevVal)]) {
             dropdown.value = prevVal;
         }
@@ -125,46 +287,45 @@ function renderDaftarKelolaEdit() {
     if (!Array.isArray(dataLaporan) || dataLaporan.length === 0) {
         wadah.innerHTML = `
             <div class="p-8 text-center">
-                <p class="text-sm font-semibold" style="color:var(--muted);">Belum ada catatan laporan tersimpan.</p>
-                <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-primary flat-btn-sm mt-3">➕ Buat Catatan Pertama</button>
+                <p class="text-sm font-medium" style="color:var(--muted);">Belum ada catatan laporan tersimpan.</p>
             </div>`;
         return;
     }
 
     const editIdxAktif = document.getElementById('editIndexHidden') ? document.getElementById('editIndexHidden').value : '';
+    const formTerbuka = !document.getElementById('formEditContainer')?.classList.contains('hidden');
 
-    wadah.innerHTML = dataLaporan.map((item, idx) => {
+    const barisHtml = new Array(dataLaporan.length);
+    for (let idx = 0; idx < dataLaporan.length; idx++) {
+        const item = dataLaporan[idx];
         const terpilih = selectedLaporanIndices.has(idx);
-        const sedangDiedit = String(idx) === String(editIdxAktif) && !document.getElementById('formEditContainer')?.classList.contains('hidden');
+        const sedangDiedit = formTerbuka && String(idx) === String(editIdxAktif);
         const adaFoto = !!(item.foto && item.foto.trim() !== '');
         const teksUraian = escapeHtml(item.uraian || '-');
 
-        return `
+        barisHtml[idx] = `
             <div class="edit-list-item ${terpilih ? 'is-selected' : ''} ${sedangDiedit ? 'is-editing' : ''}" data-row-edit-idx="${idx}">
-                <label class="flex items-center cursor-pointer p-1" title="Pilih laporan tanggal ${escapeHtml(item.tanggal)}">
+                <label class="flex items-center cursor-pointer p-1">
                     <input type="checkbox" class="custom-checkbox chk-item-laporan" data-laporan-idx="${idx}"
                         ${terpilih ? 'checked' : ''}
                         onchange="toggleSelectLaporan(${idx}, this.checked)">
                 </label>
                 <div class="flex-1 min-w-0 cursor-pointer" onclick="bukaEditPadaIndex(${idx})">
-                    <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
                         <span class="item-no-badge">#${idx + 1}</span>
-                        <span class="font-bold text-xs" style="color:var(--ink);">${escapeHtml(item.tanggal)}</span>
+                        <span class="font-semibold text-xs" style="color:var(--ink);">${escapeHtml(item.tanggal)}</span>
                         <span class="item-day-badge">${escapeHtml(item.hari)}</span>
-                        ${adaFoto ? '<span class="item-photo-badge">📷 Foto</span>' : ''}
+                        ${adaFoto ? '<span class="item-photo-badge">Foto</span>' : ''}
                     </div>
                     <p class="text-xs truncate" style="color:var(--ink-soft);">${teksUraian}</p>
                 </div>
                 <div class="flex items-center gap-1.5 flex-none">
-                    <button type="button" onclick="bukaEditPadaIndex(${idx})" class="table-action-btn edit" title="Edit laporan ini">
-                        <span>✏️</span> <span class="hidden sm:inline">Edit</span>
-                    </button>
-                    <button type="button" onclick="hapusSatuLaporanDariTabel(${idx})" class="table-action-btn delete" title="Hapus laporan ini">
-                        <span>🗑️</span>
-                    </button>
+                    <button type="button" onclick="bukaEditPadaIndex(${idx})" class="table-action-btn edit">Edit</button>
+                    <button type="button" onclick="hapusSatuLaporanDariTabel(${idx})" class="table-action-btn delete">Hapus</button>
                 </div>
             </div>`;
-    }).join('');
+    }
+    wadah.innerHTML = barisHtml.join('');
 }
 
 function bukaEditPadaIndex(idx) {
@@ -174,23 +335,25 @@ function bukaEditPadaIndex(idx) {
         dropdown.value = String(idx);
         pilihTanggalEditDropdown();
     }
-    const form = document.getElementById('formEditContainer');
-    if (form) {
-        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
 }
 
 function batalEditLaporan() {
     const dropdown = document.getElementById('pilihEditDropdown');
     const container = document.getElementById('formEditContainer');
     const hidden = document.getElementById('editIndexHidden');
+    const statusFoto = document.getElementById('statusFotoEdit');
     if (dropdown) dropdown.value = '';
     if (hidden) hidden.value = '';
     if (container) container.classList.add('hidden');
+    if (statusFoto) {
+        statusFoto.textContent = '';
+        statusFoto.classList.add('hidden');
+    }
+    cacheFotoEdit.file = null;
+    cacheFotoEdit.promise = null;
     renderDaftarKelolaEdit();
 }
 
-// ---------- Tombol Edit di samping foto (tabel laporan) ----------
 function cariIndexAsliLaporan(item) {
     if (!item) return -1;
     let idx = dataLaporan.indexOf(item);
@@ -200,7 +363,7 @@ function cariIndexAsliLaporan(item) {
 
 function editLaporanDariTabel(idx) {
     if (typeof idx !== 'number' || idx < 0 || !dataLaporan[idx]) {
-        showToast('⚠️ Laporan tidak ditemukan, coba muat ulang halaman.');
+        showToast('Laporan tidak ditemukan.');
         return;
     }
     switchTab('edit');
@@ -208,11 +371,6 @@ function editLaporanDariTabel(idx) {
     if (!dropdown) return;
     dropdown.value = String(idx);
     pilihTanggalEditDropdown();
-    showToast(`✏️ Mengedit laporan tanggal ${dataLaporan[idx].tanggal}`);
-    setTimeout(() => {
-        const form = document.getElementById('formEditContainer');
-        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 250);
 }
 
 function pilihTanggalEditDropdown() {
@@ -230,6 +388,8 @@ function pilihTanggalEditDropdown() {
     document.getElementById('editTanggal').value = item.tanggal.split('/').reverse().join('-');
     document.getElementById('editUraian').value = item.uraian;
     document.getElementById('editFoto').value = '';
+    cacheFotoEdit.file = null;
+    cacheFotoEdit.promise = null;
     const judulEl = document.getElementById('judulFormEditAktif');
     if (judulEl) judulEl.textContent = `Edit Laporan: ${item.hari}, ${item.tanggal}`;
     container.classList.remove('hidden');
@@ -240,44 +400,48 @@ function pilihTanggalEditDropdown() {
 async function simpanLaporanEdited() {
     const idx = document.getElementById('editIndexHidden').value;
     const tglInput = document.getElementById('editTanggal').value;
-    const uraian = document.getElementById('editUraian').value;
+    const uraian = document.getElementById('editUraian').value.trim();
     const fotoInput = document.getElementById('editFoto');
     if (idx === '' || !dataLaporan[idx]) {
-        showToast('⚠️ Pilih laporan terlebih dahulu!');
+        showToast('Pilih laporan terlebih dahulu.');
         return;
     }
-    if (!tglInput || !uraian.trim()) {
-        showToast('⚠️ Isi Tanggal dan Uraian terlebih dahulu!');
+    if (!tglInput || !uraian) {
+        showToast('Isi Tanggal dan Uraian terlebih dahulu.');
         return;
     }
-    const dateObj = new Date(tglInput);
+    const parts = tglInput.split('-').map(Number);
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
     const formatTgl = formatTanggalIndo(dateObj);
     const labelBulan = labelBulanIndo(dateObj);
     let fotoBase64 = dataLaporan[idx].foto;
-    if (fotoInput.files && fotoInput.files[0]) {
-        showToast('⏳ Memproses foto HD...');
+
+    if (fotoInput && fotoInput.files && fotoInput.files[0]) {
+        const file = fotoInput.files[0];
         try {
-            fotoBase64 = await bacaDanKompresFile(fotoInput.files[0], 1500, 0.9);
-            await finalizeEdit(idx, NAMA_HARI[dateObj.getDay()], formatTgl, uraian.trim(), fotoBase64, labelBulan);
+            if (cacheFotoEdit.file === file && cacheFotoEdit.promise) {
+                fotoBase64 = await cacheFotoEdit.promise;
+            } else {
+                fotoBase64 = await bacaDanKompresFile(file, 850, 0.76);
+            }
         } catch (err) {
             console.error('Error ganti foto:', err);
-            showToast('❌ Gagal memproses foto baru, coba gambar lain!');
+            showToast('Gagal memproses foto baru.');
+            return;
         }
-    } else {
-        await finalizeEdit(idx, NAMA_HARI[dateObj.getDay()], formatTgl, uraian.trim(), fotoBase64, labelBulan);
     }
+    finalizeEdit(Number(idx), NAMA_HARI[dateObj.getDay()], formatTgl, uraian, fotoBase64, labelBulan);
 }
 
-async function finalizeEdit(idx, hari, tanggal, uraian, foto, bulanLabel) {
+function finalizeEdit(idx, hari, tanggal, uraian, foto, bulanLabel) {
     dataLaporan[idx] = { hari, tanggal, uraian, foto, bulanLabel };
-    dataLaporan.sort((a, b) => parseInt(a.tanggal.split('/').reverse().join('')) - parseInt(b.tanggal.split('/').reverse().join('')));
+    urutkanDataLaporanCepat();
     selectedLaporanIndices.clear();
-    await localforage.setItem('laporanPKL', dataLaporan);
     dataTelahBerubah = true;
+    jadwalSimpanLaporanLokal();
     batalEditLaporan();
     renderSemuaData();
-    switchTab('laporan');
-    showToast('Laporan berhasil diperbarui! ✅');
+    showToast('Laporan diperbarui.');
 }
 
 // ============================================================
@@ -285,6 +449,7 @@ async function finalizeEdit(idx, hari, tanggal, uraian, foto, bulanLabel) {
 // ============================================================
 
 function bersihkanSeleksiTidakValid() {
+    if (selectedLaporanIndices.size === 0) return;
     const valid = new Set();
     selectedLaporanIndices.forEach(idx => {
         if (typeof idx === 'number' && idx >= 0 && idx < dataLaporan.length) {
@@ -301,7 +466,7 @@ function dapatkanDataFiltered() {
     const filterVal = (filterEl && filterEl.value) ? filterEl.value : 'SEMUA';
     const kataKunciEl = document.getElementById('inputPencarian');
     const kataKunci = (kataKunciEl && kataKunciEl.value) ? kataKunciEl.value.toLowerCase() : '';
-    const bulanDipilih = (filterVal === 'SEMUA' || !unikBulan.includes(filterVal)) ? unikBulan : [filterVal];
+    const semuaBulan = (filterVal === 'SEMUA' || !unikBulan.includes(filterVal));
 
     const tglMulaiVal = document.getElementById('filterTglMulai')?.value || '';
     const tglAkhirVal = document.getElementById('filterTglAkhir')?.value || '';
@@ -309,16 +474,16 @@ function dapatkanDataFiltered() {
     const angkaAkhir = tglAkhirVal ? parseInt(tglAkhirVal.replace(/-/g, ''), 10) : 99999999;
 
     const hasil = [];
-    dataLaporan.forEach((item, idxAsli) => {
-        const matchBulan = bulanDipilih.includes(item.bulanLabel);
-        const matchCari = (item.uraian || '').toLowerCase().includes(kataKunci) || (item.tanggal || '').includes(kataKunci);
-        const parts = (item.tanggal || '').split('/');
-        const angkaTgl = parts.length === 3 ? parseInt(parts[2] + parts[1] + parts[0], 10) : 0;
-        const matchRentang = angkaTgl >= angkaMulai && angkaTgl <= angkaAkhir;
-        if (matchBulan && matchCari && matchRentang) {
-            hasil.push({ item, idxAsli });
+    for (let idxAsli = 0; idxAsli < dataLaporan.length; idxAsli++) {
+        const item = dataLaporan[idxAsli];
+        if (!semuaBulan && item.bulanLabel !== filterVal) continue;
+        if (kataKunci && !(item.uraian || '').toLowerCase().includes(kataKunci) && !(item.tanggal || '').includes(kataKunci)) continue;
+        if (angkaMulai > 0 || angkaAkhir < 99999999) {
+            const angkaTgl = angkaUrutTanggal(item.tanggal);
+            if (angkaTgl < angkaMulai || angkaTgl > angkaAkhir) continue;
         }
-    });
+        hasil.push({ item, idxAsli });
+    }
     return hasil;
 }
 
@@ -354,7 +519,7 @@ function toggleSelectBulan(bulan, checked) {
 
 function toggleSelectAllLaporan(checked) {
     if (dataLaporan.length === 0) {
-        showToast('ℹ️ Belum ada laporan untuk dipilih.');
+        showToast('Belum ada laporan untuk dipilih.');
         return;
     }
 
@@ -364,7 +529,7 @@ function toggleSelectAllLaporan(checked) {
         : dapatkanDataFiltered().map(d => d.idxAsli);
 
     if (targetIndices.length === 0) {
-        showToast('ℹ️ Tidak ada laporan yang cocok dengan filter saat ini.');
+        showToast('Tidak ada laporan yang sesuai filter.');
         return;
     }
 
@@ -378,20 +543,13 @@ function toggleSelectAllLaporan(checked) {
 
     sinkronkanDomSeleksi();
     updateBulkActionUI();
-    showToast(akanDipilih
-        ? `☑️ ${selectedLaporanIndices.size} laporan dipilih.`
-        : '✖️ Pilihan laporan dibatalkan.');
 }
 
 function pilihSemuaLaporanGlobal() {
-    if (dataLaporan.length === 0) {
-        showToast('ℹ️ Belum ada data laporan.');
-        return;
-    }
-    dataLaporan.forEach((_, idx) => selectedLaporanIndices.add(idx));
+    if (dataLaporan.length === 0) return;
+    for (let i = 0; i < dataLaporan.length; i++) selectedLaporanIndices.add(i);
     sinkronkanDomSeleksi();
     updateBulkActionUI();
-    showToast(`☑️ Seluruh laporan (${dataLaporan.length}) dipilih.`);
 }
 
 function batalPilihSemuaLaporan() {
@@ -401,19 +559,16 @@ function batalPilihSemuaLaporan() {
 }
 
 function sinkronkanDomSeleksi() {
-    // Sinkronkan setiap checkbox item di tabel laporan & daftar edit
     document.querySelectorAll('.chk-item-laporan').forEach(chk => {
         const idx = Number(chk.getAttribute('data-laporan-idx'));
         chk.checked = selectedLaporanIndices.has(idx);
     });
 
-    // Highlight baris pada tabel laporan
     document.querySelectorAll('tr[data-row-laporan-idx]').forEach(tr => {
         const idx = Number(tr.getAttribute('data-row-laporan-idx'));
         tr.classList.toggle('row-selected', selectedLaporanIndices.has(idx));
     });
 
-    // Highlight baris pada daftar kelola tab edit
     document.querySelectorAll('div[data-row-edit-idx]').forEach(row => {
         const idx = Number(row.getAttribute('data-row-edit-idx'));
         row.classList.toggle('is-selected', selectedLaporanIndices.has(idx));
@@ -426,11 +581,9 @@ function updateBulkActionUI() {
     const dataFiltered = dapatkanDataFiltered();
     const indicesFiltered = dataFiltered.map(d => d.idxAsli);
 
-    // Badge total laporan di navigasi
     const navBadge = document.getElementById('navBadgeTotalLaporan');
     if (navBadge) navBadge.textContent = String(dataLaporan.length);
 
-    // Master checkbox di Tab Laporan
     const chkAllLaporan = document.getElementById('chkSelectAllLaporan');
     if (chkAllLaporan) {
         const jmlFilteredTerpilih = indicesFiltered.filter(idx => selectedLaporanIndices.has(idx)).length;
@@ -439,7 +592,6 @@ function updateBulkActionUI() {
         chkAllLaporan.indeterminate = jmlFilteredTerpilih > 0 && jmlFilteredTerpilih < indicesFiltered.length;
     }
 
-    // Master checkbox di Tab Edit
     const chkAllEdit = document.getElementById('chkSelectAllEdit');
     if (chkAllEdit) {
         chkAllEdit.disabled = dataLaporan.length === 0;
@@ -447,7 +599,6 @@ function updateBulkActionUI() {
         chkAllEdit.indeterminate = totalTerpilih > 0 && totalTerpilih < dataLaporan.length;
     }
 
-    // Checkbox per bulan di header tabel
     document.querySelectorAll('.chk-select-bulan').forEach(chk => {
         const bulan = chk.getAttribute('data-bulan');
         const itemBulan = dataFiltered.filter(d => d.item.bulanLabel === bulan);
@@ -456,10 +607,9 @@ function updateBulkActionUI() {
         chk.indeterminate = terpilihBulan > 0 && terpilihBulan < itemBulan.length;
     });
 
-    // Counter & Tombol di Tab Laporan
     const badgeLaporan = document.getElementById('badgeJumlahTerpilih');
     if (badgeLaporan) {
-        badgeLaporan.textContent = `${totalTerpilih} dari ${dataLaporan.length} dipilih`;
+        badgeLaporan.textContent = `${totalTerpilih} dipilih`;
         badgeLaporan.classList.toggle('has-selection', totalTerpilih > 0);
     }
 
@@ -480,15 +630,12 @@ function updateBulkActionUI() {
     const btnToggleText = document.getElementById('btnToggleSelectAllText');
     if (btnToggleText) {
         const semuaFilteredTerpilih = indicesFiltered.length > 0 && indicesFiltered.every(idx => selectedLaporanIndices.has(idx));
-        btnToggleText.innerHTML = semuaFilteredTerpilih
-            ? '<span>✖️</span> <span>Batal Pilih Semua</span>'
-            : '<span>☑️</span> <span>Pilih Semua</span>';
+        btnToggleText.textContent = semuaFilteredTerpilih ? 'Batal Pilih Semua' : 'Pilih Semua';
     }
 
-    // Counter & Tombol di Tab Edit
     const badgeEdit = document.getElementById('badgeJumlahTerpilihEdit');
     if (badgeEdit) {
-        badgeEdit.textContent = `${totalTerpilih} dari ${dataLaporan.length} dipilih`;
+        badgeEdit.textContent = `${totalTerpilih} dipilih`;
         badgeEdit.classList.toggle('has-selection', totalTerpilih > 0);
     }
 
@@ -506,7 +653,6 @@ function updateBulkActionUI() {
     const btnBatalEdit = document.getElementById('btnBatalPilihEdit');
     if (btnBatalEdit) btnBatalEdit.classList.toggle('hidden', totalTerpilih === 0);
 
-    // Floating Bulk Bar (muncul otomatis saat ada laporan yang dicentang)
     const floatingBar = document.getElementById('floatingBulkBar');
     const floatingCount = document.getElementById('floatingCountTerpilih');
     const floatingBtnCount = document.getElementById('floatingBtnCount');
@@ -520,7 +666,7 @@ function updateBulkActionUI() {
 // ---------- Modal Konfirmasi & Eksekusi Hapus ----------
 function bukaModalKonfirmasiHapus(mode, indices, judul, pesan) {
     if (!Array.isArray(indices) || indices.length === 0) {
-        showToast('⚠️ Tidak ada laporan yang dipilih untuk dihapus.');
+        showToast('Pilih minimal 1 laporan terlebih dahulu.');
         return;
     }
 
@@ -533,14 +679,14 @@ function bukaModalKonfirmasiHapus(mode, indices, judul, pesan) {
     const btnEksekusi = document.getElementById('btnEksekusiHapusModal');
 
     if (judulEl) judulEl.textContent = judul || 'Konfirmasi Hapus Laporan';
-    if (pesanEl) pesanEl.textContent = pesan || `Apakah Anda yakin ingin menghapus ${pendingDeleteAction.indices.length} laporan ini?`;
-    if (btnEksekusi) btnEksekusi.innerHTML = `🗑️ Ya, Hapus (${pendingDeleteAction.indices.length})`;
+    if (pesanEl) pesanEl.textContent = pesan || `Hapus ${pendingDeleteAction.indices.length} laporan yang dipilih?`;
+    if (btnEksekusi) btnEksekusi.textContent = `Hapus (${pendingDeleteAction.indices.length})`;
 
     if (previewEl) {
-        const maksPreview = 25;
+        const maksPreview = 20;
         const daftar = pendingDeleteAction.indices.slice(0, maksPreview).map(i => dataLaporan[i]).filter(Boolean);
         let htmlPreview = daftar.map(item => `
-            <div class="flex items-center justify-between gap-2 text-xs py-1.5 px-2.5 rounded-xl bg-white border border-slate-100">
+            <div class="flex items-center justify-between gap-2 text-xs py-1.5 px-2.5 rounded-lg bg-white border border-slate-200">
                 <div class="truncate">
                     <b style="color:var(--ink);">${escapeHtml(item.tanggal)}</b>
                     <span style="color:var(--muted);">(${escapeHtml(item.hari)})</span>
@@ -548,15 +694,14 @@ function bukaModalKonfirmasiHapus(mode, indices, judul, pesan) {
                 </div>
             </div>`).join('');
         if (pendingDeleteAction.indices.length > maksPreview) {
-            htmlPreview += `<p class="text-[11px] text-center pt-1 font-semibold" style="color:var(--muted);">+ ${pendingDeleteAction.indices.length - maksPreview} laporan lainnya...</p>`;
+            htmlPreview += `<p class="text-[11px] text-center pt-1 font-medium" style="color:var(--muted);">+ ${pendingDeleteAction.indices.length - maksPreview} laporan lainnya</p>`;
         }
         previewEl.innerHTML = htmlPreview;
     }
 
     if (modal) {
         if (typeof tutupSemuaModal === 'function') tutupSemuaModal('modalKonfirmasiHapus');
-        modal.classList.remove('hidden');
-        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        modal.classList.remove('hidden', 'opacity-0');
     }
 }
 
@@ -564,8 +709,7 @@ function tutupModalKonfirmasiHapus() {
     const modal = document.getElementById('modalKonfirmasiHapus');
     pendingDeleteAction = null;
     if (!modal) return;
-    modal.classList.add('opacity-0');
-    setTimeout(() => modal.classList.add('hidden'), 220);
+    modal.classList.add('hidden', 'opacity-0');
 }
 
 async function eksekusiKonfirmasiHapus() {
@@ -578,52 +722,39 @@ async function eksekusiKonfirmasiHapus() {
     const jumlahDihapus = setHapus.size;
 
     // Catat penolakan untuk entri "Libur" otomatis hari Minggu yang sengaja dihapus
-    try {
-        const ditolak = (await localforage.getItem('liburDitolak')) || [];
-        let adaTambahanDitolak = false;
-        setHapus.forEach(idx => {
-            const item = dataLaporan[idx];
-            if (!item) return;
-            const kunci = typeof kunciTanggalDariString === 'function' ? kunciTanggalDariString(item.tanggal) : '';
-            const autoLibur = typeof laporanLibur === 'function' && laporanLibur(item);
-            if (autoLibur && kunci && !ditolak.includes(kunci)) {
-                ditolak.push(kunci);
-                adaTambahanDitolak = true;
-            }
-        });
-        if (adaTambahanDitolak) {
-            await localforage.setItem('liburDitolak', ditolak);
-        }
-    } catch (e) {
-        console.warn('Gagal memperbarui liburDitolak:', e);
+    const kunciLiburDihapus = [];
+    setHapus.forEach(idx => {
+        const item = dataLaporan[idx];
+        if (!item) return;
+        const kunci = typeof kunciTanggalDariString === 'function' ? kunciTanggalDariString(item.tanggal) : '';
+        const autoLibur = typeof laporanLibur === 'function' && laporanLibur(item);
+        if (autoLibur && kunci) kunciLiburDihapus.push(kunci);
+    });
+
+    if (kunciLiburDihapus.length > 0 && typeof localforage !== 'undefined' && localforage.getItem) {
+        localforage.getItem('liburDitolak').then(ditolakLama => {
+            const ditolak = Array.isArray(ditolakLama) ? ditolakLama : [];
+            kunciLiburDihapus.forEach(k => { if (!ditolak.includes(k)) ditolak.push(k); });
+            return localforage.setItem('liburDitolak', ditolak);
+        }).catch(() => {});
     }
 
     dataLaporan = dataLaporan.filter((_, idx) => !setHapus.has(idx));
     selectedLaporanIndices.clear();
-
-    try {
-        if (dataLaporan.length > 0) {
-            await localforage.setItem('laporanPKL', dataLaporan);
-        } else {
-            await localforage.removeItem('laporanPKL');
-        }
-    } catch (e) {
-        console.error('Gagal menyimpan perubahan hapus ke database lokal:', e);
-    }
-
     dataTelahBerubah = true;
+
+    jadwalSimpanLaporanLokal();
     tutupModalKonfirmasiHapus();
     batalEditLaporan();
     renderSemuaData();
     updateDropdownEditTab();
-    showToast(`🗑️ ${jumlahDihapus} laporan berhasil dihapus!`);
+    showToast(`${jumlahDihapus} laporan dihapus.`);
 }
 
-// Dipanggil dari tombol "Hapus Terpilih"
 function hapusLaporanTerpilih() {
     bersihkanSeleksiTidakValid();
     if (selectedLaporanIndices.size === 0) {
-        showToast('⚠️ Centang minimal 1 laporan yang ingin dihapus!');
+        showToast('Centang minimal 1 laporan yang ingin dihapus.');
         return;
     }
     const indices = Array.from(selectedLaporanIndices);
@@ -631,15 +762,14 @@ function hapusLaporanTerpilih() {
         'selected',
         indices,
         `Hapus ${indices.length} Laporan Terpilih`,
-        `Anda memilih ${indices.length} catatan laporan untuk dihapus permanen dari daftar.`
+        `Anda akan menghapus ${indices.length} catatan laporan secara permanen.`
     );
 }
 
-// Dipanggil dari tombol "Hapus" pada 1 baris tabel atau daftar edit
 function hapusSatuLaporanDariTabel(idx) {
     const numIdx = Number(idx);
     if (isNaN(numIdx) || !dataLaporan[numIdx]) {
-        showToast('⚠️ Laporan tidak ditemukan.');
+        showToast('Laporan tidak ditemukan.');
         return;
     }
     const item = dataLaporan[numIdx];
@@ -647,32 +777,30 @@ function hapusSatuLaporanDariTabel(idx) {
         'single',
         [numIdx],
         `Hapus Laporan ${item.tanggal}`,
-        `Hapus permanen catatan kegiatan hari ${item.hari}, tanggal ${item.tanggal}?`
+        `Hapus permanen catatan hari ${item.hari}, tanggal ${item.tanggal}?`
     );
 }
 
-// Dipanggil dari tombol "Hapus Laporan Ini" di dalam form edit
 async function hapusLaporanSelected() {
     const idx = document.getElementById('editIndexHidden').value;
     if (idx === '' || !dataLaporan[idx]) {
-        showToast('⚠️ Pilih laporan yang ingin dihapus dulu.');
+        showToast('Pilih laporan yang ingin dihapus terlebih dahulu.');
         return;
     }
     hapusSatuLaporanDariTabel(Number(idx));
 }
 
-// Dipanggil dari tombol "Hapus Semua" cepat di toolbar
 function bukaKonfirmasiHapusSemuaCepat() {
     if (!Array.isArray(dataLaporan) || dataLaporan.length === 0) {
-        showToast('ℹ️ Belum ada data laporan untuk dihapus.');
+        showToast('Belum ada data laporan untuk dihapus.');
         return;
     }
     const semuaIndices = dataLaporan.map((_, idx) => idx);
     bukaModalKonfirmasiHapus(
         'all',
         semuaIndices,
-        `Hapus Seluruh Laporan (${semuaIndices.length} Data)`,
-        `Apakah Anda yakin ingin menghapus SEMUA (${semuaIndices.length}) catatan laporan PKL sekaligus?`
+        `Hapus Semua Laporan (${semuaIndices.length})`,
+        `Apakah Anda yakin ingin menghapus seluruh (${semuaIndices.length}) catatan laporan PKL sekaligus?`
     );
 }
 
@@ -691,26 +819,29 @@ function resetFilterTanggal() {
 
 // ---------- Statistik ----------
 function updateStatistik(dataAktif) {
-    document.getElementById('statTotalHari').innerText = dataAktif.length;
-    document.getElementById('statTotalUraian').innerText = dataAktif.length;
-    document.getElementById('statTotalFoto').innerText = dataAktif.filter(i => i.foto && i.foto.trim() !== '').length;
-    const unikBulan = [...new Set(dataAktif.map(i => i.bulanLabel))].length;
-    document.getElementById('statRataBulan').innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
+    const elHari = document.getElementById('statTotalHari');
+    const elUraian = document.getElementById('statTotalUraian');
+    const elFoto = document.getElementById('statTotalFoto');
+    const elRata = document.getElementById('statRataBulan');
+    if (elHari) elHari.innerText = dataAktif.length;
+    if (elUraian) elUraian.innerText = dataAktif.length;
+    if (elFoto) elFoto.innerText = dataAktif.filter(i => i.foto && i.foto.trim() !== '').length;
+    const unikBulan = new Set(dataAktif.map(i => i.bulanLabel)).size;
+    if (elRata) elRata.innerText = unikBulan > 0 ? (dataAktif.length / unikBulan).toFixed(1) : 0;
 }
 
-// ---------- Render Tabel Laporan ----------
+// ---------- Render Tabel Laporan (Single Join, Cepat & Ringan) ----------
 function renderSemuaData() {
     bersihkanSeleksiTidakValid();
     const wadahTabel = document.getElementById('wadahTabelBulan');
     if (!wadahTabel) return;
-    wadahTabel.innerHTML = '';
 
     if (dataLaporan.length === 0) {
         wadahTabel.innerHTML = `
-            <div class="no-print text-center my-12 p-8 rounded-2xl" style="background:#F8FAFC;border:1px dashed var(--line);">
-                <p class="text-base font-bold mb-1" style="color:var(--ink);">Belum ada data laporan PKL</p>
-                <p class="text-xs mb-4" style="color:var(--muted);">Mulai catat kegiatan harian PKL Anda untuk melihat tabel laporan.</p>
-                <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-primary flat-btn-sm">📝 Tambah Catatan Pertama</button>
+            <div class="no-print text-center my-10 p-6 rounded-xl" style="background:#F8FAFC;border:1px solid var(--line);">
+                <p class="text-sm font-semibold mb-1" style="color:var(--ink);">Belum ada data laporan PKL</p>
+                <p class="text-xs mb-3" style="color:var(--muted);">Silakan isi kegiatan harian pada tab Catat Kegiatan.</p>
+                <button type="button" onclick="switchTab('input')" class="flat-btn flat-btn-primary flat-btn-sm">Catat Kegiatan</button>
             </div>`;
         updateStatistik([]);
         updateBulkActionUI();
@@ -723,8 +854,9 @@ function renderSemuaData() {
     const filter = document.getElementById('filterBulan');
     if (filter) {
         const nilaiFilterSblm = filter.value;
-        filter.innerHTML = '<option value="SEMUA">📅 Semua Bulan</option>';
-        unikBulan.forEach(b => { filter.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`; });
+        const opsiBulan = ['<option value="SEMUA">Semua Bulan</option>'];
+        unikBulan.forEach(b => { opsiBulan.push(`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`); });
+        filter.innerHTML = opsiBulan.join('');
         if ([...filter.options].some(o => o.value === nilaiFilterSblm)) filter.value = nilaiFilterSblm;
     }
 
@@ -734,9 +866,9 @@ function renderSemuaData() {
 
     if (pasanganFiltered.length === 0) {
         wadahTabel.innerHTML = `
-            <div class="no-print text-center my-10 p-6 rounded-2xl" style="background:#F8FAFC;border:1px dashed var(--line);">
-                <p class="text-sm font-bold mb-2" style="color:var(--ink);">Tidak ada laporan yang sesuai dengan filter pencarian.</p>
-                <button type="button" onclick="resetFilterTanggal()" class="flat-btn flat-btn-soft flat-btn-sm">🔄 Reset Filter</button>
+            <div class="no-print text-center my-8 p-6 rounded-xl" style="background:#F8FAFC;border:1px solid var(--line);">
+                <p class="text-sm font-medium mb-2" style="color:var(--ink);">Tidak ada laporan yang cocok dengan filter.</p>
+                <button type="button" onclick="resetFilterTanggal()" class="flat-btn flat-btn-soft flat-btn-sm">Reset Filter</button>
             </div>`;
         updateBulkActionUI();
         if (typeof hitungDanRenderBadge === 'function') hitungDanRenderBadge();
@@ -745,98 +877,92 @@ function renderSemuaData() {
     }
 
     const unikBulanFiltered = [...new Set(dataFiltered.map(i => i.bulanLabel))];
-    unikBulanFiltered.forEach((bulan) => {
+    const semuaBlokHtml = [];
+
+    for (let b = 0; b < unikBulanFiltered.length; b++) {
+        const bulan = unikBulanFiltered[b];
         const grupBulanIni = pasanganFiltered.filter(d => d.item.bulanLabel === bulan);
-        if (grupBulanIni.length === 0) return;
+        if (grupBulanIni.length === 0) continue;
 
         const bulanAman = escapeHtml(bulan);
         const bulanJs = String(bulan).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
-        let htmlTabel = `
-            <div class="block-bulan mb-8" style="width: 100%;">
-                <div class="flex items-end justify-between gap-2 mb-3 pt-2">
-                    <div class="text-base font-bold text-black">
-                        <p>1. Laporan Kegiatan Harian</p>
-                        <p>b. Bulan <span class="uppercase">${bulanAman}</span></p>
-                    </div>
-                    <label class="no-print month-select-pill cursor-pointer select-none" title="Pilih semua laporan di bulan ${bulanAman}">
-                        <input type="checkbox" class="custom-checkbox chk-select-bulan" data-bulan="${bulanAman}"
-                            onchange="toggleSelectBulan('${bulanJs}', this.checked)">
-                        <span>Pilih Bulan Ini (${grupBulanIni.length})</span>
-                    </label>
-                </div>
-                <div class="table-wrapper" style="width: 100%;">
-                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; table-layout: fixed;">
-                        <thead>
-                            <tr>
-                                <th class="no-print" style="border: 1px solid black; padding: 6px; width: 38px; text-align: center;" title="Pilih semua di bulan ${bulanAman}">
-                                    <input type="checkbox" class="custom-checkbox chk-select-bulan" data-bulan="${bulanAman}"
-                                        onchange="toggleSelectBulan('${bulanJs}', this.checked)">
-                                </th>
-                                <th style="border: 1px solid black; padding: 6px; width: 38px; text-align: center;">No</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 74px;">Hari</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 88px;">Tanggal</th>
-                                <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
-                                <th style="border: 1px solid black; padding: 6px; width: 96px; text-align: center;">Foto</th>
-                                <th class="no-print" style="border: 1px solid black; padding: 6px; width: 112px; text-align: center;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-
-        grupBulanIni.forEach(({ item, idxAsli }, idx) => {
+        const barisBulan = [];
+        for (let idx = 0; idx < grupBulanIni.length; idx++) {
+            const { item, idxAsli } = grupBulanIni[idx];
             const idxTampil = idx + 1;
             const terpilih = selectedLaporanIndices.has(idxAsli);
             const namaFileFoto = `PKL_${item.tanggal.replace(/\//g, '-')}_${idxTampil}.jpg`;
             const adaFoto = !!(item.foto && item.foto.trim() !== '');
 
             const fotoHtml = adaFoto
-                ? `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                     <img src="${item.foto}" alt="Foto ${escapeHtml(item.tanggal)}" style="max-height: 68px; max-width: 80px; object-fit: contain; display: block; border-radius: 4px;" class="border border-gray-300">
+                ? `<div style="display:flex;justify-content:center;">
+                     <img src="${item.foto}" loading="lazy" decoding="async" alt="Foto" style="max-height:64px;max-width:78px;object-fit:contain;display:block;" class="border border-gray-300">
                    </div>`
-                : `<span style="color:#64748B;">-</span>`;
+                : `<span>-</span>`;
 
             const unduhFotoBtn = adaFoto
-                ? `<a href="${item.foto}" download="${namaFileFoto}" class="table-action-btn download" title="Unduh foto tanggal ${escapeHtml(item.tanggal)}">
-                     ⬇️ Foto
-                   </a>`
+                ? `<a href="${item.foto}" download="${namaFileFoto}" class="table-action-btn download">Unduh</a>`
                 : '';
 
-            htmlTabel += `
-                            <tr data-row-laporan-idx="${idxAsli}" class="${terpilih ? 'row-selected' : ''}">
-                                <td class="no-print" style="border: 1px solid black; padding: 5px; text-align: center; width: 38px;">
-                                    <input type="checkbox" class="custom-checkbox chk-item-laporan" data-laporan-idx="${idxAsli}"
-                                        ${terpilih ? 'checked' : ''}
-                                        onchange="toggleSelectLaporan(${idxAsli}, this.checked)"
-                                        title="Pilih laporan tanggal ${escapeHtml(item.tanggal)}">
-                                </td>
-                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 38px;">${idxTampil}</td>
-                                <td style="border: 1px solid black; padding: 5px; width: 74px;">${escapeHtml(item.hari)}</td>
-                                <td style="border: 1px solid black; padding: 5px; width: 88px;">${escapeHtml(item.tanggal)}</td>
-                                <td style="border: 1px solid black; padding: 5px; width: auto; word-wrap: break-word;">${escapeHtml(item.uraian)}</td>
-                                <td style="border: 1px solid black; padding: 5px; text-align: center; width: 96px;">
-                                    ${fotoHtml}
-                                </td>
-                                <td class="no-print" style="border: 1px solid black; padding: 6px; text-align: center; width: 112px;">
-                                    <div class="table-action-group">
-                                        <button type="button" class="table-action-btn edit" onclick="editLaporanDariTabel(${idxAsli})" title="Edit laporan tanggal ${escapeHtml(item.tanggal)}">
-                                            ✏️ Edit
-                                        </button>
-                                        <button type="button" class="table-action-btn delete" onclick="hapusSatuLaporanDariTabel(${idxAsli})" title="Hapus laporan tanggal ${escapeHtml(item.tanggal)}">
-                                            🗑️ Hapus
-                                        </button>
-                                        ${unduhFotoBtn}
-                                    </div>
-                                </td>
-                            </tr>`;
-        });
+            barisBulan.push(`
+                <tr data-row-laporan-idx="${idxAsli}" class="${terpilih ? 'row-selected' : ''}">
+                    <td class="no-print" style="border: 1px solid black; padding: 5px; text-align: center; width: 36px;">
+                        <input type="checkbox" class="custom-checkbox chk-item-laporan" data-laporan-idx="${idxAsli}"
+                            ${terpilih ? 'checked' : ''}
+                            onchange="toggleSelectLaporan(${idxAsli}, this.checked)">
+                    </td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; width: 36px;">${idxTampil}</td>
+                    <td style="border: 1px solid black; padding: 5px; width: 72px;">${escapeHtml(item.hari)}</td>
+                    <td style="border: 1px solid black; padding: 5px; width: 86px;">${escapeHtml(item.tanggal)}</td>
+                    <td style="border: 1px solid black; padding: 5px; width: auto; word-wrap: break-word;">${escapeHtml(item.uraian)}</td>
+                    <td style="border: 1px solid black; padding: 5px; text-align: center; width: 92px;">${fotoHtml}</td>
+                    <td class="no-print" style="border: 1px solid black; padding: 5px; text-align: center; width: 105px;">
+                        <div class="table-action-group">
+                            <button type="button" class="table-action-btn edit" onclick="editLaporanDariTabel(${idxAsli})">Edit</button>
+                            <button type="button" class="table-action-btn delete" onclick="hapusSatuLaporanDariTabel(${idxAsli})">Hapus</button>
+                            ${unduhFotoBtn}
+                        </div>
+                    </td>
+                </tr>`);
+        }
 
-        htmlTabel += `
-                        </tbody>
+        semuaBlokHtml.push(`
+            <div class="block-bulan mb-7" style="width: 100%;">
+                <div class="flex items-end justify-between gap-2 mb-2.5 pt-2">
+                    <div class="text-base font-bold text-black">
+                        <p>1. Laporan Kegiatan Harian</p>
+                        <p>b. Bulan <span class="uppercase">${bulanAman}</span></p>
+                    </div>
+                    <label class="no-print month-select-pill cursor-pointer select-none">
+                        <input type="checkbox" class="custom-checkbox chk-select-bulan" data-bulan="${bulanAman}"
+                            onchange="toggleSelectBulan('${bulanJs}', this.checked)">
+                        <span>Pilih bulan ini (${grupBulanIni.length})</span>
+                    </label>
+                </div>
+                <div class="table-wrapper" style="width: 100%;">
+                    <table class="w-full text-black" style="color: black !important; border-collapse: collapse; width: 100%; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th class="no-print" style="border: 1px solid black; padding: 6px; width: 36px; text-align: center;">
+                                    <input type="checkbox" class="custom-checkbox chk-select-bulan" data-bulan="${bulanAman}"
+                                        onchange="toggleSelectBulan('${bulanJs}', this.checked)">
+                                </th>
+                                <th style="border: 1px solid black; padding: 6px; width: 36px; text-align: center;">No</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 72px;">Hari</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 86px;">Tanggal</th>
+                                <th style="border: 1px solid black; padding: 6px; width: auto;">Uraian Kegiatan</th>
+                                <th style="border: 1px solid black; padding: 6px; width: 92px; text-align: center;">Foto</th>
+                                <th class="no-print" style="border: 1px solid black; padding: 6px; width: 105px; text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>${barisBulan.join('')}</tbody>
                     </table>
                 </div>
-            </div>`;
-        wadahTabel.innerHTML += htmlTabel;
-    });
+            </div>`);
+    }
+
+    wadahTabel.innerHTML = semuaBlokHtml.join('');
 
     updateBulkActionUI();
     if (typeof hitungDanRenderBadge === 'function') {

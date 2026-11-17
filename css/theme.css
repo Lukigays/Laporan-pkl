@@ -1,6 +1,6 @@
 /* ============================================================
-   MODERN CLEAN JOURNAL & DASHBOARD THEME — LAPORAN PKL BY LUKYY
-   Tata letak tombol, kartu, navigasi, & fitur multi-select/hapus
+   TEMA RINGAN & CEPAT — LAPORAN PKL
+   Tanpa blur, tanpa gradien berat, tanpa animasi lambat
    ============================================================ */
 
 :root {
@@ -15,143 +15,185 @@
   --muted-2: #94A3B8;
   --line: #E2E8F0;
   --line-2: #F1F5F9;
-  --surface: #F1F5F9;
+  --surface: #F8FAFC;
   --card: #FFFFFF;
 
-  --lilac-050: #F5F3FF;
-  --lilac-100: #EDE9FE;
-  --lilac-200: #DDD6FE;
-  --lilac-400: #8B5CF6;
-  --pink-soft: #FCE7F3;
+  --lilac-050: #F8FAFC;
+  --lilac-100: #F1F5F9;
+  --lilac-200: #E2E8F0;
+  --lilac-400: #64748B;
+  --pink-soft: #F1F5F9;
 
   --sky-100: #E0F2FE;
   --sky-200: #BAE6FD;
-  --mint-100: #D1FAE5;
+  --mint-100: #DCFCE7;
 
-  --danger: #E11D48;
-  --danger-hover: #BE123C;
-  --danger-soft: #FFE4E6;
+  --danger: #DC2626;
+  --danger-soft: #FEE2E2;
 
   --navy: #0F172A;
   --navy-2: #1E293B;
 
-  --r-xs: 8px;
-  --r-sm: 12px;
-  --r: 16px;
-  --r-md: 20px;
-  --r-lg: 24px;
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r: 10px;
+  --r-md: 12px;
+  --r-lg: 14px;
   --r-pill: 999px;
 
-  --sh-1: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
-  --sh-2: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -4px rgba(15, 23, 42, 0.04);
-  --sh-3: 0 20px 45px -12px rgba(15, 23, 42, 0.22);
+  --sh-1: none;
+  --sh-2: none;
+  --sh-3: 0 10px 25px rgba(15, 23, 42, 0.15);
 }
 
 body {
-  background: radial-gradient(circle at 15% 0%, #E0E7FF 0%, transparent 38%),
-              radial-gradient(circle at 85% 5%, #E0F2FE 0%, transparent 35%),
-              var(--surface);
+  background: var(--surface);
   color: var(--ink);
+}
+
+/* Matikan transisi tab lambat & hapus layout tab tersembunyi */
+.tab-content {
+  display: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  position: static !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+.tab-content.active {
+  display: block !important;
+}
+
+/* Matikan blur yang membebani GPU HP */
+.modal-overlay {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.modal-content {
+  border-radius: 12px !important;
+  box-shadow: var(--sh-3) !important;
+}
+.modal-topbar {
+  padding: 16px 20px;
+}
+.modal-footbar {
+  padding: 14px 20px;
 }
 
 /* ---------- 1. HEADER ---------- */
 .site-header {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: #FFFFFF;
   border-bottom: 1px solid var(--line);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 .site-header-inner {
-  min-height: 70px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .brand-mark {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--blue) 0%, #4F46E5 100%);
-  color: #fff;
-  border-radius: 13px;
-  box-shadow: 0 6px 14px -4px rgba(37, 99, 235, 0.5);
+  background: var(--navy);
+  color: #FFFFFF;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
   flex: none;
 }
 .brand-lockup h1 {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.2;
   color: var(--ink);
+}
+.brand-lockup p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.header-actions {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
-.brand-badge {
-  font-size: 11px;
-  font-weight: 700;
-  background: var(--blue-050);
-  color: var(--blue);
-  border: 1px solid var(--blue-100);
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
-}
-.brand-lockup p {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-  font-weight: 500;
-}
-.header-actions {
+
+/* ---------- 2. BAR RINGKASAN PROGRES ---------- */
+.summary-strip {
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 10px;
+}
+.summary-strip-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
+}
+.summary-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-050);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.progress-track {
+  height: 6px !important;
+  background: #E2E8F0 !important;
+  border-radius: 999px !important;
+}
+.progress-fill {
+  transition: none !important;
 }
 
-/* ---------- 2. SISTEM TOMBOL MODERN ---------- */
+/* ---------- 3. TOMBOL SIMPEL & RESPONSIF ---------- */
 .flat-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 13px;
-  line-height: 1.15;
-  padding: 11px 18px;
+  line-height: 1.2;
+  padding: 9px 15px;
   cursor: pointer;
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+  transform: none !important;
+  box-shadow: none !important;
   user-select: none;
   text-decoration: none;
 }
-.flat-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-.flat-btn:active:not(:disabled) {
-  transform: translateY(0);
+.flat-btn:hover {
+  transform: none !important;
 }
 
 .flat-btn-primary {
-  background: linear-gradient(135deg, var(--blue) 0%, #1D4ED8 100%);
+  background: var(--blue);
   color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.45);
 }
 .flat-btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
-  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.58);
+  background: var(--blue-600);
 }
 
 .flat-btn-soft {
@@ -161,25 +203,21 @@ body {
 }
 .flat-btn-soft:hover:not(:disabled) {
   background: var(--blue-100);
-  border-color: #BFDBFE;
 }
 
 .flat-btn-ghost {
   background: #FFFFFF;
   color: var(--ink-soft);
   border-color: var(--line);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 .flat-btn-ghost:hover:not(:disabled) {
-  background: #F8FAFC;
+  background: #F1F5F9;
   color: var(--ink);
-  border-color: #CBD5E1;
 }
 
 .flat-btn-navy {
   background: var(--navy);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.25);
 }
 .flat-btn-navy:hover:not(:disabled) {
   background: var(--navy-2);
@@ -188,235 +226,85 @@ body {
 .flat-btn-danger {
   background: var(--danger-soft);
   color: var(--danger);
-  border-color: #FECDD3;
+  border-color: #FECACA;
 }
 .flat-btn-danger:hover:not(:disabled) {
-  background: #FECDD3;
-  color: #9F1239;
+  background: #FECACA;
 }
 
 .flat-btn-danger-solid {
-  background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+  background: var(--danger);
   color: #FFFFFF !important;
-  border-color: transparent;
-  box-shadow: 0 6px 16px -4px rgba(225, 29, 72, 0.45);
 }
 .flat-btn-danger-solid:hover:not(:disabled) {
-  background: linear-gradient(135deg, #BE123C 0%, #9F1239 100%);
-  box-shadow: 0 8px 20px -4px rgba(225, 29, 72, 0.6);
+  background: #B91C1C;
 }
 
 .flat-btn-danger-outline {
   background: #FFFFFF;
   color: var(--danger);
-  border-color: #FDA4AF;
+  border-color: #FCA5A5;
 }
 .flat-btn-danger-outline:hover:not(:disabled) {
   background: var(--danger-soft);
-  border-color: #FB7185;
 }
 
 .flat-btn-xs {
-  padding: 6px 11px;
+  padding: 5px 10px;
   font-size: 11px;
-  border-radius: 9px;
+  border-radius: 6px;
 }
 .flat-btn-sm {
-  padding: 8px 14px;
+  padding: 7px 12px;
   font-size: 12px;
-  border-radius: 10px;
+  border-radius: 7px;
 }
 .flat-btn-lg {
-  padding: 13px 22px;
+  padding: 11px 20px;
   font-size: 14px;
-  border-radius: 13px;
+  border-radius: 8px;
 }
 
-/* ---------- 3. HERO & RINGKASAN PROGRES ---------- */
-.journal-intro {
-  display: grid;
-  grid-template-columns: 1.15fr minmax(330px, 430px);
-  gap: 24px;
-  align-items: stretch;
-  margin-bottom: 24px;
-}
-.intro-copy {
-  background: #FFFFFF;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: 26px 28px;
-  box-shadow: var(--sh-1);
+/* ---------- 4. NAVIGASI TAB ---------- */
+.workspace-bar {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.section-kicker {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--blue);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.intro-copy h2 {
-  font-family: var(--font);
-  font-size: clamp(24px, 3.2vw, 34px);
-  font-weight: 800;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  margin: 8px 0 10px;
-}
-.intro-copy h2 span {
-  color: var(--blue);
-}
-.intro-copy > p {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--muted);
-  max-width: 540px;
-}
-.hero-action-group {
-  display: flex;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 20px;
-}
-
-.progress-summary {
-  padding: 22px 24px;
-  background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-1);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.progress-topline {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--ink);
-}
-.status-pill {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: var(--r-pill);
-  background: var(--blue-050);
-  color: var(--blue);
-  border: 1px solid var(--blue-100);
-}
-.progress-count {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin: 12px 0 10px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 500;
-}
-.progress-count strong:first-child {
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--ink);
-}
-.persen-badge {
-  margin-left: auto;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--blue);
-  background: var(--blue-050);
-  padding: 4px 10px;
-  border-radius: 9px;
-}
-.progress-track {
-  height: 9px !important;
-  background: #E2E8F0 !important;
-  border-radius: var(--r-pill) !important;
-}
-.progress-detail {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
-}
-.detail-chip {
-  background: #F8FAFC;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 7px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--muted);
-}
-.detail-chip b {
-  color: var(--ink);
-  font-weight: 700;
-}
-.progress-caption {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--line-2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-/* ---------- 4. WORKSPACE BAR & SEGMENTED NAV ---------- */
-.workspace-bar {
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
   background: #FFFFFF;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 7px 10px;
-  margin-bottom: 24px;
-  box-shadow: var(--sh-1);
+  border-radius: 10px;
+  padding: 6px;
+  margin-bottom: 16px;
 }
 .workspace-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 .nav-item {
-  position: relative;
-  border: 1px solid transparent;
-  border-radius: 11px;
-  padding: 10px 18px;
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 14px;
   background: transparent;
   color: var(--muted);
   font-size: 13px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  box-shadow: none;
-  transition: all 0.18s ease;
+  gap: 6px;
+  box-shadow: none !important;
+  transition: none;
 }
 .nav-item:hover {
   color: var(--ink);
-  background: #F8FAFC;
+  background: #F1F5F9;
 }
 .nav-item.active {
   background: var(--navy) !important;
   color: #FFFFFF !important;
-  border-color: var(--navy) !important;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.25) !important;
 }
 .nav-item.active::after {
   display: none !important;
@@ -424,10 +312,10 @@ body {
 .nav-badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: var(--r-pill);
-  background: rgba(100, 116, 139, 0.14);
-  color: inherit;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #E2E8F0;
+  color: var(--ink-soft);
 }
 .nav-item.active .nav-badge {
   background: rgba(255, 255, 255, 0.2);
@@ -436,44 +324,44 @@ body {
 .workspace-quick-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-/* ---------- 5. FORMULIR & PANEL INPUT ---------- */
+/* ---------- 5. CARD & INPUT ---------- */
 .flat-card {
-  background: var(--card);
+  background: #FFFFFF;
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-1);
+  border-radius: 10px;
+  box-shadow: none !important;
 }
-.form-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding-bottom: 20px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--line);
+.flat-input {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  transition: none;
 }
-.form-heading h2 {
-  font-family: var(--font);
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-top: 2px;
+.flat-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.flat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 6px;
 }
 .form-hint {
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 11px;
 }
 .optional-label {
-  color: var(--muted-2);
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
+  color: var(--muted);
+  font-weight: 400;
   margin-left: 4px;
 }
 
@@ -482,11 +370,10 @@ body {
   background: #F8FAFC;
   color: var(--ink-soft);
   font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--r-pill);
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 .quick-chip:hover {
   background: var(--blue-050);
@@ -496,26 +383,42 @@ body {
 
 .upload-panel {
   background: #F8FAFC;
-  border: 1px dashed #CBD5E1;
-  border-radius: 16px;
-  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .form-footer-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 16px;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
 }
 
-/* ---------- 6. CHECKBOX & TOOLBAR SELECT ALL / HAPUS ---------- */
+/* ---------- 6. KALENDER MINI RINGAN ---------- */
+.kalender-box {
+  background: #FFFFFF !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  box-shadow: none !important;
+}
+.kalender-hari {
+  min-height: 40px !important;
+  border-radius: 6px !important;
+  transition: none !important;
+}
+.kalender-hari:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- 7. SELECT ALL & BULK HAPUS ---------- */
 .custom-checkbox {
-  width: 17px;
-  height: 17px;
-  border-radius: 5px;
+  width: 16px;
+  height: 16px;
   accent-color: var(--blue);
   cursor: pointer;
   flex: none;
@@ -526,11 +429,11 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
-  border: 1px solid #DBEAFE;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid var(--line);
 }
 
 .select-all-pill {
@@ -538,29 +441,23 @@ body {
   align-items: center;
   gap: 8px;
   background: #FFFFFF;
-  border: 1px solid var(--line);
-  padding: 7px 13px;
-  border-radius: 10px;
+  border: 1px solid #CBD5E1;
+  padding: 6px 11px;
+  border-radius: 7px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-  transition: border-color 0.15s ease;
-}
-.select-all-pill:hover {
-  border-color: var(--blue);
 }
 
 .selection-counter {
   display: inline-flex;
   align-items: center;
   font-size: 11px;
-  font-weight: 700;
-  padding: 5px 11px;
-  border-radius: var(--r-pill);
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
   background: #E2E8F0;
   color: var(--ink-soft);
-  transition: all 0.2s ease;
 }
 .selection-counter.has-selection {
   background: var(--blue);
@@ -570,24 +467,21 @@ body {
 .month-select-pill {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  color: #1E40AF;
+  gap: 6px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  color: var(--ink);
   font-family: var(--font);
   font-size: 11px;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: var(--r-pill);
-}
-.month-select-pill:hover {
-  background: #DBEAFE;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
-/* ---------- 7. DAFTAR KELOLA DI TAB EDIT ---------- */
+/* ---------- 8. DAFTAR KELOLA DI TAB EDIT ---------- */
 .bulk-manage-panel {
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 8px;
   background: #FFFFFF;
   overflow: hidden;
 }
@@ -596,17 +490,16 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 14px 18px;
+  gap: 10px;
+  padding: 10px 14px;
   background: #F8FAFC;
   border-bottom: 1px solid var(--line);
 }
 .edit-list-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  transition: background 0.15s ease;
+  gap: 10px;
+  padding: 10px 14px;
 }
 .edit-list-item:hover {
   background: #F8FAFC;
@@ -615,144 +508,116 @@ body {
   background: #EFF6FF;
 }
 .edit-list-item.is-editing {
-  background: #FEF3C7;
+  background: #FEF9C3;
 }
 .item-no-badge {
   font-size: 10px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 6px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
   background: #E2E8F0;
   color: var(--ink-soft);
 }
 .item-day-badge {
   font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
   background: #F1F5F9;
   color: var(--muted);
 }
 .item-photo-badge {
   font-size: 10px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
   background: var(--mint-100);
-  color: #065F46;
+  color: #166534;
 }
 
-/* ---------- 8. TOMBOL AKSI DI TABEL LAPORAN ---------- */
+/* ---------- 9. TOMBOL AKSI TABEL LAPORAN ---------- */
 .table-action-group {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: center;
-  gap: 4px;
+  gap: 3px;
   font-family: var(--font);
 }
 .table-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   font-family: var(--font) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
-  padding: 5px 9px !important;
-  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  border-radius: 5px !important;
   border: 1px solid transparent !important;
   cursor: pointer;
   text-decoration: none !important;
   line-height: 1.2 !important;
   white-space: nowrap;
-  transition: all 0.15s ease;
 }
 .table-action-btn.edit {
   background: #EFF6FF;
   color: #1D4ED8;
   border-color: #BFDBFE !important;
 }
-.table-action-btn.edit:hover {
-  background: #DBEAFE;
-}
 .table-action-btn.delete {
-  background: #FFF1F2;
-  color: #BE123C;
-  border-color: #FECDD3 !important;
-}
-.table-action-btn.delete:hover {
-  background: #FFE4E6;
+  background: #FEF2F2;
+  color: #DC2626;
+  border-color: #FECACA !important;
 }
 .table-action-btn.download {
-  background: #F5F3FF;
-  color: #6D28D9;
-  border-color: #DDD6FE !important;
-}
-.table-action-btn.download:hover {
-  background: #EDE9FE;
+  background: #F8FAFC;
+  color: var(--ink-soft);
+  border-color: #CBD5E1 !important;
 }
 
-/* Highlight baris tabel yang dicentang */
 .area-kertas tr.row-selected td {
   background-color: #EFF6FF !important;
 }
 
-/* Lebar area kertas di layar agar kolom Pilih & Aksi leluasa */
 .area-kertas {
   width: 100% !important;
-  max-width: 860px !important;
-  min-width: 720px !important;
+  max-width: 850px !important;
+  min-width: 700px !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
 }
 
-/* ---------- 9. FLOATING BULK ACTION BAR ---------- */
+/* ---------- 10. FLOATING BULK ACTION BAR ---------- */
 .floating-bulk-inner {
-  background: rgba(15, 23, 42, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
-  padding: 12px 16px;
+  background: #0F172A;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 10px 14px;
   box-shadow: var(--sh-3);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
-.floating-check-badge {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background: var(--blue);
-  color: #FFFFFF;
-  font-weight: 800;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-}
 
-/* ---------- 10. MOBILE BOTTOM NAV ---------- */
+/* ---------- 11. MOBILE BOTTOM NAV ---------- */
 .bottom-nav-shell {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
-  padding: 6px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+  padding: 4px;
   display: flex;
   gap: 4px;
 }
 .nav-item-mobile {
-  border-radius: 12px;
+  border-radius: 8px;
   color: var(--muted);
+  transition: none;
 }
 .nav-item-mobile svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -760,49 +625,40 @@ body {
   stroke-linejoin: round;
 }
 .nav-item-mobile.active {
-  background: var(--blue);
+  background: var(--navy);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.45);
 }
 
-/* ---------- 11. STAT CARD ---------- */
+/* ---------- 12. STAT CARD ---------- */
 .stat-card {
-  border-radius: 16px !important;
+  border-radius: 8px !important;
   background: #FFFFFF !important;
   border: 1px solid var(--line) !important;
-  box-shadow: var(--sh-1) !important;
+  box-shadow: none !important;
 }
 .stat-card .stat-value {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--ink);
+  margin-top: 2px;
 }
 .stat-card .stat-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
 }
 
-/* ---------- 12. RESPONSIVE & PRINT ---------- */
-@media (max-width: 900px) {
-  .journal-intro {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+#toast-box {
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  box-shadow: var(--sh-3) !important;
 }
 
-@media (max-width: 640px) {
-  .site-header-inner {
-    min-height: 62px;
-  }
-  .intro-copy {
-    padding: 20px;
-  }
-  .progress-summary {
-    padding: 18px 20px;
-  }
-  .selection-toolbar {
-    padding: 12px;
+@media (max-width: 767px) {
+  .workspace-bar {
+    display: none;
   }
 }
 
@@ -817,7 +673,6 @@ body {
     min-width: 0 !important;
     max-width: 100% !important;
     border: none !important;
-    box-shadow: none !important;
   }
   .area-kertas tr.row-selected td {
     background-color: transparent !important;
